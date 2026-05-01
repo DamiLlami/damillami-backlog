@@ -1,8 +1,10 @@
 // DamiLlami Backlog — Service Worker
 // Caches the app shell so it works offline after first visit
 
-const CACHE_NAME = 'damillami-backlog-v1';
-const APP_SHELL = [
+
+const APP_VERSION = 'v7'; // change this on every release
+const CACHE_NAME = `'damillami-backlog-${APP_VERSION}`;
+
   './',
   './index.html',
   './manifest.json',
@@ -11,24 +13,33 @@ const APP_SHELL = [
 ];
 
 // On install: pre-cache the app shell
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
+  self.skipWaiting(); // allow update to reach "waiting" faster
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache =>
+      cache.addAll([
+        '/',
+        '/index.html',
+        '/style.css',
+        '/app.js'
+      ])
+    )
   );
 });
 
 // On activate: clean up old caches
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then((keys) =>
+    caches.keys().then(keys =>
       Promise.all(
-        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
       )
     ).then(() => self.clients.claim())
   );
 });
+
 
 // On fetch: cache-first for app shell, network-first for everything else
 // (API calls to api.anthropic.com and Google Fonts will hit the network)
