@@ -103,6 +103,15 @@ Uses Anthropic's API directly from the browser — no Cloudflare functions invol
 1. Get a key at [console.anthropic.com](https://console.anthropic.com)
 2. In the app: **Settings → paste key → pick "Claude API" for either source → Save**
 
+## What's new in v8
+
+- **Cover art thumbnails** on every card (pulled automatically from IGDB / RAWG / OMDb cover images, with placeholder when none available)
+- **Amethyst + amber color palette** (replaces the previous green theme)
+- **Backlog and Played columns now group by media type** with collapsible sections — Games, Movies, TV each get their own group
+- **Show 5 by default per group** with "Show all (N)" expand button — keeps the page short while keeping all data accessible
+- **Inline completion date** on every played card — click the date badge to change it (defaults to today when first marked played)
+- **Two-button add flow** — `+ Backlog` and `+ Played` buttons replace the dropdown + Add button
+
 ## Why are credentials server-side?
 
 IGDB, RAWG, and OMDb all **block direct browser requests** (no CORS). The Pages Functions in `functions/api/` handle calls server-side and add CORS headers, so the browser can reach them safely. Your credentials never touch the browser.
