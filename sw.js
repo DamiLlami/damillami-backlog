@@ -41,6 +41,14 @@ self.addEventListener('activate', event => {
 });
 
 
+// STEP 5 — Allow the app to trigger activation
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+
 // On fetch: cache-first for app shell, network-first for everything else
 // (API calls to api.anthropic.com and Google Fonts will hit the network)
 self.addEventListener('fetch', (event) => {
