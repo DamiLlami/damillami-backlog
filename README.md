@@ -1,21 +1,23 @@
-# DamiLlami Backlog — PWA
+# Dami Media Book — PWA
 
-Your personal video game backlog tracker as an installable Progressive Web App.
+Your personal media tracker — games, movies, and TV shows — as an installable Progressive Web App.
 
 Data is stored in your browser's IndexedDB (a real local database that persists indefinitely). Works fully offline after first load. Install it once and it lives on your device like a native app.
 
 ## What's inside
 
 ```
-damillami-backlog/
+dami-media-book/
 ├── index.html               ← the app
+├── app.js                   ← service worker registration + auto-update banner
 ├── manifest.json            ← PWA config
 ├── sw.js                    ← service worker (offline support)
 ├── netlify.toml             ← Netlify config + URL routing
 ├── netlify/
 │   └── functions/
-│       ├── igdb.js          ← serverless IGDB proxy
-│       └── rawg.js          ← serverless RAWG proxy
+│       ├── igdb.js          ← serverless IGDB proxy (games)
+│       ├── rawg.js          ← serverless RAWG proxy (games)
+│       └── omdb.js          ← serverless OMDb proxy (movies & TV)
 ├── icons/
 │   ├── icon-192.png
 │   ├── icon-512.png
@@ -25,12 +27,12 @@ damillami-backlog/
 
 ## Quick start: deploy to Netlify (free, ~5 min)
 
-PWAs require HTTPS. The bundle is set up to deploy to Netlify with one command, and includes the serverless functions needed for IGDB/RAWG metadata.
+PWAs require HTTPS. The bundle is set up to deploy to Netlify with one command, and includes the serverless functions needed for IGDB/RAWG/OMDb metadata.
 
 ### Easiest path — drag and drop
 
 1. Go to [app.netlify.com/drop](https://app.netlify.com/drop)
-2. Drag the entire `damillami-backlog` folder onto the page
+2. Drag the entire `dami-media-book` folder onto the page
 3. You'll get a live HTTPS URL within seconds (e.g., `silly-otter-1234.netlify.app`)
 4. In Chrome/Edge: click the install icon in the address bar. On iOS Safari: Share → Add to Home Screen.
 
@@ -40,17 +42,16 @@ PWAs require HTTPS. The bundle is set up to deploy to Netlify with one command, 
 2. At [app.netlify.com](https://app.netlify.com), click "Add new site" → "Import existing project" → connect your GitHub repo
 3. Netlify auto-deploys on every commit. Future updates = drag a new file into GitHub, wait 30 seconds, refresh the app.
 
-## Optional: enable auto-metadata
+## Auto-metadata: pick a source per media type
 
-Without auto-metadata, new games are added with no genre/year/platforms — fill them in via the ✎ edit icon. The "↻ Refetch metadata" button can backfill old entries once you've configured a source.
+Settings has two source pickers — one for games, one for movies/TV. Each can be configured independently.
 
-Three options for auto-fill:
+### Games (Settings → 🎮 Games — Source)
 
-### IGDB (best data, free, requires Netlify) — recommended
+#### IGDB — recommended
 
-Industry-standard game database run by Twitch. Best metadata coverage by a wide margin. Free tier: 60,000 requests/month.
+Industry-standard game database run by Twitch. Best metadata coverage. Free tier: 60,000 requests/month.
 
-**Setup:**
 1. Sign in at [dev.twitch.tv/console](https://dev.twitch.tv/console) → "Register Your Application"
    - Name: anything (e.g., "MyBacklog")
    - OAuth Redirect URL: `http://localhost`
@@ -60,37 +61,72 @@ Industry-standard game database run by Twitch. Best metadata coverage by a wide 
    - `TWITCH_CLIENT_ID` = (your client ID)
    - `TWITCH_CLIENT_SECRET` = (your client secret)
 4. **Deploys → Trigger deploy** (so the function picks up the new env vars)
-5. In the app: **Settings → Source → IGDB → Save**
+5. In the app: **Settings → Games — Source → IGDB → Save**
 
-### RAWG.io (good data, free, requires Netlify)
+#### RAWG.io
 
 Simpler API. Decent data, slightly less reliable than IGDB. Free tier: 20,000 requests/month.
 
-**Setup:**
 1. Get a free key at [rawg.io/apidocs](https://rawg.io/apidocs)
 2. In Netlify: add environment variable `RAWG_API_KEY`
 3. Trigger redeploy
-4. In the app: **Settings → Source → RAWG.io → Save**
+4. In the app: **Settings → Games — Source → RAWG.io → Save**
 
-### Claude API (works anywhere, costs cents)
+### Movies & TV (Settings → 🎬 Movies & 📺 TV — Source)
 
-Uses Anthropic's API directly from the browser — no serverless functions needed. Useful if you're hosting somewhere other than Netlify, or just want the simplest setup.
+#### OMDb — recommended
 
-**Setup:**
+Free Open Movie Database with **Rotten Tomatoes scores for movies** and IMDb ratings for everything. Note: OMDb only provides RT scores for movies — TV shows get IMDb rating only (this is a limitation of the OMDb data, not the app).
+
+1. Get a free key at [omdbapi.com/apikey.aspx](https://www.omdbapi.com/apikey.aspx)
+   - Free tier: 1,000 requests/day
+   - Patreon tier: $1/month for 100k requests/day
+2. In Netlify: add environment variable `OMDB_API_KEY`
+3. Trigger redeploy
+4. In the app: **Settings → Movies & TV — Source → OMDb → Save**
+
+### Claude API (works for either, anywhere)
+
+Uses Anthropic's API directly from the browser — no serverless functions needed. Useful if you're hosting somewhere other than Netlify, or if a primary source isn't returning what you need.
+
 1. Get a key at [console.anthropic.com](https://console.anthropic.com)
-2. In the app: **Settings → Source → Claude API → paste key → Save**
+2. In the app: **Settings → paste key → pick "Claude API" for either source → Save**
 
-The key stays only in your browser's IndexedDB and goes only to Anthropic's API. Costs a fraction of a cent per game added.
+The key stays only in your browser's IndexedDB and is sent only to Anthropic's API. Costs a fraction of a cent per item added.
 
-## Why are credentials server-side for IGDB/RAWG?
+## What you get from each source
 
-Both APIs **block direct browser requests** (no CORS support). The serverless functions in `netlify/functions/` handle the calls server-side and add the necessary CORS headers, so the browser can talk to them safely. As a bonus, your API credentials never touch the browser.
+| Source | Genre | Year | Platforms | Summary | RT Score | IMDb |
+|--------|-------|------|-----------|---------|----------|------|
+| IGDB (games) | ✅ | ✅ | ✅ | — | — | — |
+| RAWG (games) | ✅ | ✅ | ✅ | — | — | — |
+| OMDb (movies) | ✅ | ✅ | — | ✅ | ✅ | ✅ |
+| OMDb (TV) | ✅ | ✅ | — | ✅ | — | ✅ |
+| Claude API (any) | ✅ | ✅ | ✅ (games) | ✅ | ✅* | ✅* |
+
+\* Claude estimates RT and IMDb from training data — directional but not always exact. OMDb is the source of truth for verified scores.
+
+## Why are credentials server-side for IGDB/RAWG/OMDb?
+
+All three APIs **block direct browser requests** (no CORS support). The serverless functions in `netlify/functions/` handle calls server-side and add the necessary CORS headers. As a bonus, your API credentials never touch the browser.
 
 If you're hosting on something other than Netlify (Vercel, Cloudflare Pages, etc.), the same functions can be adapted. The cleanest cross-platform option without server work is the Claude API path.
 
+## Features at a glance
+
+- **Three media types** — games, movies, TV — each with its own genre list and metadata source
+- **Auto-metadata** with sync-issue detection (pulsing copper dot on cards that failed to fetch)
+- **Inline rating** (1–10 scale, click without opening a modal)
+- **Click any title** to see the full summary, scores, and source attribution
+- **Two-level filters** — by media type (Games / Movies / TV / All) and by genre
+- **Refresh Metadata** button (top right) — bulk re-fetches everything that's missing data
+- **Offline-first** — works without internet after first load
+- **Auto-update banner** — installed PWAs detect new versions and prompt for refresh
+- **Export/Import backup** — JSON files you can stash anywhere
+
 ## Data backup
 
-Use **Export backup** in the footer regularly. It downloads a JSON file with everything. **Import backup** restores from one. This is your safety net if you switch browsers, clear browser data, or want to move to a different device.
+Use **Export backup** in the footer regularly. It downloads a JSON file with everything. **Import backup** restores from one. This is your safety net if you switch browsers, clear browser data, or move to a different device.
 
 ## Browser support
 
@@ -105,11 +141,13 @@ When new versions are released:
 - **GitHub-based deploy:** replace the changed files in your repo. Netlify auto-rebuilds.
 - **Drag-and-drop deploy:** log into Netlify, find your site, Deploys tab → drag the updated folder. Same URL preserved.
 
-The service worker has a version number that gets bumped with each release — installed PWAs will pick up the update automatically on next open.
+The service worker has a version number (`APP_VERSION` in `sw.js`) that gets bumped with each release — installed PWAs will detect this on next open and show the update banner.
 
 ## Troubleshooting
 
 - **"Service worker registration failed"** — opening from `file://`. Use a local server or deploy to HTTPS.
-- **"IGDB credentials not configured on server"** — env vars not set in Netlify, or you didn't redeploy after setting them. Check Site configuration → Environment variables, then Deploys → Trigger deploy.
+- **"OMDb credentials not configured on server"** — env var not set in Netlify, or you didn't redeploy after setting it.
+- **TV show has no RT score** — expected. OMDb only returns RT for movies. The app shows IMDb rating instead.
+- **Sync dot keeps appearing** — title may be misspelled or too obscure for the source. Click the dot for retry/fill-in options, or try a different source.
 - **Data disappeared after browser update** — keep an exported backup; browsers occasionally clear "uncommitted" storage.
 - **Install button doesn't appear** — already installed, or your browser doesn't support PWA install.
