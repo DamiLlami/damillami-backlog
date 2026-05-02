@@ -18,38 +18,42 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* Foundation — deep, layered blacks */
-    --bg: #050807;
-    --bg-deep: #020403;
-    --bg-elevated: #0A1310;
-    --surface: #0E1A16;
-    --surface-hover: #14241E;
-    --border: #1E2E27;
-    --border-strong: #2E443B;
+    /* Foundation — deep, layered blacks (unchanged) */
+    --bg: #060509;
+    --bg-deep: #030206;
+    --bg-elevated: #100C16;
+    --surface: #15101D;
+    --surface-hover: #1F1827;
+    --border: #2A2138;
+    --border-strong: #3D3050;
 
-    /* Text — warm cream with sage undertone */
-    --text: #ECF6EE;
-    --text-muted: #94B1A4;
-    --text-faint: #54695D;
+    /* Text — warm cream with subtle violet undertone */
+    --text: #F0EAF5;
+    --text-muted: #A697B5;
+    --text-faint: #5C5070;
 
-    /* Primary accents — green family */
-    --gold: #95D5B2;        /* mint — primary highlight */
-    --gold-dim: #74C69D;    /* dimmer mint */
-    --sage: #40916C;        /* evergreen — secondary */
-    --sage-dim: #2D6A4F;    /* deep forest */
-    --teal: #4FB3A5;        /* cool teal — depth accent */
+    /* Primary accents — amethyst family (replaces green) */
+    --gold: #C9A4F0;        /* light amethyst — primary highlight */
+    --gold-dim: #B084DC;    /* dimmer amethyst */
+    --sage: #7B5BA8;        /* deep amethyst — secondary */
+    --sage-dim: #5C3F87;    /* darker plum */
+    --teal: #9F7DCC;        /* medium violet — depth accent */
 
-    /* Warm complementary — used sparingly for emphasis & contrast */
-    --copper: #D4A574;      /* warm amber/copper */
-    --copper-dim: #A87E4F;
-    --amber-glow: #E8B17C;
+    /* Warm complementary — amber/copper for emphasis */
+    --copper: #E0B074;      /* warm amber */
+    --copper-dim: #B08856;
+    --amber-glow: #F0C589;
+
+    /* Tertiary accent — dusty rose (used for movies, sparingly elsewhere) */
+    --rose: #D08FA8;
+    --rose-dim: #A86E84;
 
     /* Status / warning */
     --crimson: #E07A5F;
-    --warning: #E8B17C;     /* warm amber for sync warnings */
+    --warning: #E0B074;     /* amber for sync warnings */
 
     --shadow: 0 1px 2px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.4);
-    --shadow-elevated: 0 4px 12px rgba(0,0,0,0.5), 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(149, 213, 178, 0.04);
+    --shadow-elevated: 0 4px 12px rgba(0,0,0,0.5), 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(201, 164, 240, 0.04);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -76,11 +80,11 @@
     position: fixed;
     inset: 0;
     background:
-      radial-gradient(ellipse 80% 50% at 15% 0%, rgba(149, 213, 178, 0.10), transparent 60%),
-      radial-gradient(ellipse 60% 40% at 85% 20%, rgba(79, 179, 165, 0.08), transparent 60%),
-      radial-gradient(ellipse 70% 50% at 50% 100%, rgba(64, 145, 108, 0.10), transparent 60%),
-      radial-gradient(ellipse 40% 30% at 90% 90%, rgba(212, 165, 116, 0.06), transparent 60%),
-      linear-gradient(180deg, rgba(5, 8, 7, 0.4) 0%, rgba(2, 4, 3, 1) 100%);
+      radial-gradient(ellipse 80% 50% at 15% 0%, rgba(201, 164, 240, 0.10), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 85% 20%, rgba(159, 125, 204, 0.10), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 50% 100%, rgba(123, 91, 168, 0.12), transparent 60%),
+      radial-gradient(ellipse 40% 30% at 90% 90%, rgba(224, 176, 116, 0.07), transparent 60%),
+      linear-gradient(180deg, rgba(6, 5, 9, 0.4) 0%, rgba(3, 2, 6, 1) 100%);
     pointer-events: none;
     z-index: 0;
   }
@@ -90,7 +94,7 @@
     content: '';
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0.6 0 0 0 0 0.84 0 0 0 0 0.7 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0.79 0 0 0 0 0.64 0 0 0 0 0.94 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
     opacity: 0.06;
     pointer-events: none;
     mix-blend-mode: overlay;
@@ -196,7 +200,7 @@
     color: var(--text);
     border-color: var(--gold-dim);
     background: linear-gradient(135deg, var(--surface-hover) 0%, var(--surface) 100%);
-    box-shadow: 0 0 16px rgba(149, 213, 178, 0.12);
+    box-shadow: 0 0 16px rgba(201, 164, 240, 0.12);
   }
 
   .refresh-meta-btn:disabled {
@@ -420,6 +424,40 @@
   .btn:hover { background: #fff; transform: translateY(-1px); }
   .btn:active { transform: translateY(0); }
 
+  /* Two add buttons — backlog (cool/dim) vs played (warm/highlighted) */
+  .btn-add-backlog {
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dim) 100%);
+    color: var(--text);
+    border: 1px solid var(--sage-dim);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  }
+  .btn-add-backlog:hover {
+    background: linear-gradient(135deg, var(--gold-dim) 0%, var(--sage) 100%);
+    color: var(--bg);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(123, 91, 168, 0.35);
+  }
+
+  .btn-add-played {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+    color: var(--bg);
+    border: 1px solid var(--gold);
+    font-weight: 600;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 0 12px rgba(201, 164, 240, 0.18);
+  }
+  .btn-add-played:hover {
+    background: linear-gradient(135deg, #DCC0F5 0%, var(--gold) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 4px 20px rgba(201, 164, 240, 0.45);
+  }
+
+  .btn-add-backlog:disabled,
+  .btn-add-played:disabled {
+    opacity: 0.5;
+    cursor: wait;
+    transform: none;
+  }
+
   .btn-ghost {
     background: transparent;
     color: var(--text-muted);
@@ -491,15 +529,15 @@
   }
 
   .type-chip[data-type="movie"].active {
-    background: var(--copper);
+    background: var(--rose);
     color: var(--bg);
-    border-color: var(--copper);
+    border-color: var(--rose);
   }
 
   .type-chip[data-type="tv"].active {
-    background: var(--teal);
+    background: var(--copper);
     color: var(--bg);
-    border-color: var(--teal);
+    border-color: var(--copper);
   }
 
   .genre-filter:empty { display: none; }
@@ -519,9 +557,9 @@
     border: 1px solid;
   }
 
-  .media-badge.game  { color: var(--gold);   border-color: rgba(149, 213, 178, 0.35); background: rgba(149, 213, 178, 0.08); }
-  .media-badge.movie { color: var(--copper); border-color: rgba(212, 165, 116, 0.4);  background: rgba(212, 165, 116, 0.10); }
-  .media-badge.tv    { color: var(--teal);   border-color: rgba(79, 179, 165, 0.4);   background: rgba(79, 179, 165, 0.10); }
+  .media-badge.game  { color: var(--gold);   border-color: rgba(201, 164, 240, 0.35); background: rgba(201, 164, 240, 0.08); }
+  .media-badge.movie { color: var(--rose);   border-color: rgba(208, 143, 168, 0.4);  background: rgba(208, 143, 168, 0.10); }
+  .media-badge.tv    { color: var(--copper); border-color: rgba(224, 176, 116, 0.4);  background: rgba(224, 176, 116, 0.10); }
 
   /* --- Rotten Tomatoes score chip --- */
   .rt-score {
@@ -675,27 +713,32 @@
   }
 
   /* --- Columns --- */
+  /* Top-level columns container — single column on mobile/narrow, two columns wide */
   .columns {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  @media (min-width: 1100px) {
+    .columns { grid-template-columns: 1fr 1fr; gap: 40px; }
   }
 
   @media (max-width: 880px) {
-    .columns { grid-template-columns: 1fr; }
     .add-bar { grid-template-columns: 1fr; }
     .container { padding: 32px 20px 60px; }
   }
 
   .column {
-    min-height: 200px;
+    min-height: 100px;
   }
 
+  /* Top-of-column header (Backlog / Played) */
   .column-header {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    padding-bottom: 16px;
+    padding-bottom: 14px;
     margin-bottom: 16px;
     border-bottom: 1px solid var(--border);
   }
@@ -703,7 +746,7 @@
   .column-title {
     font-family: 'Fraunces', serif;
     font-weight: 400;
-    font-size: 24px;
+    font-size: 26px;
     letter-spacing: -0.01em;
     display: flex;
     align-items: center;
@@ -711,8 +754,8 @@
   }
 
   .column-title .dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     display: inline-block;
   }
@@ -725,6 +768,93 @@
     font-size: 12px;
     color: var(--text-faint);
     letter-spacing: 0.1em;
+  }
+
+  /* Sub-section groups inside a column (e.g., 🎮 Games, 🎬 Movies) */
+  .group-section {
+    margin-bottom: 22px;
+  }
+
+  .group-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--surface) 0%, transparent 100%);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .group-header:hover {
+    background: linear-gradient(90deg, var(--surface-hover) 0%, transparent 100%);
+  }
+
+  .group-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .group-title .group-icon {
+    font-size: 14px;
+  }
+
+  .group-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+  }
+
+  .group-toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    transition: transform 0.2s;
+  }
+
+  .group-section.collapsed .group-toggle {
+    transform: rotate(-90deg);
+  }
+
+  .group-section.collapsed .card-list {
+    display: none;
+  }
+
+  /* "Show all" / "Show less" button */
+  .show-more-btn {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px dashed var(--border-strong);
+    color: var(--text-muted);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .show-more-btn:hover {
+    border-color: var(--gold-dim);
+    color: var(--text);
+    background: rgba(201, 164, 240, 0.04);
   }
 
   /* --- Cards --- */
@@ -752,14 +882,14 @@
   .card.played {
     border-left-color: var(--gold);
     background:
-      linear-gradient(135deg, rgba(149, 213, 178, 0.06) 0%, transparent 40%),
+      linear-gradient(135deg, rgba(201, 164, 240, 0.06) 0%, transparent 40%),
       linear-gradient(135deg, var(--bg-elevated) 0%, rgba(14, 26, 22, 0.7) 100%);
   }
 
   .card.backlog {
     border-left-color: var(--sage);
     background:
-      linear-gradient(135deg, rgba(64, 145, 108, 0.08) 0%, transparent 40%),
+      linear-gradient(135deg, rgba(123, 91, 168, 0.08) 0%, transparent 40%),
       linear-gradient(135deg, var(--bg-elevated) 0%, rgba(14, 26, 22, 0.7) 100%);
   }
 
@@ -799,13 +929,13 @@
 
   .card.played:hover {
     background:
-      linear-gradient(135deg, rgba(149, 213, 178, 0.12) 0%, transparent 40%),
+      linear-gradient(135deg, rgba(201, 164, 240, 0.12) 0%, transparent 40%),
       linear-gradient(135deg, var(--surface-hover) 0%, var(--bg-elevated) 100%);
   }
 
   .card.backlog:hover {
     background:
-      linear-gradient(135deg, rgba(64, 145, 108, 0.14) 0%, transparent 40%),
+      linear-gradient(135deg, rgba(123, 91, 168, 0.14) 0%, transparent 40%),
       linear-gradient(135deg, var(--surface-hover) 0%, var(--bg-elevated) 100%);
   }
 
@@ -845,12 +975,101 @@
     gap: 12px;
   }
 
+  /* Cover art thumbnail to the left of title */
+  .card-thumb {
+    flex-shrink: 0;
+    width: 56px;
+    height: 80px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Placeholder when no cover art is available */
+  .card-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    background: linear-gradient(135deg, var(--surface) 0%, var(--bg-elevated) 100%);
+    color: var(--text-faint);
+  }
+
+  .card-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
   .card-title {
     font-family: 'Fraunces', serif;
     font-weight: 400;
     font-size: 18px;
     letter-spacing: -0.005em;
     line-height: 1.3;
+  }
+
+  /* Completion date badge — only shown on played cards */
+  .completion-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .completion-date:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: rgba(201, 164, 240, 0.06);
+  }
+
+  .completion-date .cal-icon {
+    font-size: 11px;
+  }
+
+  .completion-date.empty {
+    color: var(--text-faint);
+    font-style: italic;
+  }
+
+  /* Inline date input that replaces the badge when editing */
+  .completion-date-input {
+    background: var(--surface);
+    border: 1px solid var(--gold-dim);
+    color: var(--text);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color-scheme: dark;
+  }
+
+  .completion-date-input:focus {
+    outline: none;
+    border-color: var(--gold);
   }
 
   .card-meta {
@@ -868,15 +1087,15 @@
     text-transform: uppercase;
     padding: 3px 8px;
     border-radius: 4px;
-    background: rgba(149, 213, 178, 0.1);
+    background: rgba(201, 164, 240, 0.1);
     color: var(--gold);
-    border: 1px solid rgba(149, 213, 178, 0.25);
+    border: 1px solid rgba(201, 164, 240, 0.25);
   }
 
   .column.backlog .genre-tag {
-    background: rgba(64, 145, 108, 0.18);
+    background: rgba(123, 91, 168, 0.18);
     color: var(--gold-dim);
-    border-color: rgba(64, 145, 108, 0.4);
+    border-color: rgba(123, 91, 168, 0.4);
   }
 
   .rating {
@@ -1252,7 +1471,7 @@
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
     border-color: var(--gold);
     color: var(--bg);
-    box-shadow: 0 0 12px rgba(149, 213, 178, 0.4);
+    box-shadow: 0 0 12px rgba(201, 164, 240, 0.4);
   }
 
   .inline-rating-clear {
@@ -1392,7 +1611,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 24px rgba(149, 213, 178, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 24px rgba(201, 164, 240, 0.15);
     z-index: 250;
     transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
     max-width: calc(100vw - 32px);
@@ -1479,11 +1698,8 @@
       <option value="movie">🎬 Movie</option>
       <option value="tv">📺 TV Show</option>
     </select>
-    <select id="statusInput">
-      <option value="backlog">Add to Backlog</option>
-      <option value="played">Mark as Played</option>
-    </select>
-    <button type="submit" class="btn" id="submitBtn">Add</button>
+    <button type="submit" class="btn btn-add-backlog" data-status="backlog" id="submitBacklogBtn">+ Backlog</button>
+    <button type="submit" class="btn btn-add-played" data-status="played" id="submitPlayedBtn">+ Played</button>
   </form>
 
   <div class="toolbar">
@@ -1500,23 +1716,8 @@
     </div>
   </div>
 
-  <div class="columns">
-    <section class="column backlog">
-      <div class="column-header">
-        <div class="column-title"><span class="dot"></span>Backlog</div>
-        <div class="column-count" id="backlogColCount">0 games</div>
-      </div>
-      <div class="card-list" id="backlogList"></div>
-    </section>
-
-    <section class="column played">
-      <div class="column-header">
-        <div class="column-title"><span class="dot"></span>Played</div>
-        <div class="column-count" id="playedColCount">0 games</div>
-      </div>
-      <div class="card-list" id="playedList"></div>
-    </section>
-  </div>
+  <!-- The columns are dynamically rendered into here based on type filter and grouping -->
+  <div class="columns" id="columnsRoot"></div>
 
   <footer class="footer">
     <div>Auto-saves on every change · <span id="lastSaved">never saved</span></div>
@@ -1590,6 +1791,12 @@
     <!-- All types: summary -->
     <label>Summary</label>
     <textarea id="editSummary" rows="3" placeholder="Brief plot or description…"></textarea>
+
+    <!-- Played-only: completion date -->
+    <div id="editCompletionRow" style="display:none;">
+      <label>Completion Date</label>
+      <input type="date" id="editCompletionDate" style="color-scheme: dark;">
+    </div>
 
     <label>Personal Rating (played only) — 1 to 10</label>
     <div class="rating-input" id="ratingInput">
@@ -1892,6 +2099,12 @@
   }
 
   // --- Render ---
+  // Tracks which groups are collapsed and which are showing all items
+  // Keys are like "backlog:game", "played:movie", etc.
+  const collapsedGroups = new Set(); // groups the user has manually collapsed
+  const expandedGroups = new Set();  // groups where user clicked "Show all"
+  const DEFAULT_VISIBLE_PER_GROUP = 15;
+
   function render() {
     const genreFilter = state.filter;
     const typeFilter = state.typeFilter || 'all';
@@ -1907,31 +2120,153 @@
     const backlog = filtered.filter(g => g.status === 'backlog');
     const played = filtered.filter(g => g.status === 'played');
 
-    // Sort: most recent additions first for backlog; highest rated first for played
-    backlog.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
-    played.sort((a, b) => (b.rating || 0) - (a.rating || 0) || (b.completedAt || 0) - (a.completedAt || 0));
+    // Build the two columns
+    const root = document.getElementById('columnsRoot');
+    root.innerHTML = `
+      <section class="column backlog">
+        <div class="column-header">
+          <div class="column-title"><span class="dot"></span>Backlog</div>
+          <div class="column-count">${backlog.length} ${backlog.length === 1 ? 'item' : 'items'}</div>
+        </div>
+        ${renderGroupedSections(backlog, 'backlog')}
+      </section>
+      <section class="column played">
+        <div class="column-header">
+          <div class="column-title"><span class="dot"></span>Played</div>
+          <div class="column-count">${played.length} ${played.length === 1 ? 'item' : 'items'}</div>
+        </div>
+        ${renderGroupedSections(played, 'played')}
+      </section>
+    `;
 
-    document.getElementById('backlogList').innerHTML = backlog.length
-      ? backlog.map(renderCard).join('')
-      : emptyState('backlog');
-
-    document.getElementById('playedList').innerHTML = played.length
-      ? played.map(renderCard).join('')
-      : emptyState('played');
-
-    // Stats (always show full totals, not filtered)
+    // Stats (always full totals, not filtered)
     const allBacklog = state.games.filter(g => g.status === 'backlog').length;
     const allPlayed = state.games.filter(g => g.status === 'played').length;
     document.getElementById('backlogCount').textContent = allBacklog;
     document.getElementById('playedCount').textContent = allPlayed;
     document.getElementById('totalCount').textContent = state.games.length;
-    document.getElementById('backlogColCount').textContent = `${backlog.length} ${backlog.length === 1 ? 'game' : 'games'}`;
-    document.getElementById('playedColCount').textContent = `${played.length} ${played.length === 1 ? 'game' : 'games'}`;
 
-    // Attach card event listeners
+    // Attach event listeners
     document.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', handleCardAction);
     });
+    document.querySelectorAll('[data-group-action]').forEach(btn => {
+      btn.addEventListener('click', handleGroupAction);
+    });
+    // Wire up date inputs that exist (when user clicks a date badge to edit it)
+    document.querySelectorAll('.completion-date-input').forEach(input => {
+      input.addEventListener('change', handleDateChange);
+      input.addEventListener('blur', handleDateBlur);
+    });
+  }
+
+  // Render a column (backlog OR played) as one or more grouped sections
+  // by media type. If type filter is set to something specific, render
+  // a single flat list (no grouping).
+  function renderGroupedSections(items, columnType) {
+    if (items.length === 0) {
+      return emptyState(columnType);
+    }
+
+    const typeFilter = state.typeFilter || 'all';
+
+    // If a single media type is selected, no need to group
+    if (typeFilter !== 'all') {
+      const sorted = sortItems(items, columnType);
+      const groupKey = `${columnType}:${typeFilter}`;
+      return renderGroupSection(sorted, columnType, typeFilter, groupKey, false);
+    }
+
+    // Group by media type, keep section ordering: games → movies → tv
+    const order = ['game', 'movie', 'tv'];
+    const groups = { game: [], movie: [], tv: [] };
+    for (const item of items) {
+      const mt = item.mediaType || 'game';
+      (groups[mt] || groups.game).push(item);
+    }
+    const sections = [];
+    for (const mt of order) {
+      if (groups[mt].length === 0) continue;
+      const sorted = sortItems(groups[mt], columnType);
+      const groupKey = `${columnType}:${mt}`;
+      sections.push(renderGroupSection(sorted, columnType, mt, groupKey, true));
+    }
+    return sections.join('');
+  }
+
+  function sortItems(items, columnType) {
+    const arr = items.slice();
+    if (columnType === 'backlog') {
+      // newest first
+      arr.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+    } else {
+      // played: most recently completed first, then by rating
+      arr.sort((a, b) =>
+        (b.completedAt || 0) - (a.completedAt || 0) ||
+        (b.rating || 0) - (a.rating || 0)
+      );
+    }
+    return arr;
+  }
+
+  function renderGroupSection(items, columnType, mediaType, groupKey, showHeader) {
+    const isCollapsed = collapsedGroups.has(groupKey);
+    const isExpanded = expandedGroups.has(groupKey);
+    const total = items.length;
+    const visible = isExpanded ? total : Math.min(DEFAULT_VISIBLE_PER_GROUP, total);
+    const slice = items.slice(0, visible);
+
+    let header = '';
+    if (showHeader) {
+      const icon = ({ game: '🎮', movie: '🎬', tv: '📺' })[mediaType] || '🎮';
+      const label = ({ game: 'Games', movie: 'Movies', tv: 'TV Shows' })[mediaType] || 'Items';
+      header = `
+        <div class="group-header" data-group-action="toggle-collapse" data-group="${groupKey}">
+          <div class="group-title"><span class="group-icon">${icon}</span>${label}</div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="group-count">${total} ${total === 1 ? 'item' : 'items'}</span>
+            <span class="group-toggle">▾</span>
+          </div>
+        </div>
+      `;
+    }
+
+    const cardsHtml = slice.map(renderCard).join('');
+
+    let showMore = '';
+    if (total > DEFAULT_VISIBLE_PER_GROUP && !isCollapsed) {
+      if (isExpanded) {
+        showMore = `<button class="show-more-btn" data-group-action="show-less" data-group="${groupKey}">Show less ↑</button>`;
+      } else {
+        const hidden = total - DEFAULT_VISIBLE_PER_GROUP;
+        showMore = `<button class="show-more-btn" data-group-action="show-all" data-group="${groupKey}">Show ${hidden} more ↓</button>`;
+      }
+    }
+
+    return `
+      <div class="group-section${isCollapsed ? ' collapsed' : ''}">
+        ${header}
+        <div class="card-list">
+          ${cardsHtml}
+        </div>
+        ${showMore}
+      </div>
+    `;
+  }
+
+  function handleGroupAction(e) {
+    const action = e.currentTarget.dataset.groupAction;
+    const groupKey = e.currentTarget.dataset.group;
+    if (action === 'toggle-collapse') {
+      // Don't toggle if user clicked on the toggle area while editing date — guard via stopPropagation
+      if (collapsedGroups.has(groupKey)) collapsedGroups.delete(groupKey);
+      else collapsedGroups.add(groupKey);
+    } else if (action === 'show-all') {
+      expandedGroups.add(groupKey);
+    } else if (action === 'show-less') {
+      expandedGroups.delete(groupKey);
+    }
+    render();
   }
 
   function escapeHtml(s) {
@@ -2028,6 +2363,39 @@
     if (imdbHtml) metaParts.push(imdbHtml);
     if (platformsHtml) metaParts.push(platformsHtml);
 
+    // Completion date (played items only)
+    let completionDateHtml = '';
+    if (isPlayed) {
+      const editingDate = g._editingDate; // transient flag
+      if (editingDate) {
+        const dateStr = g.completedAt ? new Date(g.completedAt).toISOString().slice(0, 10) : '';
+        completionDateHtml = `
+          <input
+            type="date"
+            class="completion-date-input"
+            data-id="${g.id}"
+            value="${dateStr}"
+            autofocus
+          />
+        `;
+      } else if (g.completedAt) {
+        const d = new Date(g.completedAt);
+        const formatted = `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}/${d.getFullYear()}`;
+        completionDateHtml = `
+          <button class="completion-date" data-action="edit-date" data-id="${g.id}" title="Edit completion date">
+            <span class="cal-icon">📅</span>${formatted}
+          </button>
+        `;
+      } else {
+        completionDateHtml = `
+          <button class="completion-date empty" data-action="edit-date" data-id="${g.id}" title="Set completion date">
+            <span class="cal-icon">📅</span>Set date
+          </button>
+        `;
+      }
+      metaParts.push(completionDateHtml);
+    }
+
     // Sync issue indicator
     let syncDotHtml = '';
     if (g.syncIssue && !g.classifying) {
@@ -2056,11 +2424,28 @@
       `;
     }
 
+    // Cover art thumbnail
+    let thumbHtml = '';
+    if (g.coverUrl) {
+      thumbHtml = `
+        <div class="card-thumb">
+          <img src="${escapeHtml(g.coverUrl)}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'card-thumb-placeholder\\'>${mediaIcon}</div>';"/>
+        </div>
+      `;
+    } else {
+      thumbHtml = `
+        <div class="card-thumb">
+          <div class="card-thumb-placeholder">${mediaIcon}</div>
+        </div>
+      `;
+    }
+
     return `
       <article class="card ${g.status}${classifyingClass}">
         ${syncDotHtml}
         <div class="card-top">
-          <div style="flex:1; min-width:0;">
+          ${thumbHtml}
+          <div class="card-content">
             <div class="${titleClass}" ${titleAttrs}>${escapeHtml(g.title)}</div>
             <div class="card-meta">
               ${metaParts.join('')}
@@ -2150,7 +2535,56 @@
       retrySingleSync(game);
     } else if (action === 'details') {
       openDetailsModal(game);
+    } else if (action === 'edit-date') {
+      // Mark this game as in date-edit mode and re-render
+      // The transient _editingDate flag is not persisted to storage
+      e.stopPropagation();
+      // Clear any other in-progress edits
+      state.games.forEach(g2 => { if (g2._editingDate) delete g2._editingDate; });
+      game._editingDate = true;
+      render();
+      // Focus and open the date picker on the freshly-rendered input
+      setTimeout(() => {
+        const input = document.querySelector(`.completion-date-input[data-id="${game.id}"]`);
+        if (input) {
+          input.focus();
+          // showPicker() opens the native calendar UI on supported browsers
+          if (typeof input.showPicker === 'function') {
+            try { input.showPicker(); } catch (e) { /* not all browsers allow this */ }
+          }
+        }
+      }, 0);
     }
+  }
+
+  // Handle native date input change — save the new completion date
+  function handleDateChange(e) {
+    const id = e.currentTarget.dataset.id;
+    const game = state.games.find(g => g.id === id);
+    if (!game) return;
+    const value = e.currentTarget.value; // YYYY-MM-DD
+    if (value) {
+      // Parse as local-timezone date at noon to avoid DST/UTC edge cases
+      const [y, m, d] = value.split('-').map(n => parseInt(n));
+      game.completedAt = new Date(y, m - 1, d, 12, 0, 0).getTime();
+    }
+    delete game._editingDate;
+    saveState();
+    render();
+  }
+
+  function handleDateBlur(e) {
+    // If user navigated away without picking, exit edit mode
+    const id = e.currentTarget.dataset.id;
+    const game = state.games.find(g => g.id === id);
+    if (!game) return;
+    // Slight delay so a "change" event can land first
+    setTimeout(() => {
+      if (game._editingDate) {
+        delete game._editingDate;
+        render();
+      }
+    }, 200);
   }
 
   // Close any open sync tooltips when clicking elsewhere
@@ -2194,6 +2628,8 @@
     else if (info.imdbRating === null) delete game.imdbRating;
     if (typeof info.totalSeasons === 'number') game.totalSeasons = info.totalSeasons;
     else if (info.totalSeasons === null) delete game.totalSeasons;
+    if (typeof info.coverUrl === 'string' && info.coverUrl) game.coverUrl = info.coverUrl;
+    else if (info.coverUrl === null) delete game.coverUrl;
     if (info.sourceLabel) game.sourceLabel = info.sourceLabel;
     if (info.syncStatus === 'failed' || info.syncStatus === 'error') {
       game.syncIssue = info.syncStatus;
@@ -2431,7 +2867,7 @@
       ? new Date(best.first_release_date * 1000).getFullYear()
       : null;
 
-    return { genre, year, platforms, sourceLabel: 'IGDB' };
+    return { genre, year, platforms, coverUrl: best.coverUrl || null, sourceLabel: 'IGDB' };
   }
 
   // ---- RAWG ----
@@ -2498,7 +2934,13 @@
 
     const year = best.released ? parseInt(best.released.substring(0, 4)) : null;
 
-    return { genre, year, platforms: platforms.length ? platforms : [], sourceLabel: 'RAWG.io' };
+    return {
+      genre,
+      year,
+      platforms: platforms.length ? platforms : [],
+      coverUrl: best.background_image || null,
+      sourceLabel: 'RAWG.io'
+    };
   }
 
   // ---- Claude API (legacy/fallback) ----
@@ -2632,19 +3074,26 @@ Return ONLY the JSON object, nothing else.`;
       rtScore,
       imdbRating,
       totalSeasons,
+      coverUrl: (data.Poster && data.Poster !== 'N/A') ? data.Poster : null,
       sourceLabel: 'OMDb / IMDb'
     };
   }
 
   // --- Add form ---
+  // Track which add button was clicked (form submitter) so we know status
+  let pendingAddStatus = 'backlog';
+  document.getElementById('submitBacklogBtn').addEventListener('click', () => { pendingAddStatus = 'backlog'; });
+  document.getElementById('submitPlayedBtn').addEventListener('click', () => { pendingAddStatus = 'played'; });
+
   document.getElementById('addForm').addEventListener('submit', async e => {
     e.preventDefault();
     const titleInput = document.getElementById('titleInput');
-    const submitBtn = document.getElementById('submitBtn');
+    const backlogBtn = document.getElementById('submitBacklogBtn');
+    const playedBtn = document.getElementById('submitPlayedBtn');
     const title = titleInput.value.trim();
     if (!title) return;
 
-    const status = document.getElementById('statusInput').value;
+    const status = pendingAddStatus || 'backlog';
     const mediaType = document.getElementById('mediaTypeInput').value || 'game';
     const newGame = {
       id: 'g_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
@@ -2664,7 +3113,8 @@ Return ONLY the JSON object, nothing else.`;
     render();
     titleInput.value = '';
     titleInput.focus();
-    submitBtn.disabled = true;
+    backlogBtn.disabled = true;
+    playedBtn.disabled = true;
 
     // Classify in background using the right source for this media type
     const info = await classifyGame(title, mediaType);
@@ -2675,7 +3125,8 @@ Return ONLY the JSON object, nothing else.`;
       saveState();
       render();
     }
-    submitBtn.disabled = false;
+    backlogBtn.disabled = false;
+    playedBtn.disabled = false;
   });
 
   // --- Filter chips ---
@@ -2773,6 +3224,18 @@ Return ONLY the JSON object, nothing else.`;
     const gamePlatforms = game.platforms || [];
     checkboxes.forEach(cb => { cb.checked = gamePlatforms.includes(cb.value); });
 
+    // Completion date (only for played items)
+    const completionRow = document.getElementById('editCompletionRow');
+    if (game.status === 'played') {
+      completionRow.style.display = 'block';
+      const dateInput = document.getElementById('editCompletionDate');
+      dateInput.value = game.completedAt
+        ? new Date(game.completedAt).toISOString().slice(0, 10)
+        : '';
+    } else {
+      completionRow.style.display = 'none';
+    }
+
     updateRatingDisplay();
     document.getElementById('modalBackdrop').classList.add('show');
   }
@@ -2847,6 +3310,17 @@ Return ONLY the JSON object, nothing else.`;
 
     game.summary = document.getElementById('editSummary').value.trim();
     if (!game.summary) delete game.summary;
+
+    // Completion date (played only)
+    if (game.status === 'played') {
+      const dateVal = document.getElementById('editCompletionDate').value;
+      if (dateVal) {
+        const [y, m, d] = dateVal.split('-').map(n => parseInt(n));
+        game.completedAt = new Date(y, m - 1, d, 12, 0, 0).getTime();
+      } else {
+        delete game.completedAt;
+      }
+    }
 
     game.rating = editingRating;
     game.notes = document.getElementById('editNotes').value.trim();
@@ -3046,6 +3520,7 @@ Return ONLY the JSON object, nothing else.`;
       rtScore: (typeof g.rtScore === 'number') ? g.rtScore : undefined,
       imdbRating: (typeof g.imdbRating === 'number') ? g.imdbRating : undefined,
       totalSeasons: (typeof g.totalSeasons === 'number') ? g.totalSeasons : undefined,
+      coverUrl: typeof g.coverUrl === 'string' ? g.coverUrl : undefined,
       sourceLabel: typeof g.sourceLabel === 'string' ? g.sourceLabel : undefined,
       status: (g.status === 'played') ? 'played' : 'backlog',
       rating: (typeof g.rating === 'number' && g.rating >= 0 && g.rating <= 10) ? g.rating : 0,
