@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DamiLlami Backlog</title>
+<meta name="description" content="Personal video game backlog tracker">
+<meta name="theme-color" content="#020403">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DamiLlami">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="app.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #020403;
+    --bg-elevated: #060D0A;
+    --surface: #0B1612;
+    --surface-hover: #102018;
+    --border: #1A2A22;
+    --border-strong: #2C4036;
+    --text: #EAF5EE;
+    --text-muted: #92AC9F;
+    --text-faint: #4F6359;
+    --gold: #95D5B2;
+    --gold-dim: #74C69D;
+    --sage: #40916C;
+    --sage-dim: #2D6A4F;
+    --crimson: #E07A5F;
+    --shadow: 0 1px 2px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geist', -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 20% 0%, rgba(149, 213, 178, 0.05), transparent 50%),
+      radial-gradient(circle at 80% 100%, rgba(64, 145, 108, 0.08), transparent 50%),
+      var(--bg);
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* --- Header --- */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .title-block .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 8px;
+  }
+
+  .title-block h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(36px, 5.5vw, 58px);
+    line-height: 1;
+    letter-spacing: -0.018em;
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+  }
+
+  .title-block h1 em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .stats {
+    display: flex;
+    gap: 32px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .stat-num {
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-num.gold { color: var(--gold); }
+  .stat-num.sage { color: var(--sage); }
+
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  /* --- Add form --- */
+  .add-bar {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .add-hint {
+    grid-column: 1 / -1;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    margin-top: -4px;
+  }
+
+  .add-bar input,
+  .add-bar select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+
+  .add-bar input:focus,
+  .add-bar select:focus {
+    outline: none;
+    border-color: var(--gold-dim);
+  }
+
+  .add-bar input::placeholder { color: var(--text-faint); }
+
+  .btn {
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn:hover { background: #fff; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover {
+    background: var(--surface);
+    color: var(--text);
+    transform: none;
+  }
+
+  /* --- Toolbar --- */
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .filter-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .chip:hover { color: var(--text); border-color: var(--border-strong); }
+
+  .chip.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+
+  .toolbar-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* --- Columns --- */
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  @media (max-width: 880px) {
+    .columns { grid-template-columns: 1fr; }
+    .add-bar { grid-template-columns: 1fr; }
+    .container { padding: 32px 20px 60px; }
+  }
+
+  .column {
+    min-height: 200px;
+  }
+
+  .column-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .column-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .column-title .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .column.backlog .dot { background: var(--sage); }
+  .column.played .dot { background: var(--gold); }
+
+  .column-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+  }
+
+  /* --- Cards --- */
+  .card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 16px 18px 16px 22px;
+    transition: all 0.2s;
+    position: relative;
+    animation: slideIn 0.3s ease-out;
+    overflow: hidden;
+  }
+
+  .card.played {
+    border-left-color: var(--gold);
+    background:
+      linear-gradient(to right, rgba(149, 213, 178, 0.08), transparent 30%),
+      var(--bg-elevated);
+  }
+
+  .card.backlog {
+    border-left-color: var(--sage);
+    background:
+      linear-gradient(to right, rgba(64, 145, 108, 0.12), transparent 30%),
+      var(--bg-elevated);
+  }
+
+  .card.classifying {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .card.classifying::after {
+    content: 'Classifying…';
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card:hover {
+    border-color: var(--border-strong);
+  }
+
+  .card.played:hover { background: linear-gradient(to right, rgba(149, 213, 178, 0.14), transparent 30%), var(--surface); }
+  .card.backlog:hover { background: linear-gradient(to right, rgba(64, 145, 108, 0.18), transparent 30%), var(--surface); }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .status-badge.played {
+    background: var(--gold);
+    color: var(--bg);
+  }
+
+  .status-badge.backlog {
+    background: var(--sage);
+    color: var(--text);
+    border: 1px solid var(--sage-dim);
+  }
+
+  .status-badge .check {
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .card-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 18px;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+
+  .genre-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(149, 213, 178, 0.1);
+    color: var(--gold);
+    border: 1px solid rgba(149, 213, 178, 0.25);
+  }
+
+  .column.backlog .genre-tag {
+    background: rgba(64, 145, 108, 0.18);
+    color: var(--gold-dim);
+    border-color: rgba(64, 145, 108, 0.4);
+  }
+
+  .rating {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+
+  .rating-num {
+    font-size: 16px;
+    color: var(--gold);
+    letter-spacing: -0.02em;
+  }
+
+  .rating-max {
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.05em;
+  }
+
+  .meta-divider {
+    color: var(--text-faint);
+    font-size: 11px;
+    margin: 0 2px;
+  }
+
+  .meta-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .platform-list {
+    display: inline-flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .platform-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .platform-pill.match {
+    color: var(--text);
+    border-color: var(--border-strong);
+    background: var(--surface-hover);
+  }
+
+  .card-notes {
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.5;
+    border-left: 2px solid var(--border-strong);
+    padding-left: 10px;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .card:hover .card-actions { opacity: 1; }
+
+  .icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-faint);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+  }
+
+  .icon-btn:hover {
+    color: var(--text);
+    background: var(--surface);
+  }
+
+  .icon-btn.danger:hover { color: var(--crimson); }
+  .icon-btn.success:hover { color: var(--gold); }
+
+  /* --- Empty state --- */
+  .empty-state {
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 13px;
+  }
+
+  .empty-state em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 15px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* --- Modal --- */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+
+  .modal-backdrop.show { display: flex; }
+
+  .modal {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    padding: 28px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: var(--shadow);
+  }
+
+  .modal h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  .modal .modal-sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .modal label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+
+  .modal input,
+  .modal select,
+  .modal textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+  }
+
+  .modal input:focus,
+  .modal select:focus,
+  .modal textarea:focus {
+    outline: none;
+    border-color: var(--gold-dim);
+  }
+
+  .rating-input {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .rating-input button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.12s;
+  }
+
+  .rating-input button:hover {
+    border-color: var(--gold-dim);
+    color: var(--text);
+  }
+
+  .rating-input button.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--bg);
+    font-weight: 600;
+  }
+
+  .rating-clear {
+    background: transparent !important;
+    border: 1px dashed var(--border) !important;
+    color: var(--text-faint) !important;
+    width: auto !important;
+    padding: 0 12px;
+    font-size: 10px !important;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-left: 4px;
+  }
+
+  .platform-checkboxes {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .platform-check {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .platform-check input { display: none; }
+
+  .platform-check span {
+    display: inline-block;
+    padding: 6px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    transition: all 0.12s;
+  }
+
+  .platform-check input:checked + span {
+    background: var(--text);
+    border-color: var(--text);
+    color: var(--bg);
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .modal-wide { max-width: 540px; }
+
+  .source-config {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .source-config label:first-child { margin-top: 0; }
+
+  .source-help {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  .source-help ol {
+    margin: 8px 0 0 18px;
+    padding: 0;
+  }
+
+  .source-help li { margin-bottom: 4px; }
+
+  .source-help .code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    background: var(--bg);
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+
+  /* --- Inline rating bar (shown on every card) --- */
+  .inline-rating {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .inline-rating-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    flex-shrink: 0;
+  }
+
+  .inline-rating-pills {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .inline-rating-pill {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .inline-rating-pill:hover {
+    border-color: var(--gold-dim);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+
+  .inline-rating-pill.filled {
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dim) 100%);
+    border-color: var(--sage);
+    color: var(--text);
+  }
+
+  .inline-rating-pill.peak {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+    border-color: var(--gold);
+    color: var(--bg);
+    box-shadow: 0 0 12px rgba(149, 213, 178, 0.4);
+  }
+
+  .inline-rating-clear {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    cursor: pointer;
+    padding: 0 8px;
+    height: 26px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.12s;
+    flex-shrink: 0;
+  }
+
+  .inline-rating-clear:hover {
+    color: var(--crimson);
+    border-color: var(--crimson);
+  }
+
+  .inline-rating-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--gold);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .inline-rating-display .max {
+    color: var(--text-faint);
+    font-weight: 400;
+    font-size: 11px;
+  }
+
+  /* On smaller cards, hide labels to save space */
+  @media (max-width: 600px) {
+    .inline-rating-label { display: none; }
+    .inline-rating-pill { width: 24px; height: 24px; font-size: 10px; }
+  }
+
+  /* --- Loading & toast --- */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    transition: opacity 0.3s;
+  }
+
+  .loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loading-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text);
+    color: var(--bg);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.25s;
+    z-index: 300;
+    pointer-events: none;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* --- Footer --- */
+  .footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.05em;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .footer-actions button {
+    background: transparent;
+    border: none;
+    color: var(--text-faint);
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.15s;
+  }
+
+  /* --- Update banner --- */
+  .update-banner {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: var(--bg-elevated);
+    border: 1px solid var(--gold-dim);
+    border-left: 4px solid var(--gold);
+    border-radius: 10px;
+    padding: 12px 16px 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 24px rgba(149, 213, 178, 0.15);
+    z-index: 250;
+    transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+    max-width: calc(100vw - 32px);
+  }
+
+  .update-banner.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .update-banner span {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .update-banner button {
+    background: var(--gold);
+    color: var(--bg);
+    border: none;
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .update-banner button:hover:not(:disabled) {
+    background: #fff;
+    transform: translateY(-1px);
+  }
+
+  .update-banner button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+</style>
+</head>
+<body>
+
+<div class="update-banner" id="update-banner" hidden>
+  <span>New version available</span>
+  <button id="refresh-btn" type="button">Refresh</button>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-text">Loading backlog…</div>
+</div>
+
+<div class="container">
+  <header class="header">
+    <div class="title-block">
+      <div class="eyebrow">a personal game log</div>
+      <h1>DamiLlami <em>Backlog</em></h1>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num gold" id="playedCount">0</div>
+        <div class="stat-label">Played</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num sage" id="backlogCount">0</div>
+        <div class="stat-label">Backlog</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="totalCount">0</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+  </header>
+
+  <form class="add-bar" id="addForm" autocomplete="off">
+    <input type="text" id="titleInput" placeholder="Game title…" required>
+    <select id="statusInput">
+      <option value="backlog">Add to Backlog</option>
+      <option value="played">Mark as Played</option>
+    </select>
+    <button type="submit" class="btn" id="submitBtn">Add Game</button>
+    <div class="add-hint">Genre is auto-detected — just type the title</div>
+  </form>
+
+  <div class="toolbar">
+    <div class="filter-group" id="filterGroup">
+      <button class="chip active" data-filter="all">All</button>
+      <button class="chip" data-filter="RPG">RPG</button>
+      <button class="chip" data-filter="Indie">Indie</button>
+      <button class="chip" data-filter="Shooter">Shooter</button>
+      <button class="chip" data-filter="Puzzle">Puzzle</button>
+      <button class="chip" data-filter="Strategy">Strategy</button>
+      <button class="chip" data-filter="Coop">Co-op</button>
+      <button class="chip" data-filter="Other">Other</button>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn btn-ghost" id="seedBtn" type="button">Load suggestions</button>
+    </div>
+  </div>
+
+  <div class="columns">
+    <section class="column backlog">
+      <div class="column-header">
+        <div class="column-title"><span class="dot"></span>Backlog</div>
+        <div class="column-count" id="backlogColCount">0 games</div>
+      </div>
+      <div class="card-list" id="backlogList"></div>
+    </section>
+
+    <section class="column played">
+      <div class="column-header">
+        <div class="column-title"><span class="dot"></span>Played</div>
+        <div class="column-count" id="playedColCount">0 games</div>
+      </div>
+      <div class="card-list" id="playedList"></div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <div>Auto-saves on every change · <span id="lastSaved">never saved</span></div>
+    <div class="footer-actions">
+      <button id="settingsBtn" type="button">Settings</button>
+      <button id="exportBtn" type="button">Export backup</button>
+      <button id="importBtn" type="button">Import backup</button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+      <button id="copyBtn" type="button">Copy summary</button>
+      <button id="resetBtn" type="button" class="danger">Reset all</button>
+    </div>
+  </footer>
+</div>
+
+<!-- Edit modal -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <h3 id="modalTitle">Edit Game</h3>
+    <div class="modal-sub">Update details, rating, or notes</div>
+
+    <label>Title</label>
+    <input type="text" id="editTitle">
+
+    <label>Genre</label>
+    <select id="editGenre">
+      <option value="RPG">RPG / Open World</option>
+      <option value="Indie">Indie / Narrative</option>
+      <option value="Shooter">Shooter / Action</option>
+      <option value="Puzzle">Puzzle / Platformer</option>
+      <option value="Strategy">Strategy / Sim</option>
+      <option value="Coop">Co-op / Multiplayer</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label>Release Year</label>
+    <input type="number" id="editYear" min="1970" max="2099" placeholder="e.g. 2024">
+
+    <label>Platforms</label>
+    <div class="platform-checkboxes" id="editPlatforms">
+      <label class="platform-check"><input type="checkbox" value="PC"><span>PC</span></label>
+      <label class="platform-check"><input type="checkbox" value="Xbox"><span>Xbox</span></label>
+      <label class="platform-check"><input type="checkbox" value="PS5"><span>PS5</span></label>
+      <label class="platform-check"><input type="checkbox" value="PS4"><span>PS4</span></label>
+      <label class="platform-check"><input type="checkbox" value="Switch"><span>Switch</span></label>
+      <label class="platform-check"><input type="checkbox" value="Switch 2"><span>Switch 2</span></label>
+      <label class="platform-check"><input type="checkbox" value="Mobile"><span>Mobile</span></label>
+    </div>
+
+    <label>Rating (played only) — 1 to 10</label>
+    <div class="rating-input" id="ratingInput">
+      <button type="button" data-val="1">1</button>
+      <button type="button" data-val="2">2</button>
+      <button type="button" data-val="3">3</button>
+      <button type="button" data-val="4">4</button>
+      <button type="button" data-val="5">5</button>
+      <button type="button" data-val="6">6</button>
+      <button type="button" data-val="7">7</button>
+      <button type="button" data-val="8">8</button>
+      <button type="button" data-val="9">9</button>
+      <button type="button" data-val="10">10</button>
+      <button type="button" class="rating-clear" data-val="0">Clear</button>
+    </div>
+
+    <label>Notes</label>
+    <textarea id="editNotes" rows="3" placeholder="A line about what you thought…"></textarea>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modalRefetch" type="button" title="Pull fresh genre/year/platform data from your configured source">↻ Refetch metadata</button>
+      <button class="btn btn-ghost" id="modalCancel" type="button">Cancel</button>
+      <button class="btn" id="modalSave" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-backdrop" id="settingsBackdrop">
+  <div class="modal modal-wide">
+    <h3>Settings</h3>
+    <div class="modal-sub">Pick a metadata source for auto-filling new games</div>
+
+    <label>Source</label>
+    <select id="metadataSource">
+      <option value="none">None — fill in manually</option>
+      <option value="igdb">IGDB (best data, requires Netlify deploy)</option>
+      <option value="rawg">RAWG.io (good data, requires Netlify deploy)</option>
+      <option value="claude">Claude API (works anywhere, costs cents)</option>
+    </select>
+
+    <!-- IGDB info -->
+    <div class="source-config" data-source="igdb" style="display:none;">
+      <div class="source-help">
+        <strong style="color: var(--text);">IGDB credentials are set on the server</strong>, not here. They live as environment variables in your Netlify dashboard so they never reach the browser.
+        <ol>
+          <li>Sign in at <span class="code">dev.twitch.tv/console</span> and register an application (OAuth Redirect: <span class="code">http://localhost</span>, category: Application Integration)</li>
+          <li>Copy the Client ID; click "New Secret" to generate a Client Secret</li>
+          <li>In Netlify: Site settings → Environment variables → add <span class="code">TWITCH_CLIENT_ID</span> and <span class="code">TWITCH_CLIENT_SECRET</span></li>
+          <li>Trigger a redeploy in Netlify (Deploys → Trigger deploy)</li>
+        </ol>
+        Free tier: 60,000 requests/month.
+      </div>
+    </div>
+
+    <!-- RAWG info -->
+    <div class="source-config" data-source="rawg" style="display:none;">
+      <div class="source-help">
+        <strong style="color: var(--text);">RAWG key is set on the server</strong> as an environment variable in Netlify.
+        <ol>
+          <li>Get a free key at <span class="code">rawg.io/apidocs</span></li>
+          <li>In Netlify: Site settings → Environment variables → add <span class="code">RAWG_API_KEY</span></li>
+          <li>Trigger a redeploy</li>
+        </ol>
+        Free tier: 20,000 requests/month.
+      </div>
+    </div>
+
+    <!-- Claude API key (browser-side, since their API supports it) -->
+    <div class="source-config" data-source="claude" style="display:none;">
+      <label>Anthropic API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-…" autocomplete="off">
+      <div class="source-help">
+        Stored only on this device. Get a key at <span class="code">console.anthropic.com</span>. Costs a fraction of a cent per game added. Works without any server setup — useful if you're hosting somewhere other than Netlify.
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="settingsCancel" type="button">Cancel</button>
+      <button class="btn" id="settingsSave" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // --- State ---
+  const STORAGE_KEY = 'gameledger:v1';
+  let state = {
+    games: [],
+    filter: 'all',
+    apiKey: '',
+    metadataSource: 'none',
+    igdbClientId: '',
+    igdbClientSecret: '',
+    igdbAccessToken: '',
+    igdbTokenExpiry: 0,
+    rawgKey: ''
+  };
+  let editingId = null;
+  let editingRating = 0;
+
+  // --- IndexedDB wrapper (real browser database, persists indefinitely) ---
+  const DB_NAME = 'damillami-backlog';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'kv';
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  const db = {
+    async get(key) {
+      const conn = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = conn.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).get(key);
+        req.onsuccess = () => resolve(req.result ? { value: req.result } : null);
+        req.onerror = () => reject(req.error);
+      });
+    },
+    async set(key, value) {
+      const conn = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = conn.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(value, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    },
+    async delete(key) {
+      const conn = await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = conn.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).delete(key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+  };
+
+  // --- Storage helpers ---
+  async function loadState() {
+    try {
+      const result = await db.get(STORAGE_KEY);
+      if (result && result.value) {
+        const parsed = JSON.parse(result.value);
+        state.games = parsed.games || [];
+        if (parsed.savedAt) updateSavedIndicator(parsed.savedAt);
+      }
+      // Load settings from separate slots
+      const settingsKeys = ['api_key', 'metadata_source', 'igdb_client_id', 'igdb_client_secret', 'igdb_token', 'igdb_token_expiry', 'rawg_key'];
+      const settingsMap = {
+        api_key: 'apiKey',
+        metadata_source: 'metadataSource',
+        igdb_client_id: 'igdbClientId',
+        igdb_client_secret: 'igdbClientSecret',
+        igdb_token: 'igdbAccessToken',
+        igdb_token_expiry: 'igdbTokenExpiry',
+        rawg_key: 'rawgKey'
+      };
+      for (const k of settingsKeys) {
+        const r = await db.get(k);
+        if (r && r.value !== undefined) {
+          state[settingsMap[k]] = (k === 'igdb_token_expiry') ? parseInt(r.value) || 0 : r.value;
+        }
+      }
+    } catch (e) {
+      console.error('Load failed:', e);
+      state.games = [];
+    }
+  }
+
+  async function saveSetting(key, value) {
+    try {
+      if (value === '' || value === null || value === undefined) {
+        await db.delete(key);
+      } else {
+        await db.set(key, value);
+      }
+    } catch (e) {
+      console.error('Setting save failed:', e);
+    }
+  }
+
+  async function saveState() {
+    try {
+      await db.set(STORAGE_KEY, JSON.stringify({
+        games: state.games,
+        savedAt: Date.now()
+      }));
+      updateSavedIndicator(Date.now());
+    } catch (e) {
+      console.error('Save failed:', e);
+      showToast('Could not save — please try again');
+    }
+  }
+
+  function updateSavedIndicator(ts) {
+    const el = document.getElementById('lastSaved');
+    if (!el) return;
+    if (!ts) { el.textContent = 'never saved'; return; }
+    const now = Date.now();
+    const diff = now - ts;
+    let label;
+    if (diff < 5000) label = 'saved just now';
+    else if (diff < 60000) label = `saved ${Math.floor(diff/1000)}s ago`;
+    else if (diff < 3600000) label = `saved ${Math.floor(diff/60000)}m ago`;
+    else label = `saved ${new Date(ts).toLocaleString()}`;
+    el.textContent = label;
+    el.dataset.ts = ts;
+  }
+
+  // Refresh "saved X ago" label every 30s
+  setInterval(() => {
+    const el = document.getElementById('lastSaved');
+    if (el && el.dataset.ts) updateSavedIndicator(parseInt(el.dataset.ts));
+  }, 30000);
+
+  // --- Seed data (the recommendations from earlier) ---
+  const SEEDS = [
+    { title: 'Clair Obscur: Expedition 33', genre: 'RPG', year: 2025, platforms: ['PC', 'Xbox', 'PS5'] },
+    { title: 'Kingdom Come: Deliverance 2', genre: 'RPG', year: 2025, platforms: ['PC', 'Xbox', 'PS5'] },
+    { title: "Baldur's Gate 3", genre: 'RPG', year: 2023, platforms: ['PC', 'Xbox', 'PS5'] },
+    { title: 'Cyberpunk 2077', genre: 'RPG', year: 2020, platforms: ['PC', 'Xbox', 'PS5', 'PS4'] },
+    { title: 'Dispatch', genre: 'Indie', year: 2025, platforms: ['PC', 'Xbox', 'PS5'] },
+    { title: 'Citizen Sleeper 2: Starward Vector', genre: 'Indie', year: 2025, platforms: ['PC', 'Xbox', 'PS5', 'Switch'] },
+    { title: 'Pentiment', genre: 'Indie', year: 2022, platforms: ['PC', 'Xbox', 'PS5', 'Switch'] },
+    { title: 'Wanderstop', genre: 'Indie', year: 2025, platforms: ['PC', 'Xbox', 'PS5'] },
+    { title: 'Arc Raiders', genre: 'Shooter', year: 2025, platforms: ['PC', 'Xbox', 'PS5'] },
+    { title: 'Doom: The Dark Ages', genre: 'Shooter', year: 2025, platforms: ['PC', 'Xbox', 'PS5'] },
+    { title: 'Indiana Jones and the Great Circle', genre: 'Shooter', year: 2024, platforms: ['PC', 'Xbox', 'PS5'] },
+    { title: 'Helldivers 2', genre: 'Coop', year: 2024, platforms: ['PC', 'Xbox', 'PS5'] },
+    { title: 'Blue Prince', genre: 'Puzzle', year: 2025, platforms: ['PC', 'Xbox', 'PS5'] },
+    { title: 'Hollow Knight: Silksong', genre: 'Puzzle', year: 2025, platforms: ['PC', 'Xbox', 'PS5', 'Switch'] },
+    { title: 'Animal Well', genre: 'Puzzle', year: 2024, platforms: ['PC', 'Xbox', 'PS5', 'Switch'] },
+    { title: 'Cocoon', genre: 'Puzzle', year: 2023, platforms: ['PC', 'Xbox', 'PS5', 'Switch'] }
+  ];
+
+  function seedSuggestions() {
+    const existing = new Set(state.games.map(g => g.title.toLowerCase()));
+    let added = 0;
+    SEEDS.forEach(s => {
+      if (!existing.has(s.title.toLowerCase())) {
+        state.games.push({
+          id: 'g_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          title: s.title,
+          genre: s.genre,
+          year: s.year,
+          platforms: s.platforms,
+          status: 'backlog',
+          rating: 0,
+          notes: '',
+          addedAt: Date.now()
+        });
+        added++;
+      }
+    });
+    if (added > 0) {
+      saveState();
+      render();
+      showToast(`Added ${added} suggestion${added === 1 ? '' : 's'} to your backlog`);
+    } else {
+      showToast('All suggestions already in your ledger');
+    }
+  }
+
+  // --- Render ---
+  function render() {
+    const filter = state.filter;
+    const filtered = filter === 'all'
+      ? state.games
+      : state.games.filter(g => g.genre === filter);
+
+    const backlog = filtered.filter(g => g.status === 'backlog');
+    const played = filtered.filter(g => g.status === 'played');
+
+    // Sort: most recent additions first for backlog; highest rated first for played
+    backlog.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+    played.sort((a, b) => (b.rating || 0) - (a.rating || 0) || (b.completedAt || 0) - (a.completedAt || 0));
+
+    document.getElementById('backlogList').innerHTML = backlog.length
+      ? backlog.map(renderCard).join('')
+      : emptyState('backlog');
+
+    document.getElementById('playedList').innerHTML = played.length
+      ? played.map(renderCard).join('')
+      : emptyState('played');
+
+    // Stats (always show full totals, not filtered)
+    const allBacklog = state.games.filter(g => g.status === 'backlog').length;
+    const allPlayed = state.games.filter(g => g.status === 'played').length;
+    document.getElementById('backlogCount').textContent = allBacklog;
+    document.getElementById('playedCount').textContent = allPlayed;
+    document.getElementById('totalCount').textContent = state.games.length;
+    document.getElementById('backlogColCount').textContent = `${backlog.length} ${backlog.length === 1 ? 'game' : 'games'}`;
+    document.getElementById('playedColCount').textContent = `${played.length} ${played.length === 1 ? 'game' : 'games'}`;
+
+    // Attach card event listeners
+    document.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', handleCardAction);
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // User's preferred platforms (for highlighting)
+  const USER_PLATFORMS = ['PC', 'Xbox'];
+
+  function renderCard(g) {
+    const isPlayed = g.status === 'played';
+    const notes = g.notes
+      ? `<div class="card-notes">${escapeHtml(g.notes)}</div>`
+      : '';
+    const moveAction = isPlayed
+      ? `<button class="icon-btn" data-action="unplay" data-id="${g.id}" title="Move to backlog">↩</button>`
+      : `<button class="icon-btn success" data-action="play" data-id="${g.id}" title="Mark as played">✓</button>`;
+    const statusBadge = isPlayed
+      ? `<span class="status-badge played"><span class="check">✓</span>Played</span>`
+      : `<span class="status-badge backlog">Backlog</span>`;
+    const classifyingClass = g.classifying ? ' classifying' : '';
+
+    const yearHtml = g.year ? `<span class="meta-text">${g.year}</span>` : '';
+
+    const platformsHtml = (g.platforms && g.platforms.length)
+      ? `<span class="platform-list">${g.platforms.map(p =>
+          `<span class="platform-pill${USER_PLATFORMS.includes(p) ? ' match' : ''}">${escapeHtml(p)}</span>`
+        ).join('')}</span>`
+      : '';
+
+    // Inline rating bar — only for played games
+    let inlineRating = '';
+    if (isPlayed) {
+      const currentRating = g.rating || 0;
+      const pills = [];
+      for (let i = 1; i <= 10; i++) {
+        let cls = 'inline-rating-pill';
+        if (i <= currentRating) {
+          cls += (i === currentRating) ? ' peak' : ' filled';
+        }
+        pills.push(`<button type="button" class="${cls}" data-action="rate" data-id="${g.id}" data-val="${i}" title="Rate ${i}/10">${i}</button>`);
+      }
+      const display = currentRating
+        ? `<span class="inline-rating-display">${currentRating}<span class="max">/10</span></span>`
+        : `<span class="inline-rating-display" style="color:var(--text-faint);font-weight:400;">unrated</span>`;
+      const clearBtn = currentRating
+        ? `<button type="button" class="inline-rating-clear" data-action="rate" data-id="${g.id}" data-val="0" title="Clear rating">Clear</button>`
+        : '';
+      inlineRating = `
+        <div class="inline-rating">
+          <span class="inline-rating-label">Rating</span>
+          <div class="inline-rating-pills">${pills.join('')}</div>
+          ${clearBtn}
+          ${display}
+        </div>
+      `;
+    }
+
+    const metaParts = [statusBadge, `<span class="genre-tag">${genreLabel(g.genre)}</span>`];
+    if (yearHtml) metaParts.push(yearHtml);
+    if (platformsHtml) metaParts.push(platformsHtml);
+
+    return `
+      <article class="card ${g.status}${classifyingClass}">
+        <div class="card-top">
+          <div style="flex:1; min-width:0;">
+            <div class="card-title">${escapeHtml(g.title)}</div>
+            <div class="card-meta">
+              ${metaParts.join('')}
+            </div>
+          </div>
+          <div class="card-actions">
+            ${moveAction}
+            <button class="icon-btn" data-action="edit" data-id="${g.id}" title="Edit">✎</button>
+            <button class="icon-btn danger" data-action="delete" data-id="${g.id}" title="Remove">✕</button>
+          </div>
+        </div>
+        ${notes}
+        ${inlineRating}
+      </article>
+    `;
+  }
+
+  function genreLabel(g) {
+    return ({
+      RPG: 'RPG',
+      Indie: 'Indie',
+      Shooter: 'Shooter',
+      Puzzle: 'Puzzle',
+      Strategy: 'Strategy',
+      Coop: 'Co-op',
+      Other: 'Other'
+    })[g] || g;
+  }
+
+  function emptyState(which) {
+    return `
+      <div class="empty-state">
+        <em>${which === 'backlog' ? 'Nothing queued.' : 'Nothing logged yet.'}</em>
+        ${which === 'backlog'
+          ? 'Add a game above, or load some suggestions.'
+          : 'Mark a backlog game as played to add it here.'}
+      </div>
+    `;
+  }
+
+  // --- Card actions ---
+  function handleCardAction(e) {
+    const action = e.currentTarget.dataset.action;
+    const id = e.currentTarget.dataset.id;
+    const game = state.games.find(g => g.id === id);
+    if (!game) return;
+
+    if (action === 'play') {
+      game.status = 'played';
+      game.completedAt = Date.now();
+      saveState();
+      render();
+      showToast(`Marked "${game.title}" as played`);
+    } else if (action === 'unplay') {
+      game.status = 'backlog';
+      delete game.completedAt;
+      saveState();
+      render();
+    } else if (action === 'delete') {
+      state.games = state.games.filter(g => g.id !== id);
+      saveState();
+      render();
+      showToast(`Removed "${game.title}"`);
+    } else if (action === 'edit') {
+      openEditModal(game);
+    } else if (action === 'rate') {
+      const newRating = parseInt(e.currentTarget.dataset.val);
+      // Toggle: clicking the same value clears it
+      game.rating = (game.rating === newRating) ? 0 : newRating;
+      saveState();
+      render();
+    }
+  }
+
+  // --- Game metadata lookup (routes to active source) ---
+  async function classifyGame(title) {
+    const empty = { genre: 'Other', year: null, platforms: [] };
+    if (!title) return empty;
+    try {
+      switch (state.metadataSource) {
+        case 'igdb': return await lookupIGDB(title);
+        case 'rawg': return await lookupRAWG(title);
+        case 'claude': return await lookupClaude(title);
+        default: return empty;
+      }
+    } catch (e) {
+      console.error('Metadata lookup failed:', e);
+      return empty;
+    }
+  }
+
+  // ---- IGDB ----
+  // IGDB genre IDs → our internal categories (best-fit mapping)
+  const IGDB_GENRE_MAP = {
+    12: 'RPG',     // Role-playing (RPG)
+    16: 'Strategy', // Turn-based strategy
+    15: 'Strategy', // Strategy
+    11: 'Strategy', // Real Time Strategy (RTS)
+    13: 'Strategy', // Simulator
+    5: 'Shooter',  // Shooter
+    4: 'Coop',     // Fighting (closest, often versus/multiplayer)
+    14: 'Coop',    // Sport
+    25: 'Coop',    // Hack and slash/Beat 'em up
+    7: 'Puzzle',   // Music (often rhythm puzzlers)
+    8: 'Puzzle',   // Platform
+    9: 'Puzzle',   // Puzzle
+    10: 'RPG',     // Racing — closest is action; treat as Other below if needed
+    24: 'Strategy', // Tactical
+    26: 'Other',   // Quiz/Trivia
+    30: 'Other',   // Pinball
+    31: 'Indie',   // Adventure
+    32: 'Indie',   // Indie
+    33: 'Other',   // Arcade
+    34: 'Other',   // Visual Novel — Indie fits better
+    35: 'Strategy',// Card & Board
+    36: 'Coop',    // MOBA
+    2: 'Indie',    // Point-and-click
+  };
+
+  // IGDB platform IDs → our internal platform names
+  const IGDB_PLATFORM_MAP = {
+    6: 'PC',       // Windows
+    14: 'PC',      // Mac
+    3: 'PC',       // Linux
+    49: 'Xbox',    // Xbox One
+    169: 'Xbox',   // Xbox Series X|S
+    11: 'Xbox',    // Xbox 360 (treat as Xbox)
+    48: 'PS4',     // PlayStation 4
+    167: 'PS5',    // PlayStation 5
+    130: 'Switch', // Nintendo Switch
+    508: 'Switch 2', // Nintendo Switch 2
+    34: 'Mobile',  // Android
+    39: 'Mobile',  // iOS
+  };
+
+  async function lookupIGDB(title) {
+    // Calls our Netlify Function (which handles auth + CORS)
+    const r = await fetch(`/api/igdb?title=${encodeURIComponent(title)}`);
+    if (!r.ok) {
+      const errData = await r.json().catch(() => ({}));
+      throw new Error(errData.error || 'IGDB lookup failed: ' + r.status);
+    }
+    const games = await r.json();
+    if (!games.length) return { genre: 'Other', year: null, platforms: [] };
+
+    // Pick the most popular result (highest rating count)
+    const best = games.sort((a, b) => (b.total_rating_count || 0) - (a.total_rating_count || 0))[0];
+
+    // Map genre — pick first matched IGDB genre that we recognize
+    let genre = 'Other';
+    if (best.genres) {
+      for (const gid of best.genres) {
+        if (IGDB_GENRE_MAP[gid]) { genre = IGDB_GENRE_MAP[gid]; break; }
+      }
+    }
+
+    // Map platforms
+    const platforms = [];
+    if (best.platforms) {
+      for (const pid of best.platforms) {
+        const mapped = IGDB_PLATFORM_MAP[pid];
+        if (mapped && !platforms.includes(mapped)) platforms.push(mapped);
+      }
+    }
+
+    // Extract year
+    const year = best.first_release_date
+      ? new Date(best.first_release_date * 1000).getFullYear()
+      : null;
+
+    return { genre, year, platforms };
+  }
+
+  // ---- RAWG ----
+  const RAWG_GENRE_MAP = {
+    'role-playing-games-rpg': 'RPG',
+    'shooter': 'Shooter',
+    'adventure': 'Indie',
+    'indie': 'Indie',
+    'puzzle': 'Puzzle',
+    'platformer': 'Puzzle',
+    'strategy': 'Strategy',
+    'simulation': 'Strategy',
+    'massively-multiplayer': 'Coop',
+    'sports': 'Coop',
+    'fighting': 'Coop',
+    'racing': 'Other',
+    'arcade': 'Other',
+    'card': 'Strategy',
+    'board-games': 'Strategy',
+    'family': 'Other',
+    'casual': 'Other',
+    'action': 'Shooter',  // ambiguous; default to Shooter
+  };
+
+  function mapRawgPlatform(name) {
+    const n = name.toLowerCase();
+    if (n.includes('pc') || n.includes('mac') || n.includes('linux')) return 'PC';
+    if (n.includes('xbox')) return 'Xbox';
+    if (n.includes('playstation 5') || n === 'ps5') return 'PS5';
+    if (n.includes('playstation 4') || n === 'ps4') return 'PS4';
+    if (n.includes('switch 2')) return 'Switch 2';
+    if (n.includes('switch')) return 'Switch';
+    if (n.includes('ios') || n.includes('android')) return 'Mobile';
+    return null;
+  }
+
+  async function lookupRAWG(title) {
+    const r = await fetch(`/api/rawg?title=${encodeURIComponent(title)}`);
+    if (!r.ok) {
+      const errData = await r.json().catch(() => ({}));
+      throw new Error(errData.error || 'RAWG lookup failed: ' + r.status);
+    }
+    const data = await r.json();
+    const results = data.results || [];
+    if (!results.length) return { genre: 'Other', year: null, platforms: [] };
+
+    // Pick most-rated result
+    const best = results.sort((a, b) => (b.ratings_count || 0) - (a.ratings_count || 0))[0];
+
+    let genre = 'Other';
+    if (best.genres && best.genres.length) {
+      for (const g of best.genres) {
+        if (RAWG_GENRE_MAP[g.slug]) { genre = RAWG_GENRE_MAP[g.slug]; break; }
+      }
+    }
+
+    const platforms = [];
+    if (best.platforms) {
+      for (const p of best.platforms) {
+        const mapped = mapRawgPlatform(p.platform.name);
+        if (mapped && !platforms.includes(mapped)) platforms.push(mapped);
+      }
+    }
+
+    const year = best.released ? parseInt(best.released.substring(0, 4)) : null;
+
+    return { genre, year, platforms: platforms.length ? platforms : [] };
+  }
+
+  // ---- Claude API (legacy/fallback) ----
+  async function lookupClaude(title) {
+    if (!state.apiKey) throw new Error('Claude key not configured');
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": state.apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5",
+        max_tokens: 200,
+        messages: [{
+          role: "user",
+          content: `Identify the video game "${title}" and return ONLY a JSON object with no preamble, no markdown, no code fences. Use this exact format:
+
+{"genre":"RPG","year":2024,"platforms":["PC","Xbox","PS5"]}
+
+Genre must be ONE of: RPG, Indie, Shooter, Puzzle, Strategy, Coop, Other.
+Year: original release year as a 4-digit integer. If unknown, use null.
+Platforms: array of strings, ONLY: "PC", "Xbox", "PS5", "PS4", "Switch", "Switch 2", "Mobile". Use "Xbox" for Xbox One / Series S/X.
+
+Return ONLY the JSON object, nothing else.`
+        }]
+      })
+    });
+    if (!response.ok) throw new Error('Claude API: ' + response.status);
+    const data = await response.json();
+    let text = (data.content?.[0]?.text || '').trim();
+    text = text.replace(/^```json\s*|\s*```$/g, '').replace(/^```\s*|\s*```$/g, '').trim();
+    const parsed = JSON.parse(text);
+    const validGenres = ['RPG', 'Indie', 'Shooter', 'Puzzle', 'Strategy', 'Coop', 'Other'];
+    const validPlatforms = ['PC', 'Xbox', 'PS5', 'PS4', 'Switch', 'Switch 2', 'Mobile'];
+    return {
+      genre: validGenres.includes(parsed.genre) ? parsed.genre : 'Other',
+      year: (typeof parsed.year === 'number' && parsed.year > 1970 && parsed.year < 2100) ? parsed.year : null,
+      platforms: Array.isArray(parsed.platforms)
+        ? parsed.platforms.filter(p => validPlatforms.includes(p))
+        : []
+    };
+  }
+
+  // --- Add form ---
+  document.getElementById('addForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const titleInput = document.getElementById('titleInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const title = titleInput.value.trim();
+    if (!title) return;
+
+    const status = document.getElementById('statusInput').value;
+    const newGame = {
+      id: 'g_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      title,
+      genre: 'Other',
+      year: null,
+      platforms: [],
+      status,
+      rating: 0,
+      notes: '',
+      addedAt: Date.now(),
+      classifying: true
+    };
+    if (status === 'played') newGame.completedAt = Date.now();
+    state.games.unshift(newGame);
+    render();
+    titleInput.value = '';
+    titleInput.focus();
+    submitBtn.disabled = true;
+
+    // Classify in background
+    const info = await classifyGame(title);
+    const game = state.games.find(g => g.id === newGame.id);
+    if (game) {
+      game.genre = info.genre;
+      game.year = info.year;
+      game.platforms = info.platforms;
+      delete game.classifying;
+      saveState();
+      render();
+    }
+    submitBtn.disabled = false;
+  });
+
+  // --- Filter chips ---
+  document.getElementById('filterGroup').addEventListener('click', e => {
+    if (!e.target.classList.contains('chip')) return;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    e.target.classList.add('active');
+    state.filter = e.target.dataset.filter;
+    render();
+  });
+
+  // --- Modal ---
+  function openEditModal(game) {
+    editingId = game.id;
+    editingRating = game.rating || 0;
+    document.getElementById('editTitle').value = game.title;
+    document.getElementById('editGenre').value = game.genre;
+    document.getElementById('editYear').value = game.year || '';
+    document.getElementById('editNotes').value = game.notes || '';
+
+    // Reset and set platform checkboxes
+    const checkboxes = document.querySelectorAll('#editPlatforms input[type="checkbox"]');
+    const gamePlatforms = game.platforms || [];
+    checkboxes.forEach(cb => {
+      cb.checked = gamePlatforms.includes(cb.value);
+    });
+
+    updateRatingDisplay();
+    document.getElementById('modalBackdrop').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modalBackdrop').classList.remove('show');
+    editingId = null;
+  }
+
+  function updateRatingDisplay() {
+    document.querySelectorAll('#ratingInput button').forEach(b => {
+      const v = parseInt(b.dataset.val);
+      if (v === 0) return; // skip clear button
+      b.classList.toggle('active', v <= editingRating && editingRating > 0);
+    });
+  }
+
+  document.getElementById('ratingInput').addEventListener('click', e => {
+    if (e.target.tagName !== 'BUTTON') return;
+    const v = parseInt(e.target.dataset.val);
+    editingRating = v;
+    updateRatingDisplay();
+  });
+
+  document.getElementById('modalCancel').addEventListener('click', closeModal);
+  document.getElementById('modalBackdrop').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+
+  document.getElementById('modalSave').addEventListener('click', () => {
+    const game = state.games.find(g => g.id === editingId);
+    if (!game) return;
+    game.title = document.getElementById('editTitle').value.trim() || game.title;
+    game.genre = document.getElementById('editGenre').value;
+
+    const yearVal = parseInt(document.getElementById('editYear').value);
+    game.year = (yearVal > 1970 && yearVal < 2100) ? yearVal : null;
+
+    const checkedPlatforms = Array.from(
+      document.querySelectorAll('#editPlatforms input[type="checkbox"]:checked')
+    ).map(cb => cb.value);
+    game.platforms = checkedPlatforms;
+
+    game.rating = editingRating;
+    game.notes = document.getElementById('editNotes').value.trim();
+    saveState();
+    render();
+    closeModal();
+    showToast('Saved');
+  });
+
+  // Refetch metadata for the currently-edited game
+  document.getElementById('modalRefetch').addEventListener('click', async () => {
+    const game = state.games.find(g => g.id === editingId);
+    if (!game) return;
+    if (state.metadataSource === 'none') {
+      showToast('Configure a metadata source in Settings first');
+      return;
+    }
+    const btn = document.getElementById('modalRefetch');
+    const originalText = btn.textContent;
+    btn.textContent = '↻ Fetching…';
+    btn.disabled = true;
+    const title = document.getElementById('editTitle').value.trim() || game.title;
+    const info = await classifyGame(title);
+    btn.textContent = originalText;
+    btn.disabled = false;
+
+    if (info.genre === 'Other' && !info.year && !info.platforms.length) {
+      showToast('No metadata found — title may be misspelled or too obscure');
+      return;
+    }
+
+    document.getElementById('editGenre').value = info.genre;
+    if (info.year) document.getElementById('editYear').value = info.year;
+    document.querySelectorAll('#editPlatforms input[type="checkbox"]').forEach(cb => {
+      cb.checked = info.platforms.includes(cb.value);
+    });
+    showToast('Metadata refreshed — click Save to apply');
+  });
+
+  // --- Footer actions ---
+  document.getElementById('seedBtn').addEventListener('click', seedSuggestions);
+
+  document.getElementById('resetBtn').addEventListener('click', async () => {
+    if (!confirm('Erase the entire backlog? This cannot be undone.')) return;
+    state.games = [];
+    try { await db.delete(STORAGE_KEY); } catch(e) {}
+    render();
+    showToast('Backlog cleared');
+  });
+
+  // --- Export ---
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const payload = {
+      app: 'DamiLlami Backlog',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      games: state.games
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `damillami-backlog-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`Exported ${state.games.length} game${state.games.length === 1 ? '' : 's'}`);
+  });
+
+  // --- Import ---
+  document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFile').click();
+  });
+
+  document.getElementById('importFile').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const incoming = Array.isArray(parsed) ? parsed : parsed.games;
+      if (!Array.isArray(incoming)) throw new Error('Invalid file format');
+
+      // Validate each game has the minimum required shape
+      const valid = incoming.filter(g => g && typeof g.title === 'string' && g.title.trim());
+      if (valid.length === 0) throw new Error('No valid games found in file');
+
+      const choice = state.games.length === 0
+        ? 'replace'
+        : confirm(`Import ${valid.length} game${valid.length === 1 ? '' : 's'}?\n\n• OK = MERGE with current backlog (skips duplicates by title)\n• Cancel = stop and do nothing`)
+          ? 'merge'
+          : 'cancel';
+
+      if (choice === 'cancel') {
+        e.target.value = '';
+        return;
+      }
+
+      if (choice === 'replace') {
+        state.games = valid.map(normalizeImported);
+      } else {
+        // Merge: skip titles that already exist (case-insensitive)
+        const existing = new Set(state.games.map(g => g.title.toLowerCase()));
+        const toAdd = valid.filter(g => !existing.has(g.title.toLowerCase())).map(normalizeImported);
+        state.games = [...toAdd, ...state.games];
+      }
+
+      await saveState();
+      render();
+      showToast(`Imported ${valid.length} game${valid.length === 1 ? '' : 's'}`);
+    } catch (err) {
+      showToast('Could not import — file may be corrupted');
+    } finally {
+      e.target.value = '';
+    }
+  });
+
+  function normalizeImported(g) {
+    return {
+      id: g.id || ('g_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
+      title: String(g.title).trim(),
+      genre: g.genre || 'Other',
+      year: (typeof g.year === 'number') ? g.year : null,
+      platforms: Array.isArray(g.platforms) ? g.platforms : [],
+      status: (g.status === 'played') ? 'played' : 'backlog',
+      rating: (typeof g.rating === 'number' && g.rating >= 0 && g.rating <= 10) ? g.rating : 0,
+      notes: g.notes || '',
+      addedAt: g.addedAt || Date.now(),
+      completedAt: g.completedAt || undefined
+    };
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const played = state.games.filter(g => g.status === 'played');
+    const backlog = state.games.filter(g => g.status === 'backlog');
+    const fmt = g => {
+      const meta = [genreLabel(g.genre)];
+      if (g.year) meta.push(g.year);
+      if (g.platforms && g.platforms.length) meta.push(g.platforms.join('/'));
+      const ratingStr = g.rating ? ` — ${g.rating}/10` : '';
+      const notesStr = g.notes ? ` — ${g.notes}` : '';
+      return `• ${g.title} (${meta.join(', ')})${ratingStr}${notesStr}`;
+    };
+    let out = '— DAMILLAMI BACKLOG —\n\nPLAYED:\n';
+    out += played.length ? played.map(fmt).join('\n') : '  (none)';
+    out += '\n\nBACKLOG:\n';
+    out += backlog.length ? backlog.map(fmt).join('\n') : '  (none)';
+    navigator.clipboard.writeText(out)
+      .then(() => showToast('Summary copied — paste it into chat for recommendations'))
+      .catch(() => showToast('Could not copy'));
+  });
+
+  // --- Toast ---
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  // --- Settings modal ---
+  function showActiveSourceConfig() {
+    const src = document.getElementById('metadataSource').value;
+    document.querySelectorAll('.source-config').forEach(el => {
+      el.style.display = (el.dataset.source === src) ? 'block' : 'none';
+    });
+  }
+
+  document.getElementById('settingsBtn').addEventListener('click', () => {
+    document.getElementById('metadataSource').value = state.metadataSource || 'none';
+    document.getElementById('apiKeyInput').value = state.apiKey || '';
+    showActiveSourceConfig();
+    document.getElementById('settingsBackdrop').classList.add('show');
+  });
+
+  document.getElementById('metadataSource').addEventListener('change', showActiveSourceConfig);
+
+  document.getElementById('settingsCancel').addEventListener('click', () => {
+    document.getElementById('settingsBackdrop').classList.remove('show');
+  });
+
+  document.getElementById('settingsBackdrop').addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
+  });
+
+  document.getElementById('settingsSave').addEventListener('click', async () => {
+    const newSource = document.getElementById('metadataSource').value;
+    const newApiKey = document.getElementById('apiKeyInput').value.trim();
+
+    state.metadataSource = newSource;
+    state.apiKey = newApiKey;
+
+    await saveSetting('metadata_source', newSource);
+    await saveSetting('api_key', newApiKey);
+
+    document.getElementById('settingsBackdrop').classList.remove('show');
+    const sourceLabel = { none: 'manual entry', igdb: 'IGDB', rawg: 'RAWG.io', claude: 'Claude API' }[newSource];
+    showToast(`Settings saved — using ${sourceLabel}`);
+  });
+
+  // Note: service worker registration, auto-update banner, and install prompt
+  // are handled in app.js (loaded as a separate file in <head>)
+
+  // --- Init ---
+  (async function init() {
+    await loadState();
+    render();
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  })();
+</script>
+
+</body>
+</html>
