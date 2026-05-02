@@ -1410,6 +1410,88 @@
     border: 1px solid var(--border);
   }
 
+  /* --- Season toggles (TV shows only) --- */
+  .seasons-row {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .seasons-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    flex-shrink: 0;
+  }
+
+  .seasons-pills {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .season-pill {
+    min-width: 38px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.12s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    line-height: 1;
+  }
+
+  .season-pill:hover {
+    border-color: var(--gold-dim);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+
+  .season-pill.watched {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+    border-color: var(--gold);
+    color: var(--bg);
+    box-shadow: 0 0 8px rgba(201, 164, 240, 0.25);
+  }
+
+  .season-pill.watched::before {
+    content: '✓';
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .seasons-progress {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--gold);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .seasons-progress .progress-max {
+    color: var(--text-faint);
+    font-weight: 400;
+    font-size: 10px;
+  }
+
   /* --- Inline rating bar (shown on every card) --- */
   .inline-rating {
     margin-top: 12px;
@@ -2281,6 +2363,12 @@
   function renderCard(g) {
     const isPlayed = g.status === 'played';
     const mediaType = g.mediaType || 'game';
+
+    // Lazy backfill: if this is a TV show with totalSeasons but no seasons array,
+    // generate one. Don't save here — it'll save on the next interaction.
+    if (mediaType === 'tv' && g.totalSeasons && !Array.isArray(g.seasons)) {
+      ensureSeasonsArray(g);
+    }
     const notes = g.notes
       ? `<div class="card-notes">${escapeHtml(g.notes)}</div>`
       : '';
@@ -2319,10 +2407,36 @@
       imdbHtml = `<span class="imdb-rating" title="IMDb Rating"><span class="imdb-rating-label">IMDb</span>${g.imdbRating.toFixed(1)}</span>`;
     }
 
-    // Total seasons (TV)
-    const seasonsHtml = (mediaType === 'tv' && g.totalSeasons)
-      ? `<span class="meta-text">${g.totalSeasons} season${g.totalSeasons === 1 ? '' : 's'}</span>`
-      : '';
+    // Seasons progress (TV) — replaces the simple "X seasons" text
+    let seasonsHtml = '';
+    let seasonsRow = '';
+    if (mediaType === 'tv' && g.totalSeasons) {
+      const progress = seasonProgress(g);
+      if (progress.total > 0) {
+        seasonsHtml = `<span class="meta-text">${progress.watched}/${progress.total} seasons</span>`;
+        // Build the toggle pills row (only if seasons array exists)
+        if (Array.isArray(g.seasons) && g.seasons.length) {
+          const pills = g.seasons.map(s => `
+            <button type="button" class="season-pill${s.watched ? ' watched' : ''}"
+                    data-action="toggle-season"
+                    data-id="${g.id}"
+                    data-season="${s.number}"
+                    title="${s.watched ? 'Watched' : 'Mark as watched'} — Season ${s.number}">S${s.number}</button>
+          `).join('');
+          const progressBadge = `<span class="seasons-progress">${progress.watched}<span class="progress-max">/${progress.total}</span></span>`;
+          seasonsRow = `
+            <div class="seasons-row">
+              <span class="seasons-label">Seasons</span>
+              <div class="seasons-pills">${pills}</div>
+              ${progressBadge}
+            </div>
+          `;
+        }
+      } else {
+        // We know totalSeasons but seasons array hasn't been built yet — show static text
+        seasonsHtml = `<span class="meta-text">${g.totalSeasons} season${g.totalSeasons === 1 ? '' : 's'}</span>`;
+      }
+    }
 
     // Inline 1-10 rating bar (your personal rating, played items only)
     let inlineRating = '';
@@ -2458,6 +2572,7 @@
           </div>
         </div>
         ${notes}
+        ${seasonsRow}
         ${inlineRating}
       </article>
     `;
@@ -2554,6 +2669,50 @@
           }
         }
       }, 0);
+    } else if (action === 'toggle-season') {
+      e.stopPropagation();
+      toggleSeasonWatched(game, parseInt(e.currentTarget.dataset.season));
+    }
+  }
+
+  // Toggle a single season's watched state, with smart promotion to "Played"
+  function toggleSeasonWatched(game, seasonNumber) {
+    if (!game || game.mediaType !== 'tv') return;
+    if (!Array.isArray(game.seasons)) ensureSeasonsArray(game);
+    if (!Array.isArray(game.seasons)) return; // still no seasons (no totalSeasons)
+
+    const season = game.seasons.find(s => s.number === seasonNumber);
+    if (!season) return;
+
+    const wasAllWatched = game.seasons.every(s => s.watched);
+    season.watched = !season.watched;
+    if (season.watched) {
+      season.completedAt = Date.now();
+    } else {
+      delete season.completedAt;
+    }
+
+    const isAllWatched = game.seasons.every(s => s.watched);
+    const anyWatched = game.seasons.some(s => s.watched);
+
+    // Smart status promotion logic
+    if (isAllWatched && !wasAllWatched && game.status === 'backlog') {
+      // Just completed the whole show — auto-promote to Played
+      game.status = 'played';
+      if (!game.completedAt) game.completedAt = Date.now();
+      saveState();
+      render();
+      showToast(`All seasons watched — moved "${game.title}" to Played`);
+    } else if (!anyWatched && game.status === 'played') {
+      // Unmarked everything — kick back to backlog
+      game.status = 'backlog';
+      delete game.completedAt;
+      saveState();
+      render();
+      showToast(`No seasons watched — moved "${game.title}" back to Backlog`);
+    } else {
+      saveState();
+      render();
     }
   }
 
@@ -2626,8 +2785,12 @@
     else if (info.rtScore === null) delete game.rtScore;
     if (typeof info.imdbRating === 'number') game.imdbRating = info.imdbRating;
     else if (info.imdbRating === null) delete game.imdbRating;
-    if (typeof info.totalSeasons === 'number') game.totalSeasons = info.totalSeasons;
-    else if (info.totalSeasons === null) delete game.totalSeasons;
+    if (typeof info.totalSeasons === 'number') {
+      game.totalSeasons = info.totalSeasons;
+      // If we just learned the season count, auto-init the seasons array
+      // (only adds entries that aren't already there — preserves any existing watched flags)
+      ensureSeasonsArray(game);
+    } else if (info.totalSeasons === null) delete game.totalSeasons;
     if (typeof info.coverUrl === 'string' && info.coverUrl) game.coverUrl = info.coverUrl;
     else if (info.coverUrl === null) delete game.coverUrl;
     if (info.sourceLabel) game.sourceLabel = info.sourceLabel;
@@ -2639,6 +2802,42 @@
       delete game.syncError;
     }
   }
+
+  // --- Season helpers (TV shows only) ---
+
+  // Ensure game.seasons exists and matches game.totalSeasons in length.
+  // Preserves existing entries (their watched flags + completion dates).
+  // Adds new unwatched entries if the count grew, trims if it shrank.
+  function ensureSeasonsArray(game) {
+    if (game.mediaType !== 'tv') return;
+    if (!game.totalSeasons || game.totalSeasons < 1) {
+      // No seasons known — clear array
+      delete game.seasons;
+      return;
+    }
+    if (!Array.isArray(game.seasons)) game.seasons = [];
+    // Build a map of existing entries by season number
+    const existing = {};
+    game.seasons.forEach(s => {
+      if (s && typeof s.number === 'number') existing[s.number] = s;
+    });
+    // Rebuild array fresh, sized to totalSeasons
+    const fresh = [];
+    for (let i = 1; i <= game.totalSeasons; i++) {
+      fresh.push(existing[i] || { number: i, watched: false });
+    }
+    game.seasons = fresh;
+  }
+
+  // Returns { watched, total } for a TV show
+  function seasonProgress(game) {
+    if (game.mediaType !== 'tv' || !Array.isArray(game.seasons)) {
+      return { watched: 0, total: 0 };
+    }
+    const watched = game.seasons.filter(s => s && s.watched).length;
+    return { watched, total: game.seasons.length };
+  }
+
 
   // --- Details modal ---
   let detailsCurrentId = null;
@@ -3293,6 +3492,7 @@ Return ONLY the JSON object, nothing else.`;
       delete game.rtScore;
       delete game.imdbRating;
       delete game.totalSeasons;
+      delete game.seasons;
     } else {
       // Movies & TV: clear platforms (not relevant)
       delete game.platforms;
@@ -3302,9 +3502,17 @@ Return ONLY the JSON object, nothing else.`;
       if (imdbVal >= 0 && imdbVal <= 10) game.imdbRating = imdbVal; else delete game.imdbRating;
       if (game.mediaType === 'tv') {
         const seasonsVal = parseInt(document.getElementById('editSeasons').value);
-        if (seasonsVal > 0) game.totalSeasons = seasonsVal; else delete game.totalSeasons;
+        if (seasonsVal > 0) {
+          game.totalSeasons = seasonsVal;
+          // Regenerate seasons array to match the new count (preserves existing watched flags)
+          ensureSeasonsArray(game);
+        } else {
+          delete game.totalSeasons;
+          delete game.seasons;
+        }
       } else {
         delete game.totalSeasons;
+        delete game.seasons;
       }
     }
 
@@ -3509,6 +3717,18 @@ Return ONLY the JSON object, nothing else.`;
 
   function normalizeImported(g) {
     const validTypes = ['game', 'movie', 'tv'];
+    // Validate seasons array shape
+    let seasons;
+    if (Array.isArray(g.seasons)) {
+      seasons = g.seasons
+        .filter(s => s && typeof s.number === 'number')
+        .map(s => ({
+          number: s.number,
+          watched: !!s.watched,
+          completedAt: s.completedAt || undefined
+        }));
+      if (seasons.length === 0) seasons = undefined;
+    }
     return {
       id: g.id || ('g_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
       title: String(g.title).trim(),
@@ -3520,6 +3740,7 @@ Return ONLY the JSON object, nothing else.`;
       rtScore: (typeof g.rtScore === 'number') ? g.rtScore : undefined,
       imdbRating: (typeof g.imdbRating === 'number') ? g.imdbRating : undefined,
       totalSeasons: (typeof g.totalSeasons === 'number') ? g.totalSeasons : undefined,
+      seasons: seasons,
       coverUrl: typeof g.coverUrl === 'string' ? g.coverUrl : undefined,
       sourceLabel: typeof g.sourceLabel === 'string' ? g.sourceLabel : undefined,
       status: (g.status === 'played') ? 'played' : 'backlog',
