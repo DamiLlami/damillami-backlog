@@ -47,7 +47,9 @@ export const onRequest = async ({ request, env }) => {
 
   try {
     const token = await getAccessToken(clientId, clientSecret);
-    const body = `search "${title.replace(/"/g, '\\"')}"; fields name, genres, platforms, first_release_date, total_rating_count; limit 5;`;
+    // Add `cover` to fields. IGDB returns the cover as { image_id: "abc123" }
+    // which we resolve to a full URL on our end.
+    const body = `search "${title.replace(/"/g, '\\"')}"; fields name, genres, platforms, first_release_date, total_rating_count, cover.image_id; limit 5;`;
     const r = await fetch('https://api.igdb.com/v4/games', {
       method: 'POST',
       headers: {
@@ -59,6 +61,15 @@ export const onRequest = async ({ request, env }) => {
     });
     if (!r.ok) throw new Error('IGDB query failed: ' + r.status);
     const games = await r.json();
+
+    // Convert cover image_id to a usable thumbnail URL
+    // t_cover_big = 264x374, plenty for our small thumbnail
+    for (const g of games) {
+      if (g.cover && g.cover.image_id) {
+        g.coverUrl = `https://images.igdb.com/igdb/image/upload/t_cover_big/${g.cover.image_id}.jpg`;
+      }
+    }
+
     return new Response(JSON.stringify(games), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
