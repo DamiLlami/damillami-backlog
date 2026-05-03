@@ -1582,6 +1582,102 @@
     background: rgba(201, 164, 240, 0.06);
   }
 
+  /* Toggle button to expand per-season dates */
+  .seasons-dates-toggle-wrap {
+    flex-basis: 100%;
+    margin-top: 4px;
+  }
+
+  .seasons-dates-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-faint);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 0;
+    transition: color 0.15s;
+  }
+
+  .seasons-dates-toggle:hover {
+    color: var(--gold);
+  }
+
+  /* Grid of per-season date rows when expanded */
+  .seasons-dates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 6px 12px;
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .season-date-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+  }
+
+  .season-date-label {
+    color: var(--gold);
+    font-weight: 600;
+    min-width: 24px;
+  }
+
+  .season-date-btn {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-muted);
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.12s;
+    flex: 1;
+  }
+
+  .season-date-btn:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+
+  .season-date-btn.empty {
+    color: var(--text-faint);
+    font-style: italic;
+  }
+
+  .season-date-btn .cal-icon {
+    font-size: 11px;
+  }
+
+  .season-date-input {
+    background: var(--surface);
+    border: 1px solid var(--gold-dim);
+    color: var(--text);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color-scheme: dark;
+    flex: 1;
+  }
+
+  .season-date-input:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
   /* --- Inline rating bar (shown on every card) --- */
   .inline-rating {
     margin-top: 12px;
@@ -2127,8 +2223,8 @@
     typeFilter: 'all',       // media type filter: 'all' | 'game' | 'movie' | 'tv'
     apiKey: '',
     metadataSource: 'none',  // legacy / games default
-    gamesSource: 'none',     // 'none' | 'igdb' | 'rawg' | 'claude'
-    moviesSource: 'none',    // 'none' | 'omdb' | 'claude'
+    gamesSource: 'igdb',     // 'none' | 'igdb' | 'rawg' | 'claude'
+    moviesSource: 'omdb',    // 'none' | 'omdb' | 'claude'
   };
   let editingId = null;
   let editingRating = 0;
@@ -2198,14 +2294,31 @@
         games_source: 'gamesSource',
         movies_source: 'moviesSource',
       };
+      // Track which keys were ever stored — distinguishes "explicit None" from "never set"
+      const wasStored = {};
       for (const k of Object.keys(settingsMap)) {
         const r = await db.get(k);
-        if (r && r.value !== undefined) state[settingsMap[k]] = r.value;
+        if (r && r.value !== undefined) {
+          state[settingsMap[k]] = r.value;
+          wasStored[k] = true;
+        }
       }
       // Migration: legacy single source becomes the games source
       if (state.metadataSource && state.metadataSource !== 'none' && state.gamesSource === 'none') {
         state.gamesSource = state.metadataSource;
         await saveSetting('games_source', state.gamesSource);
+        wasStored['games_source'] = true;
+      }
+
+      // Apply default sources for first-time installs (key never stored before)
+      // — preserves explicit "None" choices made by the user
+      if (!wasStored['games_source']) {
+        state.gamesSource = 'igdb';
+        await saveSetting('games_source', 'igdb');
+      }
+      if (!wasStored['movies_source']) {
+        state.moviesSource = 'omdb';
+        await saveSetting('movies_source', 'omdb');
       }
     } catch (e) {
       console.error('Load failed:', e);
@@ -2367,6 +2480,10 @@
       input.addEventListener('change', handleDateChange);
       input.addEventListener('blur', handleDateBlur);
     });
+    document.querySelectorAll('.season-date-input').forEach(input => {
+      input.addEventListener('change', handleSeasonDateChange);
+      input.addEventListener('blur', handleSeasonDateBlur);
+    });
   }
 
   // Render a column (backlog OR played) as one or more grouped sections
@@ -2484,6 +2601,20 @@
     }[c]));
   }
 
+  // Format a timestamp as MM/DD/YYYY for display
+  function formatDateMMDDYYYY(ts) {
+    if (!ts) return '';
+    const d = new Date(ts);
+    return `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}/${d.getFullYear()}`;
+  }
+
+  // Parse a YYYY-MM-DD value (from a <input type="date">) into a local-noon timestamp
+  function parseLocalDate(value) {
+    if (!value) return null;
+    const [y, m, d] = value.split('-').map(n => parseInt(n));
+    return new Date(y, m - 1, d, 12, 0, 0).getTime();
+  }
+
   // User's preferred platforms (for highlighting)
   const USER_PLATFORMS = ['PC', 'Xbox'];
 
@@ -2501,9 +2632,10 @@
       : '';
     const moveAction = isPlayed
       ? `<button class="icon-btn" data-action="unplay" data-id="${g.id}" title="Move to backlog">↩</button>`
-      : `<button class="icon-btn success" data-action="play" data-id="${g.id}" title="Mark as played">✓</button>`;
+      : `<button class="icon-btn success" data-action="play" data-id="${g.id}" title="${(mediaType === 'movie' || mediaType === 'tv') ? 'Mark as watched' : 'Mark as played'}">✓</button>`;
+    const playedLabel = (mediaType === 'movie' || mediaType === 'tv') ? 'Watched' : 'Played';
     const statusBadge = isPlayed
-      ? `<span class="status-badge played"><span class="check">✓</span>Played</span>`
+      ? `<span class="status-badge played"><span class="check">✓</span>${playedLabel}</span>`
       : `<span class="status-badge backlog">Backlog</span>`;
     const classifyingClass = g.classifying ? ' classifying' : '';
 
@@ -2552,11 +2684,61 @@
         const progressBadge = `<span class="seasons-progress">${progress.watched}<span class="progress-max">/${progress.total}</span></span>`;
         // Allow adding a season directly from the row (in case the show added one)
         const addBtn = `<button type="button" class="season-add-btn" data-action="add-season" data-id="${g.id}" title="Add a season">+</button>`;
+
+        // Per-season completion dates — expand-on-click section, only shown if any season is watched
+        let datesSection = '';
+        const hasAnyWatched = g.seasons.some(s => s.watched);
+        if (hasAnyWatched) {
+          const isExpanded = !!g._seasonDatesExpanded; // transient
+          const toggleLabel = isExpanded ? '▾ Hide dates' : '📅 Dates';
+          const dateRows = isExpanded
+            ? g.seasons.filter(s => s.watched).map(s => {
+                const dateStr = s.completedAt ? new Date(s.completedAt).toISOString().slice(0, 10) : '';
+                const display = s.completedAt
+                  ? formatDateMMDDYYYY(s.completedAt)
+                  : 'set date';
+                const isEditing = (g._editingSeasonDate === s.number);
+                if (isEditing) {
+                  return `
+                    <div class="season-date-row">
+                      <span class="season-date-label">S${s.number}</span>
+                      <input type="date"
+                             class="season-date-input"
+                             data-id="${g.id}"
+                             data-season="${s.number}"
+                             value="${dateStr}"
+                             autofocus />
+                    </div>
+                  `;
+                }
+                return `
+                  <div class="season-date-row">
+                    <span class="season-date-label">S${s.number}</span>
+                    <button type="button" class="season-date-btn${s.completedAt ? '' : ' empty'}"
+                            data-action="edit-season-date"
+                            data-id="${g.id}"
+                            data-season="${s.number}"
+                            title="Edit watch date for S${s.number}">
+                      <span class="cal-icon">📅</span>${display}
+                    </button>
+                  </div>
+                `;
+              }).join('')
+            : '';
+          datesSection = `
+            <div class="seasons-dates-toggle-wrap">
+              <button type="button" class="seasons-dates-toggle" data-action="toggle-season-dates" data-id="${g.id}">${toggleLabel}</button>
+              ${isExpanded ? `<div class="seasons-dates-grid">${dateRows}</div>` : ''}
+            </div>
+          `;
+        }
+
         seasonsRow = `
           <div class="seasons-row">
             <span class="seasons-label">Seasons</span>
             <div class="seasons-pills">${pills}${addBtn}</div>
             ${progressBadge}
+            ${datesSection}
           </div>
         `;
       } else if (g.totalSeasons) {
@@ -2751,7 +2933,9 @@
       game.completedAt = Date.now();
       saveState();
       render();
-      showToast(`Marked "${game.title}" as played`);
+      const mt = game.mediaType || 'game';
+      const verb = (mt === 'movie' || mt === 'tv') ? 'watched' : 'played';
+      showToast(`Marked "${game.title}" as ${verb}`);
     } else if (action === 'unplay') {
       game.status = 'backlog';
       delete game.completedAt;
@@ -2828,7 +3012,61 @@
       saveState();
       render();
       showToast(`Added Season ${game.totalSeasons}`);
+    } else if (action === 'toggle-season-dates') {
+      e.stopPropagation();
+      game._seasonDatesExpanded = !game._seasonDatesExpanded;
+      // Cancel any in-progress date edit when collapsing
+      if (!game._seasonDatesExpanded) delete game._editingSeasonDate;
+      render();
+    } else if (action === 'edit-season-date') {
+      e.stopPropagation();
+      const seasonNum = parseInt(e.currentTarget.dataset.season);
+      // Clear any other date being edited on this game
+      delete game._editingSeasonDate;
+      game._editingSeasonDate = seasonNum;
+      render();
+      // Focus the freshly-rendered input and pop the picker
+      setTimeout(() => {
+        const input = document.querySelector(`.season-date-input[data-id="${game.id}"][data-season="${seasonNum}"]`);
+        if (input) {
+          input.focus();
+          if (typeof input.showPicker === 'function') {
+            try { input.showPicker(); } catch (e) { /* not all browsers allow this */ }
+          }
+        }
+      }, 0);
     }
+  }
+
+  // Handle season date input changes
+  function handleSeasonDateChange(e) {
+    const id = e.currentTarget.dataset.id;
+    const seasonNum = parseInt(e.currentTarget.dataset.season);
+    const game = state.games.find(g => g.id === id);
+    if (!game || !Array.isArray(game.seasons)) return;
+    const season = game.seasons.find(s => s.number === seasonNum);
+    if (!season) return;
+    const value = e.currentTarget.value;
+    if (value) {
+      season.completedAt = parseLocalDate(value);
+    } else {
+      delete season.completedAt;
+    }
+    delete game._editingSeasonDate;
+    saveState();
+    render();
+  }
+
+  function handleSeasonDateBlur(e) {
+    const id = e.currentTarget.dataset.id;
+    const game = state.games.find(g => g.id === id);
+    if (!game) return;
+    setTimeout(() => {
+      if (game._editingSeasonDate !== undefined) {
+        delete game._editingSeasonDate;
+        render();
+      }
+    }, 200);
   }
 
   // Toggle a single season's watched state, with smart promotion to "Played"
@@ -3520,6 +3758,16 @@ Return ONLY the JSON object, nothing else.`;
   let pendingAddStatus = 'backlog';
   document.getElementById('submitBacklogBtn').addEventListener('click', () => { pendingAddStatus = 'backlog'; });
   document.getElementById('submitPlayedBtn').addEventListener('click', () => { pendingAddStatus = 'played'; });
+
+  // Update the "+ Played" / "+ Watched" label based on selected media type
+  function updateAddPlayedLabel() {
+    const mediaType = document.getElementById('mediaTypeInput').value || 'game';
+    const label = (mediaType === 'movie' || mediaType === 'tv') ? '+ Watched' : '+ Played';
+    document.getElementById('submitPlayedBtn').textContent = label;
+  }
+  document.getElementById('mediaTypeInput').addEventListener('change', updateAddPlayedLabel);
+  // Set initial label based on current selection
+  updateAddPlayedLabel();
 
   document.getElementById('addForm').addEventListener('submit', async e => {
     e.preventDefault();
