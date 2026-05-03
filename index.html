@@ -1336,9 +1336,52 @@
 
   .platform-checkboxes {
     display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 12px;
     margin-top: 4px;
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .platform-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .platform-group-title {
+    width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 2px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
+  }
+
+  .platform-group-title[data-action="toggle-platform-group"]:hover {
+    color: var(--gold);
+  }
+
+  .platform-group-toggle {
+    transition: transform 0.2s;
+  }
+
+  .platform-group.collapsed .platform-group-toggle {
+    transform: rotate(-90deg);
+  }
+
+  .platform-group.collapsed .platform-check {
+    display: none;
   }
 
   .platform-check {
@@ -1490,6 +1533,53 @@
     color: var(--text-faint);
     font-weight: 400;
     font-size: 10px;
+  }
+
+  /* Inline button to set season count when none is known */
+  .season-set-btn {
+    background: transparent;
+    border: 1px dashed var(--border-strong);
+    color: var(--text-muted);
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .season-set-btn:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: rgba(201, 164, 240, 0.06);
+  }
+
+  /* Tiny "+" button to add an additional season at the end of pills */
+  .season-add-btn {
+    background: transparent;
+    border: 1px dashed var(--border-strong);
+    color: var(--text-faint);
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    transition: all 0.15s;
+  }
+
+  .season-add-btn:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: rgba(201, 164, 240, 0.06);
   }
 
   /* --- Inline rating bar (shown on every card) --- */
@@ -1842,13 +1932,50 @@
     <div class="media-only" data-types="game">
       <label>Platforms</label>
       <div class="platform-checkboxes" id="editPlatforms">
-        <label class="platform-check"><input type="checkbox" value="PC"><span>PC</span></label>
-        <label class="platform-check"><input type="checkbox" value="Xbox"><span>Xbox</span></label>
-        <label class="platform-check"><input type="checkbox" value="PS5"><span>PS5</span></label>
-        <label class="platform-check"><input type="checkbox" value="PS4"><span>PS4</span></label>
-        <label class="platform-check"><input type="checkbox" value="Switch"><span>Switch</span></label>
-        <label class="platform-check"><input type="checkbox" value="Switch 2"><span>Switch 2</span></label>
-        <label class="platform-check"><input type="checkbox" value="Mobile"><span>Mobile</span></label>
+
+        <div class="platform-group">
+          <div class="platform-group-title">Current Gen</div>
+          <label class="platform-check"><input type="checkbox" value="PC"><span>PC</span></label>
+          <label class="platform-check"><input type="checkbox" value="Steam Deck"><span>Steam Deck</span></label>
+          <label class="platform-check"><input type="checkbox" value="Xbox"><span>Xbox</span></label>
+          <label class="platform-check"><input type="checkbox" value="PS5"><span>PS5</span></label>
+          <label class="platform-check"><input type="checkbox" value="Switch"><span>Switch</span></label>
+          <label class="platform-check"><input type="checkbox" value="Switch 2"><span>Switch 2</span></label>
+          <label class="platform-check"><input type="checkbox" value="Mobile"><span>Mobile</span></label>
+        </div>
+
+        <div class="platform-group">
+          <div class="platform-group-title">Last Gen</div>
+          <label class="platform-check"><input type="checkbox" value="PS4"><span>PS4</span></label>
+          <label class="platform-check"><input type="checkbox" value="Xbox 360"><span>Xbox 360</span></label>
+          <label class="platform-check"><input type="checkbox" value="Wii U"><span>Wii U</span></label>
+        </div>
+
+        <div class="platform-group collapsed">
+          <div class="platform-group-title" data-action="toggle-platform-group">Retro / Classic <span class="platform-group-toggle">▾</span></div>
+          <label class="platform-check"><input type="checkbox" value="PS3"><span>PS3</span></label>
+          <label class="platform-check"><input type="checkbox" value="PS2"><span>PS2</span></label>
+          <label class="platform-check"><input type="checkbox" value="PS1"><span>PS1</span></label>
+          <label class="platform-check"><input type="checkbox" value="PSP"><span>PSP</span></label>
+          <label class="platform-check"><input type="checkbox" value="Vita"><span>PS Vita</span></label>
+          <label class="platform-check"><input type="checkbox" value="Xbox One"><span>Xbox One</span></label>
+          <label class="platform-check"><input type="checkbox" value="Original Xbox"><span>Original Xbox</span></label>
+          <label class="platform-check"><input type="checkbox" value="Wii"><span>Wii</span></label>
+          <label class="platform-check"><input type="checkbox" value="GameCube"><span>GameCube</span></label>
+          <label class="platform-check"><input type="checkbox" value="N64"><span>N64</span></label>
+          <label class="platform-check"><input type="checkbox" value="SNES"><span>SNES</span></label>
+          <label class="platform-check"><input type="checkbox" value="NES"><span>NES</span></label>
+          <label class="platform-check"><input type="checkbox" value="3DS"><span>3DS</span></label>
+          <label class="platform-check"><input type="checkbox" value="DS"><span>DS</span></label>
+          <label class="platform-check"><input type="checkbox" value="GBA"><span>Game Boy Advance</span></label>
+          <label class="platform-check"><input type="checkbox" value="GBC"><span>Game Boy Color</span></label>
+          <label class="platform-check"><input type="checkbox" value="Game Boy"><span>Game Boy</span></label>
+          <label class="platform-check"><input type="checkbox" value="Dreamcast"><span>Dreamcast</span></label>
+          <label class="platform-check"><input type="checkbox" value="Saturn"><span>Saturn</span></label>
+          <label class="platform-check"><input type="checkbox" value="Genesis"><span>Genesis</span></label>
+          <label class="platform-check"><input type="checkbox" value="Atari 2600"><span>Atari 2600</span></label>
+        </div>
+
       </div>
     </div>
 
@@ -2407,34 +2534,42 @@
       imdbHtml = `<span class="imdb-rating" title="IMDb Rating"><span class="imdb-rating-label">IMDb</span>${g.imdbRating.toFixed(1)}</span>`;
     }
 
-    // Seasons progress (TV) — replaces the simple "X seasons" text
+    // Seasons row (TV only) — always present, content varies by data state
     let seasonsHtml = '';
     let seasonsRow = '';
-    if (mediaType === 'tv' && g.totalSeasons) {
+    if (mediaType === 'tv') {
       const progress = seasonProgress(g);
-      if (progress.total > 0) {
+      if (progress.total > 0 && Array.isArray(g.seasons) && g.seasons.length) {
+        // Full pill row
         seasonsHtml = `<span class="meta-text">${progress.watched}/${progress.total} seasons</span>`;
-        // Build the toggle pills row (only if seasons array exists)
-        if (Array.isArray(g.seasons) && g.seasons.length) {
-          const pills = g.seasons.map(s => `
-            <button type="button" class="season-pill${s.watched ? ' watched' : ''}"
-                    data-action="toggle-season"
-                    data-id="${g.id}"
-                    data-season="${s.number}"
-                    title="${s.watched ? 'Watched' : 'Mark as watched'} — Season ${s.number}">S${s.number}</button>
-          `).join('');
-          const progressBadge = `<span class="seasons-progress">${progress.watched}<span class="progress-max">/${progress.total}</span></span>`;
-          seasonsRow = `
-            <div class="seasons-row">
-              <span class="seasons-label">Seasons</span>
-              <div class="seasons-pills">${pills}</div>
-              ${progressBadge}
-            </div>
-          `;
-        }
-      } else {
-        // We know totalSeasons but seasons array hasn't been built yet — show static text
+        const pills = g.seasons.map(s => `
+          <button type="button" class="season-pill${s.watched ? ' watched' : ''}"
+                  data-action="toggle-season"
+                  data-id="${g.id}"
+                  data-season="${s.number}"
+                  title="${s.watched ? 'Watched' : 'Mark as watched'} — Season ${s.number}">S${s.number}</button>
+        `).join('');
+        const progressBadge = `<span class="seasons-progress">${progress.watched}<span class="progress-max">/${progress.total}</span></span>`;
+        // Allow adding a season directly from the row (in case the show added one)
+        const addBtn = `<button type="button" class="season-add-btn" data-action="add-season" data-id="${g.id}" title="Add a season">+</button>`;
+        seasonsRow = `
+          <div class="seasons-row">
+            <span class="seasons-label">Seasons</span>
+            <div class="seasons-pills">${pills}${addBtn}</div>
+            ${progressBadge}
+          </div>
+        `;
+      } else if (g.totalSeasons) {
+        // Have totalSeasons but no seasons array yet — meta text + show pills (lazy backfill should have run)
         seasonsHtml = `<span class="meta-text">${g.totalSeasons} season${g.totalSeasons === 1 ? '' : 's'}</span>`;
+      } else {
+        // No season data at all — show prompt to set count manually
+        seasonsRow = `
+          <div class="seasons-row">
+            <span class="seasons-label">Seasons</span>
+            <button type="button" class="season-set-btn" data-action="set-season-count" data-id="${g.id}" title="How many seasons does this show have?">+ Set season count</button>
+          </div>
+        `;
       }
     }
 
@@ -2672,6 +2807,27 @@
     } else if (action === 'toggle-season') {
       e.stopPropagation();
       toggleSeasonWatched(game, parseInt(e.currentTarget.dataset.season));
+    } else if (action === 'set-season-count') {
+      e.stopPropagation();
+      const input = prompt(`How many seasons does "${game.title}" have?`, '');
+      if (input === null) return;
+      const n = parseInt(input);
+      if (!n || n < 1 || n > 100) {
+        showToast('Please enter a number between 1 and 100');
+        return;
+      }
+      game.totalSeasons = n;
+      ensureSeasonsArray(game);
+      saveState();
+      render();
+      showToast(`Set ${n} season${n === 1 ? '' : 's'} for "${game.title}"`);
+    } else if (action === 'add-season') {
+      e.stopPropagation();
+      game.totalSeasons = (game.totalSeasons || 0) + 1;
+      ensureSeasonsArray(game);
+      saveState();
+      render();
+      showToast(`Added Season ${game.totalSeasons}`);
     }
   }
 
@@ -3017,18 +3173,55 @@
 
   // IGDB platform IDs → our internal platform names
   const IGDB_PLATFORM_MAP = {
-    6: 'PC',       // Windows
-    14: 'PC',      // Mac
-    3: 'PC',       // Linux
-    49: 'Xbox',    // Xbox One
-    169: 'Xbox',   // Xbox Series X|S
-    11: 'Xbox',    // Xbox 360 (treat as Xbox)
-    48: 'PS4',     // PlayStation 4
-    167: 'PS5',    // PlayStation 5
-    130: 'Switch', // Nintendo Switch
-    508: 'Switch 2', // Nintendo Switch 2
-    34: 'Mobile',  // Android
-    39: 'Mobile',  // iOS
+    // Current gen
+    6: 'PC',          // Windows
+    14: 'PC',         // Mac
+    3: 'PC',          // Linux
+    169: 'Xbox',      // Xbox Series X|S
+    167: 'PS5',       // PlayStation 5
+    130: 'Switch',    // Nintendo Switch
+    508: 'Switch 2',  // Nintendo Switch 2
+    34: 'Mobile',     // Android
+    39: 'Mobile',     // iOS
+    // Steam Deck released as platform on IGDB recently
+    471: 'Steam Deck',
+
+    // Last gen
+    48: 'PS4',        // PlayStation 4
+    49: 'Xbox One',   // Xbox One
+    11: 'Xbox 360',   // Xbox 360
+    41: 'Wii U',      // Wii U
+
+    // Sony classic
+    9: 'PS3',         // PlayStation 3
+    8: 'PS2',         // PlayStation 2
+    7: 'PS1',         // PlayStation
+    38: 'PSP',        // PSP
+    46: 'Vita',       // PlayStation Vita
+
+    // Microsoft classic
+    11: 'Xbox 360',   // (already above)
+    12: 'Original Xbox', // Xbox
+
+    // Nintendo classic
+    5: 'Wii',         // Wii
+    21: 'GameCube',   // Nintendo GameCube
+    4: 'N64',         // Nintendo 64
+    19: 'SNES',       // SNES
+    18: 'NES',        // NES
+    37: '3DS',        // Nintendo 3DS
+    20: 'DS',         // Nintendo DS
+    24: 'GBA',        // Game Boy Advance
+    22: 'GBC',        // Game Boy Color
+    33: 'Game Boy',   // Game Boy
+
+    // SEGA
+    23: 'Dreamcast',  // Dreamcast
+    32: 'Saturn',     // Saturn
+    29: 'Genesis',    // Genesis / Mega Drive
+
+    // Atari
+    59: 'Atari 2600', // Atari 2600
   };
 
   async function lookupIGDB(title) {
@@ -3093,13 +3286,41 @@
 
   function mapRawgPlatform(name) {
     const n = name.toLowerCase();
-    if (n.includes('pc') || n.includes('mac') || n.includes('linux')) return 'PC';
-    if (n.includes('xbox')) return 'Xbox';
+
+    // Current
+    if (n.includes('mac') || n.includes('linux') || n === 'pc') return 'PC';
+    if (n.includes('steam deck')) return 'Steam Deck';
+    if (n.includes('xbox series')) return 'Xbox';
+    if (n.includes('xbox one')) return 'Xbox One';
+    if (n.includes('xbox 360')) return 'Xbox 360';
+    if (n.includes('xbox') && !n.includes('360') && !n.includes('one') && !n.includes('series')) return 'Original Xbox';
     if (n.includes('playstation 5') || n === 'ps5') return 'PS5';
     if (n.includes('playstation 4') || n === 'ps4') return 'PS4';
+    if (n.includes('playstation 3') || n === 'ps3') return 'PS3';
+    if (n.includes('playstation 2') || n === 'ps2') return 'PS2';
+    if (n === 'playstation' || n === 'ps1' || n === 'ps') return 'PS1';
+    if (n.includes('vita')) return 'Vita';
+    if (n.includes('psp')) return 'PSP';
     if (n.includes('switch 2')) return 'Switch 2';
     if (n.includes('switch')) return 'Switch';
+    if (n.includes('wii u')) return 'Wii U';
+    if (n === 'wii' || n.includes('nintendo wii')) return 'Wii';
+    if (n.includes('gamecube')) return 'GameCube';
+    if (n.includes('nintendo 64') || n === 'n64') return 'N64';
+    if (n.includes('snes') || n.includes('super nintendo')) return 'SNES';
+    if (n === 'nes' || n.includes('nintendo entertainment')) return 'NES';
+    if (n.includes('3ds')) return '3DS';
+    if (n.includes('nintendo ds')) return 'DS';
+    if (n.includes('game boy advance') || n === 'gba') return 'GBA';
+    if (n.includes('game boy color') || n === 'gbc') return 'GBC';
+    if (n.includes('game boy')) return 'Game Boy';
+    if (n.includes('dreamcast')) return 'Dreamcast';
+    if (n.includes('saturn')) return 'Saturn';
+    if (n.includes('genesis') || n.includes('mega drive')) return 'Genesis';
+    if (n.includes('atari 2600')) return 'Atari 2600';
     if (n.includes('ios') || n.includes('android')) return 'Mobile';
+    // PC fallback after specific matches (so "Macintosh" caught above doesn't conflict)
+    if (n.includes('windows') || n.includes('pc')) return 'PC';
     return null;
   }
 
@@ -3169,7 +3390,15 @@ Return ONLY the JSON object, nothing else.`;
 
 Genre must be ONE of: RPG, Indie, Shooter, Puzzle, Strategy, Coop, Other.
 Year: original release year as a 4-digit integer. If unknown, use null.
-Platforms: array of strings, ONLY: "PC", "Xbox", "PS5", "PS4", "Switch", "Switch 2", "Mobile". Use "Xbox" for Xbox One / Series S/X.
+Platforms: array of strings. Use ONLY values from this list:
+"PC", "Steam Deck", "Xbox", "PS5", "Switch", "Switch 2", "Mobile",
+"PS4", "Xbox One", "Xbox 360", "Wii U",
+"PS3", "PS2", "PS1", "PSP", "Vita",
+"Original Xbox",
+"Wii", "GameCube", "N64", "SNES", "NES", "3DS", "DS", "GBA", "GBC", "Game Boy",
+"Dreamcast", "Saturn", "Genesis",
+"Atari 2600".
+Use "Xbox" for Xbox Series X|S only — Xbox One and Xbox 360 should be listed as their own values.
 Summary: 1-2 sentence summary of the game. Keep it concise.
 
 Return ONLY the JSON object, nothing else.`;
@@ -3208,7 +3437,15 @@ Return ONLY the JSON object, nothing else.`;
       };
     } else {
       const validGenres = ['RPG', 'Indie', 'Shooter', 'Puzzle', 'Strategy', 'Coop', 'Other'];
-      const validPlatforms = ['PC', 'Xbox', 'PS5', 'PS4', 'Switch', 'Switch 2', 'Mobile'];
+      const validPlatforms = [
+        'PC', 'Steam Deck', 'Xbox', 'PS5', 'Switch', 'Switch 2', 'Mobile',
+        'PS4', 'Xbox One', 'Xbox 360', 'Wii U',
+        'PS3', 'PS2', 'PS1', 'PSP', 'Vita',
+        'Original Xbox',
+        'Wii', 'GameCube', 'N64', 'SNES', 'NES', '3DS', 'DS', 'GBA', 'GBC', 'Game Boy',
+        'Dreamcast', 'Saturn', 'Genesis',
+        'Atari 2600'
+      ];
       return {
         genre: validGenres.includes(parsed.genre) ? parsed.genre : 'Other',
         year: (typeof parsed.year === 'number' && parsed.year > 1970 && parsed.year < 2100) ? parsed.year : null,
@@ -3468,6 +3705,14 @@ Return ONLY the JSON object, nothing else.`;
   });
 
   document.getElementById('modalCancel').addEventListener('click', closeModal);
+
+  // Toggle collapse on the Retro/Classic platform group when its title is clicked
+  document.getElementById('editPlatforms').addEventListener('click', e => {
+    const titleEl = e.target.closest('[data-action="toggle-platform-group"]');
+    if (!titleEl) return;
+    const group = titleEl.closest('.platform-group');
+    if (group) group.classList.toggle('collapsed');
+  });
   document.getElementById('modalBackdrop').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal();
   });
