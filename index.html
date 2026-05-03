@@ -1475,15 +1475,25 @@
 
   .seasons-pills {
     display: flex;
-    gap: 4px;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  /* Each season is a horizontal row: toggle pill | date | rating pills */
+  .season-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     flex-wrap: wrap;
-    flex: 1;
+    padding: 4px 0;
   }
 
   .season-pill {
-    min-width: 38px;
-    height: 26px;
-    padding: 0 8px;
+    min-width: 44px;
+    height: 28px;
+    padding: 0 10px;
     border-radius: 6px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -1499,6 +1509,7 @@
     justify-content: center;
     gap: 3px;
     line-height: 1;
+    flex-shrink: 0;
   }
 
   .season-pill:hover {
@@ -1518,6 +1529,127 @@
     content: '✓';
     font-size: 10px;
     font-weight: 700;
+  }
+
+  /* Inline per-season date button (visible only when watched) */
+  .season-row-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    transition: all 0.12s;
+    flex-shrink: 0;
+  }
+
+  .season-row-date:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+
+  .season-row-date.empty {
+    color: var(--text-faint);
+    font-style: italic;
+  }
+
+  .season-row-date-input {
+    background: var(--surface);
+    border: 1px solid var(--gold-dim);
+    color: var(--text);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color-scheme: dark;
+    flex-shrink: 0;
+  }
+
+  .season-row-date-input:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  /* Inline per-season rating (1-10 mini pills) */
+  .season-row-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .season-rating-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-right: 4px;
+  }
+
+  .season-rating-pill {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.1s;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .season-rating-pill:hover {
+    border-color: var(--gold-dim);
+    color: var(--text);
+  }
+
+  .season-rating-pill.filled {
+    background: rgba(201, 164, 240, 0.18);
+    border-color: var(--gold-dim);
+    color: var(--text);
+  }
+
+  .season-rating-pill.peak {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+    border-color: var(--gold);
+    color: var(--bg);
+  }
+
+  .season-rating-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--gold);
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .season-rating-display .max {
+    color: var(--text-faint);
+    font-weight: 400;
+    font-size: 9px;
+  }
+
+  .season-rating-empty {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    font-style: italic;
   }
 
   .seasons-progress {
@@ -2480,7 +2612,7 @@
       input.addEventListener('change', handleDateChange);
       input.addEventListener('blur', handleDateBlur);
     });
-    document.querySelectorAll('.season-date-input').forEach(input => {
+    document.querySelectorAll('.season-row-date-input').forEach(input => {
       input.addEventListener('change', handleSeasonDateChange);
       input.addEventListener('blur', handleSeasonDateBlur);
     });
@@ -2672,73 +2804,21 @@
     if (mediaType === 'tv') {
       const progress = seasonProgress(g);
       if (progress.total > 0 && Array.isArray(g.seasons) && g.seasons.length) {
-        // Full pill row
         seasonsHtml = `<span class="meta-text">${progress.watched}/${progress.total} seasons</span>`;
-        const pills = g.seasons.map(s => `
-          <button type="button" class="season-pill${s.watched ? ' watched' : ''}"
-                  data-action="toggle-season"
-                  data-id="${g.id}"
-                  data-season="${s.number}"
-                  title="${s.watched ? 'Watched' : 'Mark as watched'} — Season ${s.number}">S${s.number}</button>
-        `).join('');
-        const progressBadge = `<span class="seasons-progress">${progress.watched}<span class="progress-max">/${progress.total}</span></span>`;
-        // Allow adding a season directly from the row (in case the show added one)
-        const addBtn = `<button type="button" class="season-add-btn" data-action="add-season" data-id="${g.id}" title="Add a season">+</button>`;
 
-        // Per-season completion dates — expand-on-click section, only shown if any season is watched
-        let datesSection = '';
-        const hasAnyWatched = g.seasons.some(s => s.watched);
-        if (hasAnyWatched) {
-          const isExpanded = !!g._seasonDatesExpanded; // transient
-          const toggleLabel = isExpanded ? '▾ Hide dates' : '📅 Dates';
-          const dateRows = isExpanded
-            ? g.seasons.filter(s => s.watched).map(s => {
-                const dateStr = s.completedAt ? new Date(s.completedAt).toISOString().slice(0, 10) : '';
-                const display = s.completedAt
-                  ? formatDateMMDDYYYY(s.completedAt)
-                  : 'set date';
-                const isEditing = (g._editingSeasonDate === s.number);
-                if (isEditing) {
-                  return `
-                    <div class="season-date-row">
-                      <span class="season-date-label">S${s.number}</span>
-                      <input type="date"
-                             class="season-date-input"
-                             data-id="${g.id}"
-                             data-season="${s.number}"
-                             value="${dateStr}"
-                             autofocus />
-                    </div>
-                  `;
-                }
-                return `
-                  <div class="season-date-row">
-                    <span class="season-date-label">S${s.number}</span>
-                    <button type="button" class="season-date-btn${s.completedAt ? '' : ' empty'}"
-                            data-action="edit-season-date"
-                            data-id="${g.id}"
-                            data-season="${s.number}"
-                            title="Edit watch date for S${s.number}">
-                      <span class="cal-icon">📅</span>${display}
-                    </button>
-                  </div>
-                `;
-              }).join('')
-            : '';
-          datesSection = `
-            <div class="seasons-dates-toggle-wrap">
-              <button type="button" class="seasons-dates-toggle" data-action="toggle-season-dates" data-id="${g.id}">${toggleLabel}</button>
-              ${isExpanded ? `<div class="seasons-dates-grid">${dateRows}</div>` : ''}
-            </div>
-          `;
-        }
+        // One row per season — each row: [toggle pill] [date if watched] [rating pills if watched]
+        const seasonRows = g.seasons.map(s => renderSeasonRow(g, s)).join('');
+        const progressBadge = `<span class="seasons-progress">${progress.watched}<span class="progress-max">/${progress.total}</span></span>`;
+        const addBtn = `<button type="button" class="season-add-btn" data-action="add-season" data-id="${g.id}" title="Add a season">+ Add season</button>`;
 
         seasonsRow = `
           <div class="seasons-row">
-            <span class="seasons-label">Seasons</span>
-            <div class="seasons-pills">${pills}${addBtn}</div>
-            ${progressBadge}
-            ${datesSection}
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:6px;">
+              <span class="seasons-label">Seasons</span>
+              ${progressBadge}
+            </div>
+            <div class="seasons-pills">${seasonRows}</div>
+            <div style="margin-top:6px;">${addBtn}</div>
           </div>
         `;
       } else if (g.totalSeasons) {
@@ -2794,9 +2874,9 @@
     if (imdbHtml) metaParts.push(imdbHtml);
     if (platformsHtml) metaParts.push(platformsHtml);
 
-    // Completion date (played items only)
+    // Completion date (played items only — but NOT TV shows, since per-season dates handle that)
     let completionDateHtml = '';
-    if (isPlayed) {
+    if (isPlayed && mediaType !== 'tv') {
       const editingDate = g._editingDate; // transient flag
       if (editingDate) {
         const dateStr = g.completedAt ? new Date(g.completedAt).toISOString().slice(0, 10) : '';
@@ -2810,11 +2890,9 @@
           />
         `;
       } else if (g.completedAt) {
-        const d = new Date(g.completedAt);
-        const formatted = `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}/${d.getFullYear()}`;
         completionDateHtml = `
           <button class="completion-date" data-action="edit-date" data-id="${g.id}" title="Edit completion date">
-            <span class="cal-icon">📅</span>${formatted}
+            <span class="cal-icon">📅</span>${formatDateMMDDYYYY(g.completedAt)}
           </button>
         `;
       } else {
@@ -3027,7 +3105,7 @@
       render();
       // Focus the freshly-rendered input and pop the picker
       setTimeout(() => {
-        const input = document.querySelector(`.season-date-input[data-id="${game.id}"][data-season="${seasonNum}"]`);
+        const input = document.querySelector(`.season-row-date-input[data-id="${game.id}"][data-season="${seasonNum}"]`);
         if (input) {
           input.focus();
           if (typeof input.showPicker === 'function') {
@@ -3035,6 +3113,18 @@
           }
         }
       }, 0);
+    } else if (action === 'rate-season') {
+      e.stopPropagation();
+      const seasonNum = parseInt(e.currentTarget.dataset.season);
+      const newRating = parseInt(e.currentTarget.dataset.val);
+      if (!Array.isArray(game.seasons)) return;
+      const season = game.seasons.find(s => s.number === seasonNum);
+      if (!season || !season.watched) return;
+      // Click the same rating again to clear it (toggle off)
+      season.rating = (season.rating === newRating) ? 0 : newRating;
+      if (!season.rating) delete season.rating;
+      saveState();
+      render();
     }
   }
 
@@ -3230,6 +3320,79 @@
     }
     const watched = game.seasons.filter(s => s && s.watched).length;
     return { watched, total: game.seasons.length };
+  }
+
+  // Render a single season row: toggle pill + (date + rating, if watched)
+  function renderSeasonRow(g, s) {
+    const togglePill = `
+      <button type="button" class="season-pill${s.watched ? ' watched' : ''}"
+              data-action="toggle-season"
+              data-id="${g.id}"
+              data-season="${s.number}"
+              title="${s.watched ? 'Watched' : 'Mark as watched'} — Season ${s.number}">S${s.number}</button>
+    `;
+
+    if (!s.watched) {
+      // Just the toggle pill — nothing else for unwatched seasons
+      return `<div class="season-row">${togglePill}</div>`;
+    }
+
+    // Date control (inline button or input field if editing)
+    let dateControl;
+    if (g._editingSeasonDate === s.number) {
+      const dateStr = s.completedAt ? new Date(s.completedAt).toISOString().slice(0, 10) : '';
+      dateControl = `
+        <input type="date"
+               class="season-row-date-input"
+               data-id="${g.id}"
+               data-season="${s.number}"
+               value="${dateStr}"
+               autofocus />
+      `;
+    } else if (s.completedAt) {
+      dateControl = `
+        <button type="button" class="season-row-date"
+                data-action="edit-season-date"
+                data-id="${g.id}"
+                data-season="${s.number}"
+                title="Edit watch date for S${s.number}">📅 ${formatDateMMDDYYYY(s.completedAt)}</button>
+      `;
+    } else {
+      dateControl = `
+        <button type="button" class="season-row-date empty"
+                data-action="edit-season-date"
+                data-id="${g.id}"
+                data-season="${s.number}"
+                title="Set watch date for S${s.number}">📅 set date</button>
+      `;
+    }
+
+    // Per-season rating (1-10 mini pills)
+    const currentRating = s.rating || 0;
+    const ratingPills = [];
+    for (let i = 1; i <= 10; i++) {
+      let cls = 'season-rating-pill';
+      if (i <= currentRating) cls += (i === currentRating) ? ' peak' : ' filled';
+      ratingPills.push(`<button type="button" class="${cls}" data-action="rate-season" data-id="${g.id}" data-season="${s.number}" data-val="${i}" title="Rate S${s.number}: ${i}/10">${i}</button>`);
+    }
+    const ratingDisplay = currentRating
+      ? `<span class="season-rating-display">${currentRating}<span class="max">/10</span></span>`
+      : '';
+    const ratingControl = `
+      <span class="season-row-rating">
+        <span class="season-rating-label">Rate</span>
+        ${ratingPills.join('')}
+        ${ratingDisplay}
+      </span>
+    `;
+
+    return `
+      <div class="season-row">
+        ${togglePill}
+        ${dateControl}
+        ${ratingControl}
+      </div>
+    `;
   }
 
 
@@ -3908,9 +4071,9 @@ Return ONLY the JSON object, nothing else.`;
     const gamePlatforms = game.platforms || [];
     checkboxes.forEach(cb => { cb.checked = gamePlatforms.includes(cb.value); });
 
-    // Completion date (only for played items)
+    // Completion date (only for played items, and not for TV shows — per-season dates handle TV)
     const completionRow = document.getElementById('editCompletionRow');
-    if (game.status === 'played') {
+    if (game.status === 'played' && mediaType !== 'tv') {
       completionRow.style.display = 'block';
       const dateInput = document.getElementById('editCompletionDate');
       dateInput.value = game.completedAt
@@ -4012,8 +4175,8 @@ Return ONLY the JSON object, nothing else.`;
     game.summary = document.getElementById('editSummary').value.trim();
     if (!game.summary) delete game.summary;
 
-    // Completion date (played only)
-    if (game.status === 'played') {
+    // Completion date (played only — skip for TV since per-season dates handle it)
+    if (game.status === 'played' && game.mediaType !== 'tv') {
       const dateVal = document.getElementById('editCompletionDate').value;
       if (dateVal) {
         const [y, m, d] = dateVal.split('-').map(n => parseInt(n));
@@ -4218,7 +4381,8 @@ Return ONLY the JSON object, nothing else.`;
         .map(s => ({
           number: s.number,
           watched: !!s.watched,
-          completedAt: s.completedAt || undefined
+          completedAt: s.completedAt || undefined,
+          rating: (typeof s.rating === 'number' && s.rating >= 0 && s.rating <= 10) ? s.rating : undefined
         }));
       if (seasons.length === 0) seasons = undefined;
     }
