@@ -833,6 +833,78 @@
     display: none;
   }
 
+  /* Series sub-grouping inside a media-type group */
+  .series-subgroup {
+    margin: 4px 0 12px;
+    padding: 0 0 0 16px;
+    border-left: 2px solid var(--sage-dim);
+  }
+
+  .series-subgroup:last-child {
+    margin-bottom: 0;
+  }
+
+  .series-subheader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(123, 91, 168, 0.08) 0%, transparent 100%);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .series-subheader:hover {
+    background: linear-gradient(90deg, rgba(123, 91, 168, 0.14) 0%, transparent 100%);
+  }
+
+  .series-subheader-title {
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    letter-spacing: 0;
+    color: var(--gold-dim);
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .series-icon {
+    font-size: 11px;
+    color: var(--sage);
+    font-style: normal;
+  }
+
+  .series-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+  }
+
+  .series-toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    transition: transform 0.2s;
+  }
+
+  .series-subgroup.collapsed .series-toggle {
+    transform: rotate(-90deg);
+  }
+
+  .series-subgroup.collapsed .series-cards {
+    display: none;
+  }
+
+  .series-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
   /* "Show all" / "Show less" button */
   .show-more-btn {
     display: block;
@@ -1199,6 +1271,52 @@
 
   .icon-btn.danger:hover { color: var(--crimson); }
   .icon-btn.success:hover { color: var(--gold); }
+
+  /* "Completed" toggle pill — TV shows only — sits in card actions area */
+  .complete-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: all 0.18s;
+    line-height: 1;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .complete-toggle:hover {
+    color: #8FBA9F;
+    border-color: #6FA887;
+    background: rgba(111, 168, 135, 0.08);
+  }
+
+  .complete-toggle.active {
+    background: linear-gradient(135deg, #6FA887 0%, #5A8C70 100%);
+    border-color: #6FA887;
+    color: #0F1A14;
+    box-shadow: 0 0 10px rgba(111, 168, 135, 0.35);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .complete-toggle.active:hover {
+    background: linear-gradient(135deg, #7FB897 0%, #6FA887 100%);
+    color: #0F1A14;
+  }
+
+  .complete-toggle .check-mark {
+    font-size: 11px;
+    font-weight: 700;
+  }
 
   /* --- Empty state --- */
   .empty-state {
@@ -2141,6 +2259,10 @@
     <label>Title</label>
     <input type="text" id="editTitle">
 
+    <label>Series / Franchise <span style="color: var(--text-faint); font-weight: 400;">(optional)</span></label>
+    <input type="text" id="editSeries" placeholder="e.g., Final Fantasy, Marvel, Star Trek" autocomplete="off" list="seriesSuggestions">
+    <datalist id="seriesSuggestions"></datalist>
+
     <label>Media Type</label>
     <select id="editMediaType">
       <option value="game">🎮 Game</option>
@@ -2689,7 +2811,7 @@
       `;
     }
 
-    const cardsHtml = slice.map(renderCard).join('');
+    const cardsHtml = renderItemsWithSeriesSubgroups(slice, groupKey);
 
     let showMore = '';
     if (total > DEFAULT_VISIBLE_PER_GROUP && !isCollapsed) {
@@ -2710,6 +2832,82 @@
         ${showMore}
       </div>
     `;
+  }
+
+  // Render a list of items, grouping consecutive items that share a series under a sub-header.
+  // Items with no series, or items whose series only appears once in the slice, render flat.
+  function renderItemsWithSeriesSubgroups(items, parentGroupKey) {
+    if (!items.length) return '';
+
+    // Count series occurrences across the slice — only group if 2+ items share a series
+    const seriesCounts = {};
+    for (const item of items) {
+      if (item.series) {
+        seriesCounts[item.series] = (seriesCounts[item.series] || 0) + 1;
+      }
+    }
+
+    // Sort items so members of the same series are contiguous (preserves overall order otherwise)
+    const sorted = items.slice().sort((a, b) => {
+      const aHas = !!(a.series && seriesCounts[a.series] >= 2);
+      const bHas = !!(b.series && seriesCounts[b.series] >= 2);
+      if (aHas && bHas) {
+        // Same series? keep relative order. Different series? alphabetical.
+        if (a.series !== b.series) return a.series.localeCompare(b.series);
+        return 0;
+      }
+      // Items with a series go before flat ones, so series groups appear at top
+      if (aHas && !bHas) return -1;
+      if (!aHas && bHas) return 1;
+      return 0;
+    });
+
+    const html = [];
+    let currentSeries = null;
+    let currentSeriesCards = [];
+
+    const flushSeries = () => {
+      if (currentSeries && currentSeriesCards.length) {
+        const subKey = `${parentGroupKey}::series::${currentSeries}`;
+        const isSeriesCollapsed = collapsedGroups.has(subKey);
+        html.push(`
+          <div class="series-subgroup${isSeriesCollapsed ? ' collapsed' : ''}">
+            <div class="series-subheader" data-group-action="toggle-collapse" data-group="${subKey}">
+              <div class="series-subheader-title">
+                <span class="series-icon">⛓</span>${escapeHtml(currentSeries)}
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="series-count">${currentSeriesCards.length}</span>
+                <span class="series-toggle">▾</span>
+              </div>
+            </div>
+            <div class="series-cards">
+              ${currentSeriesCards.join('')}
+            </div>
+          </div>
+        `);
+      }
+      currentSeries = null;
+      currentSeriesCards = [];
+    };
+
+    for (const item of sorted) {
+      const itemSeries = (item.series && seriesCounts[item.series] >= 2) ? item.series : null;
+      if (itemSeries) {
+        if (itemSeries !== currentSeries) {
+          flushSeries();
+          currentSeries = itemSeries;
+        }
+        currentSeriesCards.push(renderCard(item));
+      } else {
+        // Flush any pending series group before rendering a flat item
+        flushSeries();
+        html.push(renderCard(item));
+      }
+    }
+    flushSeries(); // final flush
+
+    return html.join('');
   }
 
   function handleGroupAction(e) {
@@ -2961,6 +3159,14 @@
             </div>
           </div>
           <div class="card-actions">
+            ${mediaType === 'tv' ? `
+              <button class="complete-toggle${g.completed ? ' active' : ''}"
+                      data-action="toggle-complete"
+                      data-id="${g.id}"
+                      title="${g.completed ? 'Series complete — click to unmark' : 'Mark show as complete'}">
+                ${g.completed ? '<span class="check-mark">✓</span>Completed' : 'Completed'}
+              </button>
+            ` : ''}
             ${moveAction}
             <button class="icon-btn" data-action="edit" data-id="${g.id}" title="Edit">✎</button>
             <button class="icon-btn danger" data-action="delete" data-id="${g.id}" title="Remove">✕</button>
@@ -3125,6 +3331,20 @@
       if (!season.rating) delete season.rating;
       saveState();
       render();
+    } else if (action === 'toggle-complete') {
+      e.stopPropagation();
+      game.completed = !game.completed;
+      if (game.completed) {
+        // Track when the user marked it complete (separate from completedAt season dates)
+        game.completedSeriesAt = Date.now();
+      } else {
+        delete game.completedSeriesAt;
+      }
+      saveState();
+      render();
+      showToast(game.completed
+        ? `"${game.title}" marked as complete`
+        : `"${game.title}" — completed flag cleared`);
     }
   }
 
@@ -3277,6 +3497,10 @@
     } else if (info.totalSeasons === null) delete game.totalSeasons;
     if (typeof info.coverUrl === 'string' && info.coverUrl) game.coverUrl = info.coverUrl;
     else if (info.coverUrl === null) delete game.coverUrl;
+    // Series — only auto-fill if there isn't already one (user manual edits take priority)
+    if (typeof info.series === 'string' && info.series && !game.series) {
+      game.series = info.series;
+    }
     if (info.sourceLabel) game.sourceLabel = info.sourceLabel;
     if (info.syncStatus === 'failed' || info.syncStatus === 'error') {
       game.syncIssue = info.syncStatus;
@@ -3660,7 +3884,14 @@
       ? new Date(best.first_release_date * 1000).getFullYear()
       : null;
 
-    return { genre, year, platforms, coverUrl: best.coverUrl || null, sourceLabel: 'IGDB' };
+    // Series: prefer `collection.name` (specific main series) over `franchise.name` (broader umbrella).
+    // Example: "Final Fantasy VII Remake" — collection: "Final Fantasy", franchise: "Final Fantasy"
+    // For "Mass Effect: Andromeda" — collection: "Mass Effect", franchise: "Mass Effect"
+    let series = null;
+    if (best.collection && best.collection.name) series = best.collection.name;
+    else if (best.franchise && best.franchise.name) series = best.franchise.name;
+
+    return { genre, year, platforms, coverUrl: best.coverUrl || null, series, sourceLabel: 'IGDB' };
   }
 
   // ---- RAWG ----
@@ -3760,6 +3991,7 @@
       year,
       platforms: platforms.length ? platforms : [],
       coverUrl: best.background_image || null,
+      series: detectSeriesFromTitle(best.name || ''),
       sourceLabel: 'RAWG.io'
     };
   }
@@ -3834,6 +4066,7 @@ Return ONLY the JSON object, nothing else.`;
         imdbRating: (typeof parsed.imdbRating === 'number') ? parsed.imdbRating : null,
         rtScore: (mediaType === 'movie' && typeof parsed.rtScore === 'number') ? parsed.rtScore : null,
         totalSeasons: (mediaType === 'tv' && typeof parsed.totalSeasons === 'number') ? parsed.totalSeasons : null,
+        series: detectSeriesFromTitle(title),
         sourceLabel: 'Claude AI'
       };
     } else {
@@ -3852,6 +4085,7 @@ Return ONLY the JSON object, nothing else.`;
         year: (typeof parsed.year === 'number' && parsed.year > 1970 && parsed.year < 2100) ? parsed.year : null,
         platforms: Array.isArray(parsed.platforms) ? parsed.platforms.filter(p => validPlatforms.includes(p)) : [],
         summary: typeof parsed.summary === 'string' ? parsed.summary : '',
+        series: detectSeriesFromTitle(title),
         sourceLabel: 'Claude AI'
       };
     }
@@ -3912,8 +4146,44 @@ Return ONLY the JSON object, nothing else.`;
       imdbRating,
       totalSeasons,
       coverUrl: (data.Poster && data.Poster !== 'N/A') ? data.Poster : null,
+      series: detectSeriesFromTitle(data.Title || ''),
       sourceLabel: 'OMDb / IMDb'
     };
+  }
+
+  // Heuristic series detection from title patterns.
+  // Returns a series name if the title looks like part of a franchise, or null.
+  // This is intentionally conservative — we'd rather miss a series than mislabel one.
+  function detectSeriesFromTitle(title) {
+    if (!title || typeof title !== 'string') return null;
+
+    // Pattern 1: "Series: Subtitle" — e.g., "Star Wars: A New Hope"
+    // Common subtitle separators: ":", " - "
+    const colonMatch = title.match(/^(.+?):\s+/);
+    if (colonMatch) {
+      const candidate = colonMatch[1].trim();
+      // Skip overly generic single-word titles that often have unrelated colons
+      if (candidate.length >= 3 && candidate.split(/\s+/).length <= 5) {
+        return candidate;
+      }
+    }
+    const dashMatch = title.match(/^(.+?)\s+-\s+/);
+    if (dashMatch) {
+      const candidate = dashMatch[1].trim();
+      if (candidate.length >= 3 && candidate.split(/\s+/).length <= 5) {
+        return candidate;
+      }
+    }
+
+    // Pattern 2: trailing roman numerals or numbers — e.g., "Rocky II", "Mission Impossible 3"
+    const numberedMatch = title.match(/^(.+?)\s+(?:[IVX]{1,4}|[2-9]|\d{2,})$/);
+    if (numberedMatch) {
+      const candidate = numberedMatch[1].trim();
+      if (candidate.length >= 3) return candidate;
+    }
+
+    // No confident match
+    return null;
   }
 
   // --- Add form ---
@@ -4029,6 +4299,18 @@ Return ONLY the JSON object, nothing else.`;
 
   // --- Modal ---
   // Helper: rebuild the genre dropdown for a given media type
+  // Update the series autocomplete suggestions with all unique series names from the user's library.
+  function refreshSeriesSuggestions() {
+    const datalist = document.getElementById('seriesSuggestions');
+    if (!datalist) return;
+    const seriesSet = new Set();
+    state.games.forEach(g => {
+      if (g.series && typeof g.series === 'string') seriesSet.add(g.series);
+    });
+    const sorted = Array.from(seriesSet).sort((a, b) => a.localeCompare(b));
+    datalist.innerHTML = sorted.map(s => `<option value="${escapeHtml(s)}"></option>`).join('');
+  }
+
   function populateGenreDropdown(selectEl, mediaType, currentValue) {
     const genres = GENRES_BY_TYPE[mediaType] || GENRES_BY_TYPE.game;
     selectEl.innerHTML = genres.map(g => `<option value="${g}">${genreLabel(g)}</option>`).join('');
@@ -4054,6 +4336,11 @@ Return ONLY the JSON object, nothing else.`;
 
     document.getElementById('editTitle').value = game.title;
     document.getElementById('editMediaType').value = mediaType;
+    document.getElementById('editSeries').value = game.series || '';
+
+    // Refresh series suggestions (autocomplete from existing series in user's library)
+    refreshSeriesSuggestions();
+
     populateGenreDropdown(document.getElementById('editGenre'), mediaType, game.genre);
     applyMediaTypeVisibility(mediaType);
 
@@ -4134,6 +4421,11 @@ Return ONLY the JSON object, nothing else.`;
     game.title = document.getElementById('editTitle').value.trim() || game.title;
     game.mediaType = document.getElementById('editMediaType').value;
     game.genre = document.getElementById('editGenre').value;
+
+    // Series — trim + treat empty as "clear"
+    const seriesVal = document.getElementById('editSeries').value.trim();
+    if (seriesVal) game.series = seriesVal;
+    else delete game.series;
 
     const yearVal = parseInt(document.getElementById('editYear').value);
     game.year = (yearVal > 1880 && yearVal < 2100) ? yearVal : null;
@@ -4399,6 +4691,9 @@ Return ONLY the JSON object, nothing else.`;
       totalSeasons: (typeof g.totalSeasons === 'number') ? g.totalSeasons : undefined,
       seasons: seasons,
       coverUrl: typeof g.coverUrl === 'string' ? g.coverUrl : undefined,
+      series: typeof g.series === 'string' && g.series.trim() ? g.series.trim() : undefined,
+      completed: !!g.completed,
+      completedSeriesAt: (typeof g.completedSeriesAt === 'number') ? g.completedSeriesAt : undefined,
       sourceLabel: typeof g.sourceLabel === 'string' ? g.sourceLabel : undefined,
       status: (g.status === 'played') ? 'played' : 'backlog',
       rating: (typeof g.rating === 'number' && g.rating >= 0 && g.rating <= 10) ? g.rating : 0,
