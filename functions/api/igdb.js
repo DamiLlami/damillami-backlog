@@ -49,7 +49,11 @@ export const onRequest = async ({ request, env }) => {
     const token = await getAccessToken(clientId, clientSecret);
     // Add `cover` to fields. IGDB returns the cover as { image_id: "abc123" }
     // which we resolve to a full URL on our end.
-    const body = `search "${title.replace(/"/g, '\\"')}"; fields name, genres, platforms, first_release_date, total_rating_count, cover.image_id; limit 5;`;
+    // Add `cover` to fields. IGDB returns the cover as { image_id: "abc123" }
+    // which we resolve to a full URL on our end.
+    // `franchise.name` and `collection.name` give us series info — IGDB sometimes uses one,
+    // sometimes the other. We pull both and the browser picks whichever is populated.
+    const body = `search "${title.replace(/"/g, '\\"')}"; fields name, genres, platforms, first_release_date, total_rating_count, cover.image_id, franchise.name, collection.name; limit 5;`;
     const r = await fetch('https://api.igdb.com/v4/games', {
       method: 'POST',
       headers: {
