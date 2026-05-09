@@ -1,0 +1,22 @@
+# Cloudflare Pages headers config
+# Replaces the [[headers]] blocks from netlify.toml
+
+# Icons can be cached for a long time — they don't change between releases
+/icons/*
+  Cache-Control: public, max-age=2592000
+
+# Manifest doesn't change often
+/manifest.json
+  Cache-Control: public, max-age=86400
+
+# Service worker should NEVER be cached so updates roll out fast
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# index.html should also revalidate so users see new versions promptly
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# app.js should revalidate too — it bootstraps the SW registration
+/app.js
+  Cache-Control: no-cache, no-store, must-revalidate
