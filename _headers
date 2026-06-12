@@ -1,0 +1,27 @@
+# Cloudflare Pages headers config
+
+# Service worker — NEVER cache at any level (browser OR CDN edge)
+# The s-maxage=0 specifically tells Cloudflare's CDN not to cache at the edge.
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate, s-maxage=0
+  Pragma: no-cache
+  CDN-Cache-Control: no-store
+  Cloudflare-CDN-Cache-Control: no-store
+
+# app.js bootstraps SW registration — also must not be cached
+/app.js
+  Cache-Control: no-cache, no-store, must-revalidate, s-maxage=0
+  CDN-Cache-Control: no-store
+
+# index.html — never cache so users always get the latest version
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate, s-maxage=0
+  CDN-Cache-Control: no-store
+
+# Icons can be cached for a long time — they don't change between releases
+/icons/*
+  Cache-Control: public, max-age=2592000
+
+# Manifest doesn't change often
+/manifest.json
+  Cache-Control: public, max-age=86400
