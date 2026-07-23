@@ -7234,7 +7234,7 @@
      QUICK MODE FAB
   ============================================================ */
   .quick-fab {
-    position: fixed; bottom: 82px; right: 20px; z-index: 1050;
+    position: fixed; bottom: 96px; right: 20px; z-index: 1050;
     width: 52px; height: 52px; border-radius: 50%;
     background: var(--copper); border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
@@ -7418,23 +7418,27 @@
   }
   .drawer-sync { display: flex !important; align-items: center; gap: 8px; font-size: 12px; color: var(--text-faint); }
 
-  /* ---- Layout toggle row — centered below tabs ---- */
+  /* ---- Layout toggle row — centered below tabs, no overflow ---- */
   .layout-toggle-row { display: flex; justify-content: center; margin-bottom: 10px; }
   .layout-toggle-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 16px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+    padding: 5px 14px; border-radius: 8px;
     background: var(--surface); border: 1px solid var(--border);
-    color: var(--text-muted); cursor: pointer; font-size: 12px; transition: all 0.15s;
+    color: var(--text-muted); cursor: pointer; font-size: 11px;
+    white-space: nowrap; overflow: hidden;
+    max-width: 120px;
+    transition: all 0.15s;
   }
   .layout-toggle-btn:hover { border-color: var(--copper); color: var(--text); }
-  .layout-toggle-label-text { font-size: 11px; letter-spacing: 0.04em; }
+  .layout-toggle-icon { font-size: 13px; flex: 0 0 auto; }
+  .layout-toggle-label-text { font-size: 11px; letter-spacing: 0.03em; flex: 0 0 auto; }
 
   /* ---- Section tabs full-width ---- */
   .library-controls { width: 100%; margin-bottom: 4px; }
   .library-controls-left { width: 100%; }
   .columns-tabs { width: 100%; }
 
-  /* ---- Now section — always 2-column grid ---- */
+  /* ---- Now section — always 2-column grid, symmetric ---- */
   .now-cards {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
@@ -7442,29 +7446,55 @@
   }
   .now-card {
     width: auto !important; flex: unset !important;
+    min-width: 0; /* critical: prevents card from expanding beyond grid cell */
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 10px; padding: 10px;
     cursor: pointer; transition: border-color 0.15s;
+    overflow: hidden; /* clip anything that would overflow */
   }
+  /* Ensure cover art doesn't push card wider */
+  .now-card .now-card-cover { flex: 0 0 30px; width: 30px; height: 42px; }
+  .now-card .now-card-info { min-width: 0; flex: 1; overflow: hidden; }
+  .now-card .now-card-title { font-size: 12px; }
+  .now-card .now-quick-btn { font-size: 9px; padding: 4px 2px; }
 
-  /* ---- Add bar — 3-row layout ---- */
+  /* ---- Add bar — styled dropdowns with character ---- */
   .add-bar { display: flex; flex-direction: column; gap: 8px; }
   .add-dropdowns-row { display: flex; gap: 8px; width: 100%; }
   .add-select {
-    flex: 1; padding: 9px 10px; border-radius: 8px;
-    font-size: 13px; color: var(--text);
-    background: var(--surface); border: 1px solid var(--border);
-    cursor: pointer; appearance: none; -webkit-appearance: none;
+    flex: 1; padding: 10px 28px 10px 12px;
+    border-radius: 10px; font-size: 13px; font-weight: 500;
+    color: var(--text); cursor: pointer;
+    appearance: none; -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+    background-repeat: no-repeat; background-position: right 10px center;
+    /* Styled background with subtle gradient */
+    background-color: var(--bg-elevated);
+    border: 2px solid var(--border);
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
-  .add-select:focus { border-color: var(--copper); outline: none; }
+  .add-select:focus { outline: none; box-shadow: 0 0 0 3px rgba(224,176,116,0.18); }
+  /* Type select — accent shifts per selected value via JS class */
+  #addTypeSelect { border-color: var(--copper); }
+  #addTypeSelect.type-game  { border-color: #9B59B6; background-color: rgba(155,89,182,0.08); }
+  #addTypeSelect.type-movie { border-color: #E74C3C; background-color: rgba(231,76,60,0.08); }
+  #addTypeSelect.type-tv    { border-color: #3498DB; background-color: rgba(52,152,219,0.08); }
+  #addTypeSelect.type-book  { border-color: #27AE60; background-color: rgba(39,174,96,0.08); }
+  #addTypeSelect.type-album { border-color: #F39C12; background-color: rgba(243,156,18,0.08); }
+  /* Status select — accent per status */
+  #addStatusSelect { border-color: var(--border-strong); }
+  #addStatusSelect.status-backlog     { border-color: var(--text-faint); background-color: var(--bg-elevated); }
+  #addStatusSelect.status-in-progress { border-color: #3498DB; background-color: rgba(52,152,219,0.08); }
+  #addStatusSelect.status-played      { border-color: #27AE60; background-color: rgba(39,174,96,0.08); }
+  #addStatusSelect.status-dnf         { border-color: #8B0000; background-color: rgba(139,0,0,0.08); }
+
   .add-title-input {
     width: 100%; box-sizing: border-box;
-    padding: 10px 14px; border-radius: 8px; font-size: 14px;
-    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 14px; border-radius: 10px; font-size: 14px;
+    background: var(--bg-elevated); border: 2px solid var(--border); color: var(--text);
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
-  .add-title-input:focus { border-color: var(--copper); outline: none; }
+  .add-title-input:focus { border-color: var(--copper); outline: none; box-shadow: 0 0 0 3px rgba(224,176,116,0.18); }
   .add-actions-row { display: flex; justify-content: center; }
   .add-actions-row .detailed-add-btn { padding: 6px 20px; }
 
@@ -8866,20 +8896,18 @@
   .floating-actions-inner {
     display: flex;
     align-items: center;
-    gap: 8px;
-    overflow-x: auto;
-    /* Allow horizontal scroll on tiny screens but hide the scrollbar */
-    scrollbar-width: none;
+    gap: 4px;
+    overflow: visible; /* no scroll */
+    flex-wrap: nowrap;
   }
-  .floating-actions-inner::-webkit-scrollbar { display: none; }
 
   .floating-saved {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
+    font-size: 9px;
+    letter-spacing: 0.08em;
     color: var(--text-faint);
     text-transform: uppercase;
-    padding: 4px 10px;
+    padding: 4px 8px;
     border-right: 1px solid var(--border);
     white-space: nowrap;
     flex-shrink: 0;
@@ -8887,7 +8915,7 @@
 
   .floating-actions-buttons {
     display: flex;
-    gap: 4px;
+    gap: 0;
     flex-shrink: 0;
   }
 
@@ -8896,11 +8924,11 @@
     border: none;
     color: var(--text-muted);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
+    font-size: 9px;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     cursor: pointer;
-    padding: 6px 10px;
+    padding: 5px 7px;
     border-radius: 999px;
     transition: all 0.15s;
     white-space: nowrap;
@@ -8911,19 +8939,16 @@
     background: var(--surface);
   }
 
-  .floating-actions-buttons button.danger {
-    color: var(--text-faint);
-  }
+  .floating-actions-buttons button.danger { color: var(--text-faint); }
   .floating-actions-buttons button.danger:hover {
     color: #E36F6F;
     background: rgba(220, 80, 80, 0.08);
   }
 
-  /* On very narrow screens, the bar pinches to fit */
   @media (max-width: 480px) {
-    .floating-actions { padding: 6px 8px; bottom: 12px; }
-    .floating-saved { font-size: 9px; padding: 4px 8px; }
-    .floating-actions-buttons button { padding: 5px 8px; font-size: 9px; }
+    .floating-actions { padding: 5px 8px; bottom: 12px; }
+    .floating-saved { font-size: 8px; padding: 3px 6px; }
+    .floating-actions-buttons button { padding: 4px 5px; font-size: 8px; letter-spacing: 0.04em; }
   }
 
   /* Bottom-right vertical stack when signed in (top to bottom):
@@ -11831,7 +11856,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v115.2';
+  const APP_VERSION = 'v115.3';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
@@ -26494,10 +26519,19 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
   const ADD_TYPE_COLORS = { game:'#9B59B6', movie:'#E74C3C', tv:'#3498DB', book:'#27AE60', album:'#F39C12' };
   function updateAddTypeColor() {
     const sel = document.getElementById('addTypeSelect');
-    if (sel) sel.style.borderLeftColor = ADD_TYPE_COLORS[sel.value] || 'var(--copper)';
+    if (!sel) return;
+    sel.className = 'add-select add-type-select type-' + (sel.value || 'game');
+  }
+  function updateAddStatusColor() {
+    const sel = document.getElementById('addStatusSelect');
+    if (!sel) return;
+    const statusClass = (sel.value || 'backlog').replace(/-/g, '-'); // keep as-is
+    sel.className = 'add-select add-status-select status-' + (sel.value || 'backlog');
   }
   document.getElementById('addTypeSelect')?.addEventListener('change', updateAddTypeColor);
+  document.getElementById('addStatusSelect')?.addEventListener('change', updateAddStatusColor);
   updateAddTypeColor();
+  updateAddStatusColor();
 
   // ================================================================
   // IMMEDIATE RATING MODAL
