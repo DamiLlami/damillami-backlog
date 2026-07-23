@@ -2104,8 +2104,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
+    width: 100%;
+  }
+  .centered-type-filter .type-chip {
+    flex: 0 0 auto;
   }
 
   /* Library controls bar — sits between Now section and columns */
@@ -7171,14 +7175,14 @@
   .hamburger-btn {
     position: fixed; top: 16px; left: 16px; z-index: 1100;
     width: 40px; height: 40px;
-    background: var(--bg-elevated); border: 1px solid var(--border);
+    background: transparent; border: none;
     border-radius: 10px; cursor: pointer;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 5px;
     transition: background 0.15s;
   }
-  .hamburger-btn:hover { background: var(--surface); }
-  .hamburger-line { width: 18px; height: 2px; background: var(--text-muted); border-radius: 2px; transition: all 0.2s; }
+  .hamburger-btn:hover { background: rgba(255,255,255,0.08); }
+  .hamburger-line { width: 20px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.2s; }
   .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; }
   .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
@@ -7230,7 +7234,7 @@
      QUICK MODE FAB
   ============================================================ */
   .quick-fab {
-    position: fixed; bottom: 24px; right: 20px; z-index: 1050;
+    position: fixed; bottom: 82px; right: 20px; z-index: 1050;
     width: 52px; height: 52px; border-radius: 50%;
     background: var(--copper); border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
@@ -8995,14 +8999,21 @@
        Saves a ton of vertical space. Each filter group becomes a horizontal
        scroller with the chips on one line; momentum-scroll on iOS. */
     .filter-stack { gap: 6px; }
-    .filter-group {
+    /* Genre and platform chips scroll horizontally — saves vertical space */
+    .filter-group.genre-filter,
+    .filter-group.platform-filter {
       flex-wrap: nowrap;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       padding-bottom: 2px;
-      /* fade hint at the right edge that there's more to scroll */
       scroll-snap-type: x proximity;
+    }
+    /* Type chips wrap into 2 clean centered lines */
+    .filter-group.type-filter {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      justify-content: center;
     }
     .filter-group::-webkit-scrollbar { display: none; }
     .chip {
@@ -10226,48 +10237,20 @@
     </div>
   </header>
 
-  <!-- Unified headline toolbar — two centered rows, each toggleable via Settings → Functionality -->
-  <div class="headline-toolbar" id="headlineToolbar">
-    <div class="hl-row" id="hlRowTop">
-      <button class="hl-btn" id="refreshMetaBtn" type="button" title="Refresh metadata for entries that need it">
-        <span class="hl-btn-icon">↻</span><span class="hl-btn-label">Refresh Metadata</span>
-      </button>
-      <button class="hl-btn" id="mergeModeBtn" type="button" title="Select multiple cards to merge into a series">
-        <span class="hl-btn-icon">⛓</span><span class="hl-btn-label">Merge Cards</span>
-      </button>
-      <button class="hl-btn" id="bulkModeBtn" type="button" title="Select multiple cards to change status, rate, or delete at once">
-        <span class="hl-btn-icon">☑</span><span class="hl-btn-label">Select Cards</span>
-      </button>
-      <button class="hl-btn" id="timelineBtn" type="button" title="See what you finished over time">
-        <span class="hl-btn-icon">📅</span><span class="hl-btn-label">Timeline</span>
-      </button>
-      <button class="hl-btn" id="wrappedBtn" type="button" title="Your year in review">
-        <span class="hl-btn-icon">📊</span><span class="hl-btn-label">Year Review</span>
-      </button>
-      <button class="hl-btn" id="achievementsBtn" type="button" title="Your achievements and stats">
-        <span class="hl-btn-icon">🏆</span><span class="hl-btn-label">Achievements</span>
-      </button>
-    </div>
-    <div class="hl-row" id="hlRowBottom">
-      <button class="hl-btn" id="surpriseBtn" type="button" title="Surprise me from my backlog">
-        <span class="hl-btn-icon">🎲</span><span class="hl-btn-label">Surprise Me</span>
-      </button>
-      <button class="hl-btn" id="battleBtn" type="button" title="Battle Mode">
-        <span class="hl-btn-icon">⚔️</span><span class="hl-btn-label">Battle</span>
-      </button>
-      <button class="hl-btn" id="rateSkipBtn" type="button" title="Rate or Skip">
-        <span class="hl-btn-icon">⭐</span><span class="hl-btn-label">Rate</span>
-      </button>
-      <button class="hl-btn" id="galleryBtn" type="button" title="Cover art mosaic">
-        <span class="hl-btn-icon">🖼️</span><span class="hl-btn-label">Gallery</span>
-      </button>
-      <button class="hl-btn" id="statsBtn" type="button" title="Statistics dashboard">
-        <span class="hl-btn-icon">📊</span><span class="hl-btn-label">Stats</span>
-      </button>
-      <button class="hl-btn" id="calendarBtn" type="button" title="Calendar view">
-        <span class="hl-btn-icon">📅</span><span class="hl-btn-label">Calendar</span>
-      </button>
-    </div>
+  <!-- Toolbar buttons moved to hamburger drawer — kept hidden here for JS wiring -->
+  <div style="display:none;" aria-hidden="true">
+    <button id="refreshMetaBtn" type="button"></button>
+    <button id="mergeModeBtn" type="button"></button>
+    <button id="bulkModeBtn" type="button"></button>
+    <button id="timelineBtn" type="button"></button>
+    <button id="wrappedBtn" type="button"></button>
+    <button id="achievementsBtn" type="button"></button>
+    <button id="surpriseBtn" type="button"></button>
+    <button id="battleBtn" type="button"></button>
+    <button id="rateSkipBtn" type="button"></button>
+    <button id="galleryBtn" type="button"></button>
+    <button id="statsBtn" type="button"></button>
+    <button id="calendarBtn" type="button"></button>
   </div>
 
   <!-- Selection mode action bar — appears only when in merge selection mode -->
@@ -10961,9 +10944,6 @@
       <button class="settings-nav-item active" data-settings-tab="display">
         <span class="settings-nav-icon">🖥️</span><span class="settings-nav-label">Display</span>
       </button>
-      <button class="settings-nav-item" data-settings-tab="toolbar">
-        <span class="settings-nav-icon">🎛️</span><span class="settings-nav-label">Toolbar</span>
-      </button>
       <button class="settings-nav-item" data-settings-tab="search">
         <span class="settings-nav-icon">🔍</span><span class="settings-nav-label">Search</span>
       </button>
@@ -11038,38 +11018,6 @@
       </div>
 
       <!-- ═══ TOOLBAR ═══ -->
-      <div class="settings-panel" id="settingsPanelToolbar" role="tabpanel" style="display:none;">
-        <div class="settings-section-header">
-          <div class="settings-section-title">🎛️ Toolbar</div>
-          <div class="settings-section-desc">Choose which buttons appear in the two toolbar rows below the title. Uncheck anything you never use.</div>
-        </div>
-
-        <div class="setting-group-label">Library Tools — Top Row</div>
-        <div class="setting-checklist">
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="refreshMetadata"> <span class="setting-check-icon">↻</span> Refresh Metadata <span class="setting-check-desc">Re-fetch cover art and data for items that need it</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="mergeCards"> <span class="setting-check-icon">⛓</span> Merge Cards <span class="setting-check-desc">Combine multiple entries into a single series card</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="selectCards"> <span class="setting-check-icon">☑</span> Select Cards <span class="setting-check-desc">Bulk-select cards to change status, rate, or delete</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="timeline"> <span class="setting-check-icon">📅</span> Timeline <span class="setting-check-desc">Chronological feed of everything you've finished</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="yearReview"> <span class="setting-check-icon">📊</span> Year Review <span class="setting-check-desc">Your annual media summary and wrapped stats</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="achievements"> <span class="setting-check-icon">🏆</span> Achievements <span class="setting-check-desc">Your badge collection and franchise progress</span></label>
-        </div>
-
-        <div class="setting-group-label" style="margin-top:20px;">Feature Buttons — Bottom Row</div>
-        <div class="setting-checklist">
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="surpriseMe"> <span class="setting-check-icon">🎲</span> Surprise Me <span class="setting-check-desc">Pick a random backlog item to start tonight</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="battle"> <span class="setting-check-icon">⚔️</span> Battle <span class="setting-check-desc">Tournament bracket to decide what to play next</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="rate"> <span class="setting-check-icon">⭐</span> Rate or Skip <span class="setting-check-desc">Rapid-fire rating queue for unrated completions</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="gallery"> <span class="setting-check-icon">🖼️</span> Gallery <span class="setting-check-desc">Full cover art mosaic of your entire library</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="stats"> <span class="setting-check-icon">📊</span> Stats <span class="setting-check-desc">Deep statistics dashboard with charts and breakdowns</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="calendar"> <span class="setting-check-icon">📅</span> Calendar <span class="setting-check-desc">Month and year view of your activity history</span></label>
-        </div>
-
-        <div class="setting-group-label" style="margin-top:20px;">Add Bar</div>
-        <div class="setting-checklist">
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="detailedAdd"> <span class="setting-check-icon">✎</span> Detailed Add <span class="setting-check-desc">Pre-fill every field before creating an entry</span></label>
-          <label class="setting-check-item"><input type="checkbox" class="hl-toggle" data-hl-key="discover"> <span class="setting-check-icon">✨</span> Discover <span class="setting-check-desc">AI-picks new things not yet in your library</span></label>
-        </div>
-      </div>
 
       <!-- ═══ SEARCH ═══ -->
       <div class="settings-panel" id="settingsPanelSearch" role="tabpanel" style="display:none;">
@@ -11825,7 +11773,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v115';
+  const APP_VERSION = 'v115.1';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
@@ -27474,59 +27422,11 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
     await saveSetting('genre_visibility', JSON.stringify(gv));
     renderGenreChips();
   });
-  const HL_BTN_MAP = {
-    refreshMetadata: 'refreshMetaBtn',
-    mergeCards:      'mergeModeBtn',
-    selectCards:     'bulkModeBtn',
-    timeline:        'timelineBtn',
-    yearReview:      'wrappedBtn',
-    achievements:    'achievementsBtn',
-    surpriseMe:      'surpriseBtn',
-    battle:          'battleBtn',
-    rate:            'rateSkipBtn',
-    gallery:         'galleryBtn',
-    stats:           'statsBtn',
-    calendar:        'calendarBtn',
-    detailedAdd:     'detailedAddBtn',
-    discover:        'discoverBtn',
-  };
-
+  // Toolbar buttons are now in the drawer — no headline visibility system needed
   function applyHeadlineVisibility() {
-    const vis = state.headlineVisibility || {};
-    Object.entries(HL_BTN_MAP).forEach(([key, elId]) => {
-      const el = document.getElementById(elId);
-      if (el) el.style.display = vis[key] === false ? 'none' : '';
-    });
-    // Hide entire row when all its buttons are toggled off
-    const topKeys = ['refreshMetadata','mergeCards','selectCards','timeline','yearReview','achievements'];
-    const bottomKeys = ['surpriseMe','battle','rate','gallery','stats','calendar'];
-    const topRow = document.getElementById('hlRowTop');
-    const bottomRow = document.getElementById('hlRowBottom');
-    if (topRow) topRow.style.display = topKeys.every(k => vis[k] === false) ? 'none' : '';
-    if (bottomRow) bottomRow.style.display = bottomKeys.every(k => vis[k] === false) ? 'none' : '';
-    // Add bar centering
-    const addRow = document.querySelector('.detailed-add-row');
-    if (addRow) {
-      const dVisible = vis.detailedAdd !== false;
-      const disVisible = vis.discover !== false;
-      if (!dVisible && !disVisible) { addRow.style.display = 'none'; }
-      else { addRow.style.display = ''; addRow.style.justifyContent = (dVisible && disVisible) ? '' : 'center'; }
-    }
+    // no-op: toolbar moved to drawer in v115
   }
-
-  // Apply on load
   applyHeadlineVisibility();
-
-  // Wire Functionality settings panel toggles
-  document.querySelectorAll('.hl-toggle').forEach(cb => {
-    cb.addEventListener('change', async () => {
-      const key = cb.dataset.hlKey;
-      if (!state.headlineVisibility) state.headlineVisibility = {};
-      state.headlineVisibility[key] = cb.checked;
-      await saveSetting('headline_visibility', JSON.stringify(state.headlineVisibility));
-      applyHeadlineVisibility();
-    });
-  });
 
   // Lets you see the theme applied before locking it in.
   let _themePreviewId = null;
@@ -27751,6 +27651,7 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
     renderGenreChips();
     updateLayoutToggleUI();
     updateSortToggleUI();
+    applyTheme(state.theme || 'amethyst'); // re-apply after pull in case state changed
     render();
     document.getElementById('loadingOverlay').classList.add('hidden');
 
