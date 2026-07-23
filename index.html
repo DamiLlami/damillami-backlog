@@ -7165,6 +7165,247 @@
     border-color: var(--copper);
   }
 
+  /* ============================================================
+     HAMBURGER BUTTON
+  ============================================================ */
+  .hamburger-btn {
+    position: fixed; top: 16px; left: 16px; z-index: 1100;
+    width: 40px; height: 40px;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: 10px; cursor: pointer;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 5px;
+    transition: background 0.15s;
+  }
+  .hamburger-btn:hover { background: var(--surface); }
+  .hamburger-line { width: 18px; height: 2px; background: var(--text-muted); border-radius: 2px; transition: all 0.2s; }
+  .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; }
+  .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ============================================================
+     APP DRAWER — left side sheet
+  ============================================================ */
+  .drawer-overlay {
+    position: fixed; inset: 0; z-index: 1099;
+    background: rgba(0,0,0,0.5); opacity: 0;
+    pointer-events: none; transition: opacity 0.25s;
+  }
+  .drawer-overlay.show { opacity: 1; pointer-events: all; }
+  .app-drawer {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 280px; z-index: 1100;
+    background: var(--bg); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    overflow-y: auto;
+  }
+  .app-drawer.open { transform: translateX(0); }
+  .drawer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 18px 16px; border-bottom: 1px solid var(--border);
+    font-family: 'Fraunces', Georgia, serif; font-size: 17px; color: var(--text);
+  }
+  .drawer-close-btn {
+    background: none; border: none; font-size: 22px; color: var(--text-faint);
+    cursor: pointer; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center; border-radius: 8px;
+  }
+  .drawer-close-btn:hover { background: var(--surface); color: var(--text); }
+  .drawer-section-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-faint); padding: 14px 18px 4px;
+  }
+  .drawer-item {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    padding: 11px 18px; background: none; border: none; cursor: pointer;
+    font-size: 14px; color: var(--text-muted); text-align: left; transition: all 0.12s;
+  }
+  .drawer-item:hover { background: var(--surface); color: var(--text); }
+  .drawer-icon { font-size: 16px; flex: 0 0 20px; text-align: center; }
+  .drawer-dnf-item { color: var(--copper); }
+  .drawer-dnf-item:hover { color: var(--gold); }
+
+  /* ============================================================
+     QUICK MODE FAB
+  ============================================================ */
+  .quick-fab {
+    position: fixed; bottom: 24px; right: 20px; z-index: 1050;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--copper); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+    transition: transform 0.15s, background 0.15s;
+  }
+  .quick-fab:hover { background: var(--gold); transform: scale(1.06); }
+  .quick-fab:active { transform: scale(0.97); }
+  .quick-fab-icon { font-size: 22px; color: var(--bg); line-height: 1; }
+
+  /* ============================================================
+     QUICK MODE SHEETS
+  ============================================================ */
+  .quick-sheet-backdrop {
+    position: fixed; inset: 0; z-index: 1080;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .quick-sheet-backdrop.show { opacity: 1; pointer-events: all; }
+  .quick-sheet {
+    width: 100%; max-width: 540px; background: var(--bg);
+    border-radius: 20px 20px 0 0; border: 1px solid var(--border); border-bottom: none;
+    padding: 12px 20px 40px;
+    transform: translateY(100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  .quick-sheet-backdrop.show .quick-sheet { transform: translateY(0); }
+  .quick-sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 14px; }
+  .quick-sheet-title { font-family: 'Fraunces', Georgia, serif; font-size: 18px; color: var(--text); margin-bottom: 16px; }
+  .quick-sheet-actions { display: flex; flex-direction: column; gap: 8px; }
+  .quick-action-btn {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px;
+    background: var(--surface); border: 1px solid var(--border); cursor: pointer;
+    text-align: left; width: 100%; transition: border-color 0.12s, background 0.12s;
+  }
+  .quick-action-btn:hover { border-color: var(--copper); background: var(--bg-elevated); }
+  .qa-icon { font-size: 20px; flex: 0 0 28px; text-align: center; color: var(--copper); font-weight: 700; }
+  .qa-label { font-size: 15px; color: var(--text); font-weight: 500; display: block; }
+  .qa-desc { font-size: 11px; color: var(--text-faint); display: block; margin-top: 1px; }
+  .quick-add-input {
+    width: 100%; padding: 12px 14px; font-size: 15px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); margin-bottom: 8px; box-sizing: border-box;
+  }
+  .quick-add-input:focus { border-color: var(--copper); outline: none; }
+  .quick-add-results { max-height: 200px; overflow-y: auto; margin-bottom: 10px; }
+  .qar-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+    border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text); transition: background 0.1s;
+  }
+  .qar-item:hover, .qar-item.selected { background: var(--surface); }
+  .qar-cover {
+    width: 32px; height: 44px; border-radius: 4px; background: var(--bg-elevated);
+    background-size: cover; background-position: center; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .qar-title { font-size: 13px; color: var(--text); font-weight: 500; }
+  .qar-meta { font-size: 11px; color: var(--text-faint); }
+  .quick-add-status-row { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+  .quick-status-btn {
+    flex: 1; padding: 8px 4px; border-radius: 8px; font-size: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-muted); cursor: pointer; min-width: 60px; transition: all 0.12s;
+  }
+  .quick-status-btn.active { background: var(--copper); border-color: var(--copper); color: var(--bg); font-weight: 600; }
+  .quick-status-btn[data-qs="dnf"].active { background: #8B0000; border-color: #8B0000; color: #fff; }
+  .qc-desc { font-size: 12px; color: var(--text-faint); margin-bottom: 12px; }
+  .qc-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    cursor: pointer; margin-bottom: 6px; transition: border-color 0.12s;
+  }
+  .qc-item:hover { border-color: var(--copper); }
+  .qc-cover {
+    width: 36px; height: 48px; border-radius: 5px; background: var(--bg-elevated);
+    background-size: cover; background-position: center; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .qc-info { flex: 1; min-width: 0; }
+  .qc-title { font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qc-status { font-size: 11px; color: var(--copper); margin-top: 2px; }
+  .ql-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--border); margin-bottom: 6px;
+  }
+  .ql-info { flex: 1; min-width: 0; }
+  .ql-title { font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ql-btns { display: flex; gap: 6px; flex: 0 0 auto; }
+  .ql-btn {
+    padding: 6px 10px; border-radius: 7px; font-size: 12px;
+    background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;
+  }
+  .ql-btn:hover { border-color: var(--copper); color: var(--copper); }
+
+  /* ============================================================
+     IMMEDIATE RATING MODAL
+  ============================================================ */
+  .rate-now-modal { text-align: center; padding: 28px 24px 24px; max-width: 340px; width: 100%; }
+  .rate-now-cover {
+    width: 64px; height: 88px; border-radius: 8px; background: var(--surface);
+    background-size: cover; background-position: center;
+    margin: 0 auto 12px; display: flex; align-items: center; justify-content: center;
+    font-size: 28px; border: 1px solid var(--border);
+  }
+  .rate-now-title {
+    font-family: 'Fraunces', Georgia, serif; font-size: 17px; color: var(--text);
+    margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .rate-now-sub { font-size: 12px; color: var(--text-faint); margin-bottom: 18px; }
+  .rate-now-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
+  .rate-now-btn {
+    padding: 10px 0; border-radius: 8px; font-size: 15px; font-weight: 600;
+    background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; transition: all 0.12s;
+  }
+  .rate-now-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(224,176,116,0.1); }
+  .rate-now-skip { background: none; border: none; font-size: 12px; color: var(--text-faint); cursor: pointer; text-decoration: underline; }
+  .rate-now-buttons { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+  /* ============================================================
+     NEW ADD BAR — single line
+  ============================================================ */
+  .add-bar-single-row { display: flex; align-items: center; gap: 6px; width: 100%; }
+  .add-type-wrap, .add-status-wrap { flex: 0 0 auto; }
+  .add-type-select, .add-status-select {
+    padding: 9px 8px; border-radius: 10px; font-size: 13px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer;
+  }
+  .add-type-select { min-width: 110px; border-left: 3px solid var(--copper); transition: border-color 0.15s; }
+  .add-status-select { min-width: 86px; }
+  .add-title-input {
+    flex: 1; padding: 9px 12px; border-radius: 10px; font-size: 14px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--text); min-width: 0;
+  }
+  .add-title-input:focus { border-color: var(--copper); outline: none; }
+
+  /* ============================================================
+     SEARCH CONTROLS ROW
+  ============================================================ */
+  .search-controls-row { display: flex; gap: 8px; margin-top: 8px; }
+  .search-controls-row .sort-toggle-wrap,
+  .search-controls-row .filter-adv-wrap { flex: 1; }
+  .search-control-btn {
+    width: 100%; display: flex; align-items: center; justify-content: center;
+    gap: 6px; padding: 9px 12px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-muted); cursor: pointer; font-size: 13px; transition: all 0.12s;
+  }
+  .search-control-btn:hover { border-color: var(--border-strong); color: var(--text); }
+
+  /* ============================================================
+     SECTION TABS — equal-width, full screen width
+  ============================================================ */
+  .columns-tabs {
+    display: flex; width: 100%; background: var(--surface);
+    border-radius: 10px; border: 1px solid var(--border); overflow: hidden;
+  }
+  .columns-tab {
+    flex: 1; padding: 9px 4px; border: none; background: none;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted);
+    cursor: pointer; transition: all 0.15s; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .columns-tab:last-child { border-right: none; }
+  .columns-tab:hover { background: var(--bg-elevated); color: var(--text); }
+  .columns-tab.active { background: var(--bg-elevated); color: var(--gold); font-weight: 600; }
+  .columns-tab-count {
+    display: inline-block; margin-left: 4px; background: var(--border);
+    color: var(--text-muted); border-radius: 999px; padding: 1px 6px; font-size: 9px;
+  }
+  .columns-tab.active .columns-tab-count { background: var(--gold); color: var(--bg); }
+
+  /* DNF modal list */
+  .dnf-empty { text-align: center; color: var(--text-faint); font-size: 13px; padding: 20px 0; }
 
   /* ============================================================
      SETTINGS — Side nav shell
@@ -10071,97 +10312,68 @@
   </div>
 
   <form class="add-bar" id="addForm" autocomplete="off">
-    <!-- Title input gets full width on its own row -->
-    <input type="text" id="titleInput" placeholder="Media title…" required>
-
-    <!-- Split-button row: each pair is one media type, two click zones -->
-    <div class="add-actions">
-      <!-- Game: Backlog | Played -->
-      <div class="split-btn split-game" role="group" aria-label="Add as game">
-        <button type="button" class="split-half backlog" data-type="game" data-status="backlog" title="Add to backlog as a game">
-          <span class="split-icon">🎮</span>Backlog
-        </button>
-        <button type="button" class="split-half completed" data-type="game" data-status="played" title="Add as played game">Played</button>
+    <div class="add-bar-single-row">
+      <!-- Media type dropdown — retains per-type colors -->
+      <div class="add-type-wrap">
+        <select class="add-type-select" id="addTypeSelect">
+          <option value="game">🎮 Game</option>
+          <option value="movie">🎬 Movie</option>
+          <option value="tv">📺 TV</option>
+          <option value="book">📚 Book</option>
+          <option value="album">💿 Album</option>
+        </select>
       </div>
-
-      <!-- Movie/TV: Backlog | Watched (with movie/TV toggle) -->
-      <div class="split-btn split-watch" role="group" aria-label="Add as movie or TV">
-        <button type="button" class="split-half backlog" data-type="movie" data-status="backlog" id="watchBacklogBtn" title="Add to backlog as a movie">
-          <span class="split-icon" id="watchIcon">🎬</span>Backlog
-        </button>
-        <button type="button" class="split-half completed" data-type="movie" data-status="played" id="watchCompletedBtn" title="Add as watched movie">Watched</button>
-        <button type="button" class="watch-toggle" id="watchModeToggle" title="Switch between Movie and TV Show" aria-label="Toggle movie or TV">
-          <span class="watch-toggle-on">🎬</span>
-          <span class="watch-toggle-off">📺</span>
-        </button>
-      </div>
-
-      <!-- Book: Backlog | Read -->
-      <div class="split-btn split-book" role="group" aria-label="Add as book">
-        <button type="button" class="split-half backlog" data-type="book" data-status="backlog" title="Add to backlog as a book">
-          <span class="split-icon">📚</span>Backlog
-        </button>
-        <button type="button" class="split-half completed" data-type="book" data-status="played" title="Add as read book">Read</button>
-      </div>
-
-      <!-- Album: Backlog | Listened -->
-      <div class="split-btn split-album" role="group" aria-label="Add as album">
-        <button type="button" class="split-half backlog" data-type="album" data-status="backlog" title="Add to backlog as an album">
-          <span class="split-icon">💿</span>Backlog
-        </button>
-        <button type="button" class="split-half completed" data-type="album" data-status="played" title="Add as listened album">Listened</button>
+      <!-- Title search field -->
+      <input type="text" id="titleInput" class="add-title-input" placeholder="Media title…" required autocomplete="off" autocapitalize="off">
+      <!-- Status dropdown -->
+      <div class="add-status-wrap">
+        <select class="add-status-select" id="addStatusSelect">
+          <option value="backlog">Backlog</option>
+          <option value="in-progress">Playing</option>
+          <option value="played">Done</option>
+          <option value="dnf">DNF</option>
+        </select>
       </div>
     </div>
 
-    <!-- Detailed Add: opens a full form modal where you pre-fill every field
-         (status, rating, notes, etc.) before the card is created. Use when you
-         have intentional context to add, vs. the quick-add bar for "throw it on
-         the pile" workflow. -->
+    <!-- Detailed Add + Discover — slim row below -->
     <div class="detailed-add-row">
-      <button type="button" class="detailed-add-btn" id="detailedAddBtn" title="Add with all details (rating, notes, etc.) pre-filled">
+      <button type="button" class="detailed-add-btn" id="detailedAddBtn">
         <span class="detailed-add-icon">✎</span>
         <span class="detailed-add-label">Detailed Add…</span>
-        <span class="detailed-add-hint">Fill in everything before creating</span>
       </button>
-      <button type="button" class="detailed-add-btn discover-btn" id="discoverBtn" title="Get AI recommendations of things not in your library">
+      <button type="button" class="detailed-add-btn discover-btn" id="discoverBtn">
         <span class="detailed-add-icon">✨</span>
         <span class="detailed-add-label">Discover…</span>
-        <span class="detailed-add-hint">AI picks new things for your taste</span>
       </button>
     </div>
   </form>
 
-  <div class="toolbar">
-    <!-- Search bar + layout toggle row -->
-    <div class="search-and-layout-row">
-      <!-- Search bar: filters cards by title (substring match, case-insensitive).
-           Composes with the type/genre/platform filters — search applies on top of them.
-           Cmd/Ctrl+K focuses, Escape clears. The × button clears manually. -->
-      <div class="search-bar" id="searchBar">
-        <span class="search-icon">🔍</span>
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search by title…"
-          autocomplete="off"
-          autocapitalize="off"
-          spellcheck="false"
-          aria-label="Search by title"
-        >
-        <button
-          type="button"
-          class="search-clear"
-          id="searchClearBtn"
-          title="Clear search (Esc)"
-          aria-label="Clear search"
-          style="display:none;"
-        >×</button>
-        <span class="search-hint" id="searchHint" aria-live="polite"></span>
-      </div>
 
-      <!-- Sort control -->
+
+  </form>
+
+  <div class="toolbar">
+    <!-- Full-width search bar -->
+    <div class="search-bar" id="searchBar">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search by title…"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        aria-label="Search by title"
+      >
+      <button type="button" class="search-clear" id="searchClearBtn" title="Clear search (Esc)" aria-label="Clear search" style="display:none;">×</button>
+      <span class="search-hint" id="searchHint" aria-live="polite"></span>
+    </div>
+
+    <!-- Sort + Filters: each half-width, directly under search -->
+    <div class="search-controls-row">
       <div class="sort-toggle-wrap">
-        <button type="button" class="layout-toggle-btn sort-toggle-btn" id="sortToggleBtn" aria-label="Change sort order" title="Sort" aria-haspopup="true" aria-expanded="false">
+        <button type="button" class="search-control-btn" id="sortToggleBtn" aria-label="Sort" aria-haspopup="true" aria-expanded="false">
           <span class="sort-toggle-icon">↕</span>
           <span class="sort-toggle-label" id="sortToggleLabel">Sort By</span>
         </button>
@@ -10195,10 +10407,8 @@
         </div>
       </div>
 
-      <!-- Advanced filters: rating range, year range, added period, rated/unrated.
-           A count badge shows how many advanced filters are active. -->
       <div class="filter-adv-wrap">
-        <button type="button" class="layout-toggle-btn filter-adv-btn" id="filterAdvBtn" aria-label="Advanced filters" title="Filters" aria-haspopup="true" aria-expanded="false">
+        <button type="button" class="search-control-btn" id="filterAdvBtn" aria-label="Filters" aria-haspopup="true" aria-expanded="false">
           <span class="filter-adv-icon">⚲</span>
           <span class="filter-adv-label">Filters</span>
           <span class="filter-adv-count" id="filterAdvCount" style="display:none;">0</span>
@@ -10257,9 +10467,7 @@
           <button type="button" class="filter-adv-clear" id="filterAdvClear">Clear all filters</button>
         </div>
       </div>
-
-      <!-- Random pick: surprises you with one item from the current (filtered) backlog -->
-    </div>
+    </div><!-- /.search-controls-row -->
 
     <div class="filter-stack">
       <div class="filter-group type-filter centered-type-filter" id="typeFilterGroup">
@@ -10327,145 +10535,131 @@
 <!-- Floating slime button — admin-only. Sits in the bottom-right above the
      floating actions bar. Idle animation: gentle bob. Click opens the slime
      modal where the user picks a quick prompt or types a custom question. -->
-<button class="slime-fab" id="slimeFab" type="button" title="Ask the slime for a recommendation" aria-label="Open slime assistant">
-  <span class="slime-fab-svg-wrap" id="slimeFabSvgWrap">
-    <!-- Original friendly slime — teardrop body, two soft eyes, gentle smile.
-         Inspired by the general "happy blob" archetype but not based on any
-         specific franchise mascot. Colors driven by theme vars so it harmonizes
-         with whatever theme is active. -->
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" class="slime-svg">
-      <defs>
-        <radialGradient id="slimeBodyGrad" cx="40%" cy="35%" r="65%">
-          <stop offset="0%" stop-color="currentColor" stop-opacity="1"/>
-          <stop offset="70%" stop-color="currentColor" stop-opacity="0.85"/>
-          <stop offset="100%" stop-color="currentColor" stop-opacity="0.55"/>
-        </radialGradient>
-        <radialGradient id="slimeHighlight" cx="35%" cy="30%" r="20%">
-          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
-          <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <!-- Body: rounded blob, slightly wider at base -->
-      <path d="M 32 8
-               C 18 8, 8 28, 8 44
-               C 8 54, 18 58, 32 58
-               C 46 58, 56 54, 56 44
-               C 56 28, 46 8, 32 8 Z"
-            fill="url(#slimeBodyGrad)"/>
-      <!-- Soft highlight -->
-      <ellipse cx="24" cy="22" rx="9" ry="6" fill="url(#slimeHighlight)"/>
-      <!-- Left eye -->
-      <ellipse cx="24" cy="34" rx="3.5" ry="4.5" fill="#1a0d2e"/>
-      <ellipse cx="24.8" cy="32.5" rx="1.2" ry="1.6" fill="#ffffff"/>
-      <!-- Right eye -->
-      <ellipse cx="40" cy="34" rx="3.5" ry="4.5" fill="#1a0d2e"/>
-      <ellipse cx="40.8" cy="32.5" rx="1.2" ry="1.6" fill="#ffffff"/>
-      <!-- Mouth: gentle smile -->
-      <path d="M 27 43 Q 32 47 37 43" stroke="#1a0d2e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-      <!-- Cute cheek blush -->
-      <circle cx="18" cy="40" r="2.2" fill="#E8A0C8" opacity="0.5"/>
-      <circle cx="46" cy="40" r="2.2" fill="#E8A0C8" opacity="0.5"/>
-    </svg>
-  </span>
-  <span class="slime-fab-label">Slime</span>
+<!-- Hamburger menu button — opens left-side drawer -->
+<button class="hamburger-btn" id="hamburgerBtn" type="button" aria-label="Open menu">
+  <span class="hamburger-line"></span>
+  <span class="hamburger-line"></span>
+  <span class="hamburger-line"></span>
 </button>
 
-<!-- Slime modal — opens when the FAB is clicked. Tier 1: single-shot recommendation. -->
-<div class="modal-backdrop" id="slimeBackdrop" style="display:none;">
-  <div class="modal slime-modal">
-    <div class="slime-modal-header">
-      <div class="slime-avatar" id="slimeAvatar">
-        <!-- Larger version of the slime, with mood states applied via class -->
-        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" class="slime-svg slime-svg-large">
-          <defs>
-            <radialGradient id="slimeBodyGradLg" cx="40%" cy="35%" r="65%">
-              <stop offset="0%" stop-color="currentColor" stop-opacity="1"/>
-              <stop offset="70%" stop-color="currentColor" stop-opacity="0.85"/>
-              <stop offset="100%" stop-color="currentColor" stop-opacity="0.55"/>
-            </radialGradient>
-            <radialGradient id="slimeHighlightLg" cx="35%" cy="30%" r="20%">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
-              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
-          <path class="slime-body" d="M 32 8 C 18 8, 8 28, 8 44 C 8 54, 18 58, 32 58 C 46 58, 56 54, 56 44 C 56 28, 46 8, 32 8 Z" fill="url(#slimeBodyGradLg)"/>
-          <ellipse cx="24" cy="22" rx="9" ry="6" fill="url(#slimeHighlightLg)"/>
-          <ellipse class="slime-eye slime-eye-left" cx="24" cy="34" rx="3.5" ry="4.5" fill="#1a0d2e"/>
-          <ellipse cx="24.8" cy="32.5" rx="1.2" ry="1.6" fill="#ffffff"/>
-          <ellipse class="slime-eye slime-eye-right" cx="40" cy="34" rx="3.5" ry="4.5" fill="#1a0d2e"/>
-          <ellipse cx="40.8" cy="32.5" rx="1.2" ry="1.6" fill="#ffffff"/>
-          <path class="slime-mouth" d="M 27 43 Q 32 47 37 43" stroke="#1a0d2e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-          <circle cx="18" cy="40" r="2.2" fill="#E8A0C8" opacity="0.5"/>
-          <circle cx="46" cy="40" r="2.2" fill="#E8A0C8" opacity="0.5"/>
-        </svg>
-      </div>
-      <div class="slime-header-text">
-        <h3 class="slime-title">Slime</h3>
-        <div class="slime-subtitle" id="slimeSubtitle">Ready to help, glorp!</div>
-      </div>
-      <button type="button" class="slime-close" id="slimeCloseBtn" aria-label="Close">×</button>
-    </div>
+<!-- Left-side drawer overlay -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
 
-    <!-- Quick prompt buttons + custom input -->
-    <div class="slime-prompts" id="slimePrompts">
-      <button type="button" class="slime-prompt-btn" data-prompt="tonight">
-        <span class="slime-prompt-icon">🌙</span>
-        <span class="slime-prompt-label">
-          <strong>Pick something for tonight</strong>
-          <span>Based on your mood and current backlog</span>
-        </span>
+<!-- Left-side drawer -->
+<div class="app-drawer" id="appDrawer">
+  <div class="drawer-header">
+    <div class="drawer-title">Dami Media Book</div>
+    <button class="drawer-close-btn" id="drawerCloseBtn" type="button">×</button>
+  </div>
+
+  <div class="drawer-section-label">Library Tools</div>
+  <button class="drawer-item" id="drawerRefreshMeta"><span class="drawer-icon">↻</span> Refresh Metadata</button>
+  <button class="drawer-item" id="drawerMerge"><span class="drawer-icon">⛓</span> Merge Cards</button>
+  <button class="drawer-item" id="drawerSelect"><span class="drawer-icon">☑</span> Select Cards</button>
+
+  <div class="drawer-section-label">Views</div>
+  <button class="drawer-item" id="drawerTimeline"><span class="drawer-icon">📅</span> Timeline</button>
+  <button class="drawer-item" id="drawerYearReview"><span class="drawer-icon">📊</span> Year Review</button>
+  <button class="drawer-item" id="drawerAchievements"><span class="drawer-icon">🏆</span> Achievements</button>
+  <button class="drawer-item drawer-dnf-item" id="drawerDNF"><span class="drawer-icon">💀</span> DNF — Did Not Finish</button>
+
+  <div class="drawer-section-label">Features</div>
+  <button class="drawer-item" id="drawerSurprise"><span class="drawer-icon">🎲</span> Surprise Me</button>
+  <button class="drawer-item" id="drawerBattle"><span class="drawer-icon">⚔️</span> Battle</button>
+  <button class="drawer-item" id="drawerRate"><span class="drawer-icon">⭐</span> Rate or Skip</button>
+  <button class="drawer-item" id="drawerGallery"><span class="drawer-icon">🖼️</span> Gallery</button>
+  <button class="drawer-item" id="drawerStats"><span class="drawer-icon">📊</span> Stats</button>
+  <button class="drawer-item" id="drawerCalendar"><span class="drawer-icon">📅</span> Calendar</button>
+</div>
+
+<!-- DNF modal -->
+<div class="modal-backdrop" id="dnfBackdrop">
+  <div class="modal modal-wide">
+    <button class="surprise-close" id="dnfCloseBtn" type="button">×</button>
+    <div style="font-family:'Fraunces',Georgia,serif;font-size:22px;color:var(--copper);margin-bottom:4px;">💀 Did Not Finish</div>
+    <div style="font-size:12px;color:var(--text-faint);margin-bottom:16px;">Items you started but couldn't get through. No shame.</div>
+    <div id="dnfList"></div>
+  </div>
+</div>
+
+<!-- Quick Mode FAB — bottom right -->
+<button class="quick-fab" id="quickFab" type="button" aria-label="Quick actions">
+  <span class="quick-fab-icon">⚡</span>
+</button>
+
+<!-- Quick Mode sheet -->
+<div class="quick-sheet-backdrop" id="quickSheetBackdrop">
+  <div class="quick-sheet" id="quickSheet">
+    <div class="quick-sheet-handle"></div>
+    <div class="quick-sheet-title">Quick Mode</div>
+    <div class="quick-sheet-actions">
+      <button class="quick-action-btn" id="qaQuickAdd">
+        <span class="qa-icon">➕</span>
+        <span class="qa-label">Quick Add</span>
+        <span class="qa-desc">Search + add in 2 taps</span>
       </button>
-      <button type="button" class="slime-prompt-btn" data-prompt="finish">
-        <span class="slime-prompt-icon">🎯</span>
-        <span class="slime-prompt-label">
-          <strong>What should I finish?</strong>
-          <span>Stuff that's in progress and worth completing</span>
-        </span>
+      <button class="quick-action-btn" id="qaQuickComplete">
+        <span class="qa-icon">✓</span>
+        <span class="qa-label">Quick Complete</span>
+        <span class="qa-desc">Finish something + rate it</span>
       </button>
-      <button type="button" class="slime-prompt-btn" data-prompt="surprise">
-        <span class="slime-prompt-icon">✨</span>
-        <span class="slime-prompt-label">
-          <strong>Surprise me</strong>
-          <span>Random pick from your library or new suggestions</span>
-        </span>
+      <button class="quick-action-btn" id="qaLogProgress">
+        <span class="qa-icon">+</span>
+        <span class="qa-label">Log Progress</span>
+        <span class="qa-desc">+1 ep or +1h on current item</span>
       </button>
-      <button type="button" class="slime-prompt-btn" data-prompt="like">
-        <span class="slime-prompt-icon">💜</span>
-        <span class="slime-prompt-label">
-          <strong>Something like…</strong>
-          <span>I'll ask what vibe you want</span>
-        </span>
-      </button>
-
-      <!-- Custom prompt input — always visible at the bottom -->
-      <div class="slime-custom-input-row">
-        <input type="text" id="slimeCustomInput" placeholder="Or ask anything, glorp…" autocomplete="off">
-        <button type="button" class="slime-send-btn" id="slimeSendBtn" aria-label="Send">→</button>
-      </div>
-    </div>
-
-    <!-- Response area — hidden until a prompt completes -->
-    <div class="slime-response" id="slimeResponse" style="display:none;">
-      <div class="slime-response-content" id="slimeResponseContent"></div>
-      <div class="slime-response-actions">
-        <button type="button" class="btn btn-ghost" id="slimeAskAgainBtn">← Ask something else</button>
-      </div>
-    </div>
-
-    <!-- Loading state -->
-    <div class="slime-loading" id="slimeLoading" style="display:none;">
-      <div class="slime-loading-text" id="slimeLoadingText">Hmm, let me think… glorp!</div>
-      <div class="slime-loading-dots"><span></span><span></span><span></span></div>
-    </div>
-
-    <!-- Error state -->
-    <div class="slime-error" id="slimeError" style="display:none;">
-      <div class="slime-error-message" id="slimeErrorMessage"></div>
-      <button type="button" class="btn btn-ghost" id="slimeRetryBtn">Try again</button>
     </div>
   </div>
 </div>
-<!-- ===================================================== -->
+
+<!-- Quick Add sheet -->
+<div class="quick-sheet-backdrop" id="quickAddBackdrop">
+  <div class="quick-sheet">
+    <div class="quick-sheet-handle"></div>
+    <div class="quick-sheet-title">⚡ Quick Add</div>
+    <input type="text" id="quickAddInput" class="quick-add-input" placeholder="Search title…" autocomplete="off">
+    <div class="quick-add-results" id="quickAddResults"></div>
+    <div class="quick-add-status-row">
+      <button class="quick-status-btn active" data-qs="backlog">Backlog</button>
+      <button class="quick-status-btn" data-qs="in-progress">Playing</button>
+      <button class="quick-status-btn" data-qs="played">Done</button>
+      <button class="quick-status-btn" data-qs="dnf">DNF</button>
+    </div>
+    <button class="btn" id="quickAddConfirmBtn" style="width:100%;margin-top:10px;">Add</button>
+  </div>
+</div>
+
+<!-- Quick Complete sheet -->
+<div class="quick-sheet-backdrop" id="quickCompleteBackdrop">
+  <div class="quick-sheet">
+    <div class="quick-sheet-handle"></div>
+    <div class="quick-sheet-title">✓ Quick Complete</div>
+    <div class="qc-desc">Tap an item to mark it done and rate it</div>
+    <div id="quickCompleteList"></div>
+  </div>
+</div>
+
+<!-- Quick Log Progress sheet -->
+<div class="quick-sheet-backdrop" id="quickLogBackdrop">
+  <div class="quick-sheet">
+    <div class="quick-sheet-handle"></div>
+    <div class="quick-sheet-title">+ Log Progress</div>
+    <div id="quickLogList"></div>
+  </div>
+</div>
+
+<!-- Immediate Rating Modal — fires when any item is completed -->
+<div class="modal-backdrop" id="rateNowBackdrop">
+  <div class="modal rate-now-modal">
+    <div class="rate-now-cover" id="rateNowCover"></div>
+    <div class="rate-now-title" id="rateNowTitle"></div>
+    <div class="rate-now-sub">How would you rate it?</div>
+    <div class="rate-now-buttons">
+      <button class="rate-now-skip" id="rateNowSkip">Skip for now</button>
+      <div class="rate-now-grid" id="rateNowGrid"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Edit modal -->
 <div class="modal-backdrop" id="modalBackdrop">
@@ -11631,7 +11825,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v114';
+  const APP_VERSION = 'v115';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
@@ -14274,6 +14468,7 @@
     const backlog = filtered.filter(g => normalizeStatus(g.status) === 'backlog');
     const inProgress = filtered.filter(g => normalizeStatus(g.status) === 'in-progress');
     const played = filtered.filter(g => normalizeStatus(g.status) === 'played');
+    // DNF is excluded from all main views — accessible only via drawer
 
     // Update the search-bar hint with a live match count
     updateSearchHint(filtered.length, searchQuery);
@@ -16642,16 +16837,14 @@
   // Falls back to 'backlog' for unknown/missing values so old data stays valid.
   function normalizeStatus(s) {
     if (!s) return 'backlog';
-    const lower = s.toLowerCase();
-    if (lower === 'played' || lower === 'completed' || lower === 'watched' || lower === 'read' || lower === 'listened' || lower === 'dropped') return 'played';
-    if (lower === 'in-progress' || lower === 'playing' || lower === 'watching' || lower === 'reading' || lower === 'listening') return 'in-progress';
-    if (lower === 'backlog' || lower === 'on-hold' || lower === 'waiting') return 'backlog';
+    const lower = s.toLowerCase().trim();
+    if (['played','completed','watched','read','listened','done','finished'].includes(lower)) return 'played';
+    if (['in-progress','playing','watching','reading','listening','started'].includes(lower)) return 'in-progress';
+    if (['dnf','dropped','abandoned','did not finish','did-not-finish'].includes(lower)) return 'dnf';
+    if (['backlog','on-hold','waiting','want','queued','plan to'].includes(lower)) return 'backlog';
     return 'backlog';
   }
-  function isExtendedStatus(s) {
-    const lower = (s || '').toLowerCase();
-    return lower === 'on-hold' || lower === 'dropped' || lower === 'waiting';
-  }
+  function isExtendedStatus(s) { return false; } // on-hold and waiting removed
 
   // Record status changes for history tracking
   function setItemStatus(game, newStatus) {
@@ -22365,6 +22558,34 @@ CRITICAL OUTPUT RULES:
       }});
     });
 
+    // === DNF ACHIEVEMENTS — funny + unique ===
+    const dnfCount = (state.games||[]).filter(g => normalizeStatus(g.status) === 'dnf').length;
+    b.push({ icon: '🏳️', name: 'The Quitter', desc: 'DNF your first item. No shame. Not everything deserves your time.',
+      check: () => ({ unlocked: dnfCount >= 1, prog: `${Math.min(dnfCount,1)}/1` }) });
+    b.push({ icon: '💀', name: 'Serial Abandoner', desc: 'DNF 5 items. You have standards. Very strict standards.',
+      check: () => ({ unlocked: dnfCount >= 5, prog: `${Math.min(dnfCount,5)}/5` }) });
+    b.push({ icon: '🗑️', name: 'The Ruthless', desc: 'DNF 10 items. You have zero tolerance for wasting your time.',
+      check: () => ({ unlocked: dnfCount >= 10, prog: `${Math.min(dnfCount,10)}/10` }) });
+    b.push({ icon: '🧹', name: 'Life is Short', desc: 'DNF 15 items. Every hour matters. These didn\'t.',
+      check: () => ({ unlocked: dnfCount >= 15, prog: `${Math.min(dnfCount,15)}/15` }) });
+    b.push({ icon: '📉', name: 'It Got Worse', desc: 'Have a DNF item you previously rated 7+ before dropping.',
+      check: () => {
+        const found = (state.games||[]).some(g => normalizeStatus(g.status) === 'dnf' && g.rating >= 7);
+        return { unlocked: found, prog: found ? '✓' : '—' };
+      }});
+    b.push({ icon: '😮‍💨', name: 'Not For Me', desc: 'DNF something that\'s rated 8+ on IMDb. Everyone else loved it. You did not.',
+      check: () => {
+        const found = (state.games||[]).some(g => normalizeStatus(g.status) === 'dnf' && g.imdbRating >= 8);
+        return { unlocked: found, prog: found ? '✓' : '—' };
+      }});
+    b.push({ icon: '⏱️', name: 'Fastest Drop', desc: 'DNF something the same day you added it. Knew immediately.',
+      check: () => {
+        const found = (state.games||[]).some(g => {
+          if (normalizeStatus(g.status) !== 'dnf' || !g.addedAt || !g.updatedAt) return false;
+          return (g.updatedAt - g.addedAt) < 86400000;
+        });
+        return { unlocked: found, prog: found ? '✓' : '—' };
+      }}); 
     // ================================================================
     // ROUND 4 — Complete sweep. Every anime and game title from
     // your actual library. Heavy episode coverage. Personal patterns.
@@ -26214,171 +26435,304 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
     })[key] || null;
   }
 
-  function openSlimeModal() {
-    if (!auth.isAdmin) return; // safety guard, FAB shouldn't be visible otherwise
-    document.getElementById('slimeBackdrop').style.display = 'flex';
-    // Reset to prompt-picker state
-    document.getElementById('slimePrompts').style.display = 'block';
-    document.getElementById('slimeResponse').style.display = 'none';
-    document.getElementById('slimeLoading').style.display = 'none';
-    document.getElementById('slimeError').style.display = 'none';
-    document.getElementById('slimeCustomInput').value = '';
-    document.getElementById('slimeAvatar').classList.remove('thinking', 'happy');
-    document.getElementById('slimeSubtitle').textContent = 'Ready to help, glorp!';
+
+  // SLIME REMOVED
+
+  // ================================================================
+  // HAMBURGER + DRAWER
+  // ================================================================
+  function openDrawer() {
+    document.getElementById('appDrawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('show');
+    document.getElementById('hamburgerBtn').classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
-
-  function closeSlimeModal() {
-    document.getElementById('slimeBackdrop').style.display = 'none';
+  function closeDrawer() {
+    document.getElementById('appDrawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('show');
+    document.getElementById('hamburgerBtn').classList.remove('open');
+    document.body.style.overflow = '';
   }
+  document.getElementById('hamburgerBtn')?.addEventListener('click', openDrawer);
+  document.getElementById('drawerCloseBtn')?.addEventListener('click', closeDrawer);
+  document.getElementById('drawerOverlay')?.addEventListener('click', closeDrawer);
 
-  // Switch UI between prompt-pick / loading / response / error states
-  function setSlimeState(which) {
-    const promptsEl = document.getElementById('slimePrompts');
-    const responseEl = document.getElementById('slimeResponse');
-    const loadingEl = document.getElementById('slimeLoading');
-    const errorEl = document.getElementById('slimeError');
-    const avatar = document.getElementById('slimeAvatar');
-    const subtitle = document.getElementById('slimeSubtitle');
-    promptsEl.style.display = 'none';
-    responseEl.style.display = 'none';
-    loadingEl.style.display = 'none';
-    errorEl.style.display = 'none';
-    avatar.classList.remove('thinking', 'happy');
-    if (which === 'prompts') {
-      promptsEl.style.display = 'block';
-      subtitle.textContent = 'Ready to help, glorp!';
-    } else if (which === 'loading') {
-      loadingEl.style.display = 'block';
-      avatar.classList.add('thinking');
-      subtitle.textContent = 'Thinking…';
-      document.getElementById('slimeLoadingText').textContent = pickSlimeLoadingMessage();
-    } else if (which === 'response') {
-      responseEl.style.display = 'block';
-      avatar.classList.add('happy');
-      subtitle.textContent = 'Here you go!';
-      // Remove 'happy' after the bounce animation finishes so it can play again next time
-      setTimeout(() => avatar.classList.remove('happy'), 600);
-    } else if (which === 'error') {
-      errorEl.style.display = 'block';
-      subtitle.textContent = 'Oh no, something went wrong, glorp…';
-    }
-  }
+  function drawerAction(fn) { closeDrawer(); setTimeout(fn, 140); }
+  document.getElementById('drawerRefreshMeta')?.addEventListener('click', () => drawerAction(() => document.getElementById('refreshMetaBtn')?.click()));
+  document.getElementById('drawerMerge')?.addEventListener('click', () => drawerAction(() => document.getElementById('mergeModeBtn')?.click()));
+  document.getElementById('drawerSelect')?.addEventListener('click', () => drawerAction(() => document.getElementById('bulkModeBtn')?.click()));
+  document.getElementById('drawerTimeline')?.addEventListener('click', () => drawerAction(() => document.getElementById('timelineBtn')?.click()));
+  document.getElementById('drawerYearReview')?.addEventListener('click', () => drawerAction(() => document.getElementById('wrappedBtn')?.click()));
+  document.getElementById('drawerAchievements')?.addEventListener('click', () => drawerAction(() => document.getElementById('achievementsBtn')?.click()));
+  document.getElementById('drawerSurprise')?.addEventListener('click', () => drawerAction(() => document.getElementById('surpriseBtn')?.click()));
+  document.getElementById('drawerBattle')?.addEventListener('click', () => drawerAction(() => document.getElementById('battleBtn')?.click()));
+  document.getElementById('drawerRate')?.addEventListener('click', () => drawerAction(() => document.getElementById('rateSkipBtn')?.click()));
+  document.getElementById('drawerGallery')?.addEventListener('click', () => drawerAction(() => document.getElementById('galleryBtn')?.click()));
+  document.getElementById('drawerStats')?.addEventListener('click', () => drawerAction(() => document.getElementById('statsBtn')?.click()));
+  document.getElementById('drawerCalendar')?.addEventListener('click', () => drawerAction(() => document.getElementById('calendarBtn')?.click()));
+  document.getElementById('drawerDNF')?.addEventListener('click', () => drawerAction(openDNFModal));
 
-  // Light markdown → HTML renderer for slime responses. Only handles **bold**, *italic*,
-  // and simple bulleted/numbered lists. Everything else is plain text (escaped).
-  function renderSlimeMarkdown(text) {
-    // Escape HTML first
-    let safe = String(text || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-    // Bold **text**
-    safe = safe.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
-    // Italic *text* (avoid matching ** which we already converted)
-    safe = safe.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
-    return safe;
-  }
-
-  // The main call. Sends prompt + library summary to Claude, displays the response.
-  async function askSlime(userPrompt) {
-    // Validate API key exists
-    if (!state.apiKey || !state.apiKey.trim()) {
-      setSlimeState('error');
-      document.getElementById('slimeErrorMessage').innerHTML = `
-        I can't think without an API key, glorp. Open Settings → General and paste an Anthropic API key in the "Claude API Key" field.
-      `;
-      return;
-    }
-    setSlimeState('loading');
-
-    const librarySummary = buildLibrarySummaryForSlime();
-    const fullUserMessage = `Here is my library (${state.games.length} entries):\n\n${librarySummary}\n\n---\n\nMy ask: ${userPrompt}`;
-
-    try {
-      const resp = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': state.apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1024,
-          system: getSlimeSystemPrompt(),
-          messages: [{ role: 'user', content: fullUserMessage }],
-        }),
+  // ================================================================
+  // DNF MODAL
+  // ================================================================
+  function openDNFModal() {
+    const dnfItems = (state.games || []).filter(g => normalizeStatus(g.status) === 'dnf');
+    const list = document.getElementById('dnfList');
+    if (!list) return;
+    if (!dnfItems.length) {
+      list.innerHTML = '<div class="dnf-empty">💀 Nothing dropped yet.<br><span style="font-size:11px;">Items you mark DNF appear here.</span></div>';
+    } else {
+      list.innerHTML = dnfItems.map(g => {
+        const icon = g.mediaType==='movie'?'🎬':g.mediaType==='tv'?'📺':g.mediaType==='book'?'📚':g.mediaType==='album'?'💿':'🎮';
+        const cover = g.coverUrl ? `background-image:url('${g.coverUrl}')` : '';
+        return `<div class="card" style="margin-bottom:8px;cursor:default;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:36px;height:48px;border-radius:5px;background:var(--surface);background-size:cover;background-position:center;${cover};flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:16px;">${g.coverUrl?'':icon}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(g.title)}</div>
+              <div style="font-size:11px;color:var(--copper);margin-top:2px;">Did Not Finish</div>
+            </div>
+            <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;flex:0 0 auto;" data-dnf-restore="${g.id}">↩ Restore</button>
+          </div>
+        </div>`;
+      }).join('');
+      list.querySelectorAll('[data-dnf-restore]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const g = (state.games||[]).find(x => x.id === btn.dataset.dnfRestore);
+          if (g) { g.status = 'backlog'; g.updatedAt = Date.now(); await saveState(); render(); openDNFModal(); showToast(`${g.title} → Backlog`); }
+        });
       });
-
-      if (!resp.ok) {
-        let errMsg = `API error (${resp.status})`;
-        try {
-          const errData = await resp.json();
-          if (errData.error && errData.error.message) errMsg = errData.error.message;
-        } catch (e) {}
-        setSlimeState('error');
-        document.getElementById('slimeErrorMessage').textContent = errMsg + ' — check your API key or try again, glorp.';
-        return;
-      }
-
-      const data = await resp.json();
-      const responseText = (data.content && data.content[0] && data.content[0].text) || 'Hmm, I came up empty, glorp. Try asking again?';
-      setSlimeState('response');
-      document.getElementById('slimeResponseContent').innerHTML = renderSlimeMarkdown(responseText);
-    } catch (e) {
-      setSlimeState('error');
-      document.getElementById('slimeErrorMessage').textContent = 'Network error reaching Claude: ' + (e.message || 'unknown') + '. Glorp.';
     }
+    document.getElementById('dnfBackdrop').classList.add('show');
+  }
+  document.getElementById('dnfCloseBtn')?.addEventListener('click', () => document.getElementById('dnfBackdrop').classList.remove('show'));
+  document.getElementById('dnfBackdrop')?.addEventListener('click', e => { if (e.target===e.currentTarget) e.currentTarget.classList.remove('show'); });
+
+  // ================================================================
+  // NEW ADD BAR — single-line type+title+status
+  // ================================================================
+  // TYPE_COLORS defined in mobile UX section above
+  function updateAddTypeColor() {
+    const sel = document.getElementById('addTypeSelect');
+    if (sel) sel.style.borderLeftColor = TYPE_COLORS[sel.value] || 'var(--copper)';
+  }
+  document.getElementById('addTypeSelect')?.addEventListener('change', updateAddTypeColor);
+  updateAddTypeColor();
+
+  // Submit handler for the new single-row add bar
+  document.getElementById('addForm')?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const titleEl = document.getElementById('titleInput');
+    const title = titleEl?.value?.trim();
+    if (!title) return;
+    const type = document.getElementById('addTypeSelect')?.value || 'game';
+    const status = document.getElementById('addStatusSelect')?.value || 'backlog';
+    await handleAddTitle(title, type, status);
+    if (titleEl) titleEl.value = '';
+  });
+
+  // ================================================================
+  // IMMEDIATE RATING MODAL
+  // ================================================================
+  let _rateNowGameId = null;
+  function openRateNowModal(game) {
+    if (!game) return;
+    _rateNowGameId = game.id;
+    const cover = document.getElementById('rateNowCover');
+    const titleEl = document.getElementById('rateNowTitle');
+    const grid = document.getElementById('rateNowGrid');
+    if (!cover || !titleEl || !grid) return;
+    const icon = game.mediaType==='movie'?'🎬':game.mediaType==='tv'?'📺':game.mediaType==='book'?'📚':game.mediaType==='album'?'💿':'🎮';
+    cover.style.backgroundImage = game.coverUrl ? `url('${game.coverUrl}')` : '';
+    cover.textContent = game.coverUrl ? '' : icon;
+    titleEl.textContent = game.title || '';
+    grid.innerHTML = [1,2,3,4,5,6,7,8,9,10].map(n =>
+      `<button class="rate-now-btn" data-rating="${n}">${n}</button>`
+    ).join('');
+    grid.querySelectorAll('.rate-now-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const g = (state.games||[]).find(x => x.id === _rateNowGameId);
+        if (g) { g.rating = parseInt(btn.dataset.rating); g.updatedAt = Date.now(); await saveState(); render(); }
+        closeRateNowModal();
+        showToast(`Rated ${g?.title||''}: ${btn.dataset.rating}/10 ⭐`);
+      });
+    });
+    document.getElementById('rateNowBackdrop').classList.add('show');
+  }
+  function closeRateNowModal() {
+    document.getElementById('rateNowBackdrop').classList.remove('show');
+    _rateNowGameId = null;
+  }
+  document.getElementById('rateNowSkip')?.addEventListener('click', closeRateNowModal);
+  document.getElementById('rateNowBackdrop')?.addEventListener('click', e => { if (e.target===e.currentTarget) closeRateNowModal(); });
+
+  // Central completion function — sets status + fires rating modal
+  function markGameComplete(game) {
+    if (!game) return;
+    if (!Array.isArray(game.statusHistory)) game.statusHistory = [];
+    game.statusHistory.push({ from: game.status||'backlog', to:'played', at:Date.now() });
+    game.status = 'played';
+    game.completedAt = game.completedAt || Date.now();
+    game.updatedAt = Date.now();
+    saveState().then(() => { render(); if (!game.rating) openRateNowModal(game); else showToast(`Completed: ${game.title}`); });
   }
 
-  // === Wire up the slime UI ===
-  document.getElementById('slimeFab').addEventListener('click', openSlimeModal);
-  document.getElementById('slimeCloseBtn').addEventListener('click', closeSlimeModal);
-  document.getElementById('slimeBackdrop').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeSlimeModal();
-  });
-  document.getElementById('slimeAskAgainBtn').addEventListener('click', () => setSlimeState('prompts'));
-  document.getElementById('slimeRetryBtn').addEventListener('click', () => setSlimeState('prompts'));
+  // Override all quick-done buttons to route through markGameComplete
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-quick-done]');
+    if (!btn) return;
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    const game = (state.games||[]).find(g => g.id === btn.dataset.quickDone);
+    if (game) markGameComplete(game);
+  }, true);
 
-  // Quick-prompt button clicks
-  document.querySelectorAll('#slimePrompts .slime-prompt-btn').forEach(btn => {
+  // ================================================================
+  // QUICK MODE FAB
+  // ================================================================
+  function openSheet(id) { document.getElementById(id)?.classList.add('show'); }
+  function closeSheet(id) { document.getElementById(id)?.classList.remove('show'); }
+  function closeAllSheets() {
+    ['quickSheetBackdrop','quickAddBackdrop','quickCompleteBackdrop','quickLogBackdrop'].forEach(closeSheet);
+  }
+  document.getElementById('quickFab')?.addEventListener('click', () => openSheet('quickSheetBackdrop'));
+  document.getElementById('quickSheetBackdrop')?.addEventListener('click', e => { if (e.target===e.currentTarget) closeAllSheets(); });
+  ['quickAddBackdrop','quickCompleteBackdrop','quickLogBackdrop'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', e => { if (e.target===e.currentTarget) closeSheet(id); });
+  });
+
+  document.getElementById('qaQuickAdd')?.addEventListener('click', () => {
+    closeSheet('quickSheetBackdrop');
+    setTimeout(() => { openSheet('quickAddBackdrop'); setTimeout(() => document.getElementById('quickAddInput')?.focus(), 200); }, 120);
+  });
+  document.getElementById('qaQuickComplete')?.addEventListener('click', () => {
+    closeSheet('quickSheetBackdrop');
+    renderQuickCompleteList();
+    setTimeout(() => openSheet('quickCompleteBackdrop'), 120);
+  });
+  document.getElementById('qaLogProgress')?.addEventListener('click', () => {
+    closeSheet('quickSheetBackdrop');
+    renderQuickLogList();
+    setTimeout(() => openSheet('quickLogBackdrop'), 120);
+  });
+
+  // Quick Add
+  let _qaSelected = null, _qaStatus = 'backlog', _qaDebounce = null;
+  document.querySelectorAll('.quick-status-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const key = btn.dataset.prompt;
-      if (key === 'like') {
-        // Special: prompt the user for what they want and submit that
-        document.getElementById('slimeCustomInput').focus();
-        document.getElementById('slimeCustomInput').placeholder = 'Like what? e.g., "cozy sci-fi", "fast-paced shooter"…';
-        return;
-      }
-      const prompt = getSlimeQuickPromptText(key);
-      if (prompt) askSlime(prompt);
+      document.querySelectorAll('.quick-status-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active'); _qaStatus = btn.dataset.qs;
     });
   });
-
-  // Custom prompt submit (button + Enter key)
-  function submitCustomPrompt() {
-    const input = document.getElementById('slimeCustomInput');
-    const val = input.value.trim();
-    if (!val) return;
-    askSlime(val);
-  }
-  document.getElementById('slimeSendBtn').addEventListener('click', submitCustomPrompt);
-  document.getElementById('slimeCustomInput').addEventListener('keypress', e => {
-    if (e.key === 'Enter') { e.preventDefault(); submitCustomPrompt(); }
+  document.getElementById('quickAddInput')?.addEventListener('input', e => {
+    clearTimeout(_qaDebounce);
+    const q = e.target.value.trim();
+    if (!q) { document.getElementById('quickAddResults').innerHTML = ''; return; }
+    _qaDebounce = setTimeout(() => doQuickAddSearch(q), 380);
   });
-
-  // Esc closes the slime modal
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      const bd = document.getElementById('slimeBackdrop');
-      if (bd && bd.style.display === 'flex') closeSlimeModal();
+  async function doQuickAddSearch(query) {
+    const results = document.getElementById('quickAddResults');
+    results.innerHTML = '<div style="padding:8px;color:var(--text-faint);font-size:12px;">Searching…</div>';
+    let items = [];
+    try { items = await fetchSearchResults(query, 'game', state); } catch(e) {}
+    if (!items.length) { results.innerHTML = `<div class="qar-item" data-qar-manual="1"><div class="qar-cover">➕</div><div><div class="qar-title">${escapeHtml(query)}</div><div class="qar-meta">Add manually</div></div></div>`; }
+    else {
+      results.innerHTML = items.slice(0,8).map((item,i) => {
+        const icon = item.mediaType==='movie'?'🎬':item.mediaType==='tv'?'📺':'🎮';
+        return `<div class="qar-item" data-qar="${i}"><div class="qar-cover" ${item.coverUrl?`style="background-image:url('${item.coverUrl}')"`:''}>${item.coverUrl?'':icon}</div><div><div class="qar-title">${escapeHtml(item.title||'')}</div><div class="qar-meta">${escapeHtml(item.year||item.platform||item.mediaType||'')}</div></div></div>`;
+      }).join('');
     }
+    const all = items.slice(0,8);
+    results.querySelectorAll('[data-qar]').forEach((el,i) => {
+      el.addEventListener('click', () => {
+        results.querySelectorAll('.qar-item').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected'); _qaSelected = all[i];
+        document.getElementById('quickAddInput').value = all[i]?.title||'';
+      });
+    });
+    results.querySelectorAll('[data-qar-manual]').forEach(el => {
+      el.addEventListener('click', () => { el.classList.add('selected'); _qaSelected = null; });
+    });
+  }
+  document.getElementById('quickAddConfirmBtn')?.addEventListener('click', async () => {
+    const title = (_qaSelected?.title || document.getElementById('quickAddInput')?.value||'').trim();
+    if (!title) return;
+    const newGame = {
+      id: 'g_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      title, status: _qaStatus,
+      mediaType: _qaSelected?.mediaType || 'game',
+      coverUrl: _qaSelected?.coverUrl || '',
+      rating: null, addedAt: Date.now(), updatedAt: Date.now(),
+    };
+    if (!Array.isArray(state.games)) state.games = [];
+    state.games.unshift(newGame);
+    await saveState(); render(); closeAllSheets();
+    showToast(`Added: ${title}`);
+    if (_qaStatus === 'played') { setTimeout(() => openRateNowModal(newGame), 300); }
+    _qaSelected = null; document.getElementById('quickAddInput').value = '';
+    document.querySelectorAll('.quick-status-btn').forEach(b => { b.classList.toggle('active', b.dataset.qs==='backlog'); });
+    _qaStatus = 'backlog';
   });
 
-  // ============================================================
-  // /SLIME ASSISTANT
-  // ============================================================
+  // Quick Complete
+  function renderQuickCompleteList() {
+    const list = document.getElementById('quickCompleteList');
+    const inProgress = (state.games||[]).filter(g => normalizeStatus(g.status)==='in-progress');
+    if (!inProgress.length) { list.innerHTML = '<div class="qc-desc">Nothing in progress right now.</div>'; return; }
+    list.innerHTML = inProgress.map(g => {
+      const icon = g.mediaType==='movie'?'🎬':g.mediaType==='tv'?'📺':'🎮';
+      return `<div class="qc-item" data-qc-id="${g.id}">
+        <div class="qc-cover" ${g.coverUrl?`style="background-image:url('${g.coverUrl}')"`:''}>${g.coverUrl?'':icon}</div>
+        <div class="qc-info"><div class="qc-title">${escapeHtml(g.title)}</div><div class="qc-status">In Progress</div></div>
+        <span style="color:var(--copper);font-size:20px;padding-right:4px;">✓</span>
+      </div>`;
+    }).join('');
+    list.querySelectorAll('.qc-item').forEach(el => {
+      el.addEventListener('click', () => {
+        const game = (state.games||[]).find(g => g.id===el.dataset.qcId);
+        if (!game) return;
+        closeAllSheets();
+        setTimeout(() => markGameComplete(game), 150);
+      });
+    });
+  }
+
+  // Quick Log
+  function renderQuickLogList() {
+    const list = document.getElementById('quickLogList');
+    const inProgress = (state.games||[]).filter(g => normalizeStatus(g.status)==='in-progress');
+    if (!inProgress.length) { list.innerHTML = '<div class="qc-desc">Nothing in progress right now.</div>'; return; }
+    list.innerHTML = inProgress.map(g => `
+      <div class="ql-item">
+        <div class="ql-info"><div class="ql-title">${escapeHtml(g.title)}</div></div>
+        <div class="ql-btns">
+          ${g.mediaType==='tv' ? `<button class="ql-btn" data-ql-ep="${g.id}">+1 ep</button>` : ''}
+          <button class="ql-btn" data-ql-hr="${g.id}">+1h</button>
+          <button class="ql-btn" data-ql-30="${g.id}">+30m</button>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('[data-ql-ep]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const g=(state.games||[]).find(x=>x.id===btn.dataset.qlEp);
+        if(!g) return; g.currentEpisode=(g.currentEpisode||0)+1; g.updatedAt=Date.now();
+        await saveState(); renderNowDashboard(); showToast(`+1 ep — ${g.title}`);
+      });
+    });
+    list.querySelectorAll('[data-ql-hr]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const g=(state.games||[]).find(x=>x.id===btn.dataset.qlHr);
+        if(!g) return; g.hoursPlayed=(g.hoursPlayed||0)+1; g.updatedAt=Date.now();
+        await saveState(); renderNowDashboard(); showToast(`+1h — ${g.title}`);
+      });
+    });
+    list.querySelectorAll('[data-ql-30]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const g=(state.games||[]).find(x=>x.id===btn.dataset.ql30);
+        if(!g) return; g.hoursPlayed=Math.round(((g.hoursPlayed||0)+0.5)*10)/10; g.updatedAt=Date.now();
+        await saveState(); renderNowDashboard(); showToast(`+30m — ${g.title}`);
+      });
+    });
+  }
 
   // ============================================================
   // DETAILED ADD — pre-fill all card fields before saving
