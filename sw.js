@@ -2,7 +2,7 @@
 // Caches the app shell so it works offline after first visit.
 // Bump APP_VERSION on every release to force installed PWAs to update.
 
-const APP_VERSION = 'v114';
+const APP_VERSION = 'v115';
 
 const CACHE_NAME = `dami-media-book-${APP_VERSION}`;
 
