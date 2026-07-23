@@ -7411,6 +7411,66 @@
   /* DNF modal list */
   .dnf-empty { text-align: center; color: var(--text-faint); font-size: 13px; padding: 20px 0; }
 
+  /* ---- Drawer footer + sync in drawer ---- */
+  .drawer-footer {
+    margin-top: auto; padding: 14px 18px 18px;
+    border-top: 1px solid var(--border);
+  }
+  .drawer-sync { display: flex !important; align-items: center; gap: 8px; font-size: 12px; color: var(--text-faint); }
+
+  /* ---- Layout toggle row — centered below tabs ---- */
+  .layout-toggle-row { display: flex; justify-content: center; margin-bottom: 10px; }
+  .layout-toggle-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 16px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-muted); cursor: pointer; font-size: 12px; transition: all 0.15s;
+  }
+  .layout-toggle-btn:hover { border-color: var(--copper); color: var(--text); }
+  .layout-toggle-label-text { font-size: 11px; letter-spacing: 0.04em; }
+
+  /* ---- Section tabs full-width ---- */
+  .library-controls { width: 100%; margin-bottom: 4px; }
+  .library-controls-left { width: 100%; }
+  .columns-tabs { width: 100%; }
+
+  /* ---- Now section — always 2-column grid ---- */
+  .now-cards {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px; padding: 4px 0;
+  }
+  .now-card {
+    width: auto !important; flex: unset !important;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px;
+    cursor: pointer; transition: border-color 0.15s;
+  }
+
+  /* ---- Add bar — 3-row layout ---- */
+  .add-bar { display: flex; flex-direction: column; gap: 8px; }
+  .add-dropdowns-row { display: flex; gap: 8px; width: 100%; }
+  .add-select {
+    flex: 1; padding: 9px 10px; border-radius: 8px;
+    font-size: 13px; color: var(--text);
+    background: var(--surface); border: 1px solid var(--border);
+    cursor: pointer; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+  }
+  .add-select:focus { border-color: var(--copper); outline: none; }
+  .add-title-input {
+    width: 100%; box-sizing: border-box;
+    padding: 10px 14px; border-radius: 8px; font-size: 14px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  }
+  .add-title-input:focus { border-color: var(--copper); outline: none; }
+  .add-actions-row { display: flex; justify-content: center; }
+  .add-actions-row .detailed-add-btn { padding: 6px 20px; }
+
+  /* ---- Toolbar tighter ---- */
+  .toolbar { gap: 8px; margin-bottom: 12px; }
+
   /* ============================================================
      SETTINGS — Side nav shell
   ============================================================ */
@@ -10205,10 +10265,7 @@
 </div>
 
 <!-- Sync status indicator (small dot in the header area) -->
-<div class="sync-indicator" id="syncIndicator" title="Sync status">
-  <span class="sync-dot"></span>
-  <span class="sync-label">Synced</span>
-</div>
+<!-- sync indicator now lives inside the drawer footer -->
 
 <div class="container">
   <header class="header">
@@ -10295,46 +10352,36 @@
   </div>
 
   <form class="add-bar" id="addForm" autocomplete="off">
-    <div class="add-bar-single-row">
-      <!-- Media type dropdown — retains per-type colors -->
-      <div class="add-type-wrap">
-        <select class="add-type-select" id="addTypeSelect">
-          <option value="game">🎮 Game</option>
-          <option value="movie">🎬 Movie</option>
-          <option value="tv">📺 TV</option>
-          <option value="book">📚 Book</option>
-          <option value="album">💿 Album</option>
-        </select>
-      </div>
-      <!-- Title search field -->
-      <input type="text" id="titleInput" class="add-title-input" placeholder="Media title…" required autocomplete="off" autocapitalize="off">
-      <!-- Status dropdown -->
-      <div class="add-status-wrap">
-        <select class="add-status-select" id="addStatusSelect">
-          <option value="backlog">Backlog</option>
-          <option value="in-progress">Playing</option>
-          <option value="played">Done</option>
-          <option value="dnf">DNF</option>
-        </select>
-      </div>
+    <!-- Row 1: Media type + Status side by side -->
+    <div class="add-dropdowns-row">
+      <select class="add-select add-type-select" id="addTypeSelect">
+        <option value="game">🎮 Game</option>
+        <option value="movie">🎬 Movie</option>
+        <option value="tv">📺 TV</option>
+        <option value="book">📚 Book</option>
+        <option value="album">💿 Album</option>
+      </select>
+      <select class="add-select add-status-select" id="addStatusSelect">
+        <option value="backlog">Backlog</option>
+        <option value="in-progress">In Progress</option>
+        <option value="played">Completed</option>
+        <option value="dnf">DNF</option>
+      </select>
     </div>
-
-    <!-- Detailed Add + Discover — slim row below -->
-    <div class="detailed-add-row">
+    <!-- Row 2: Title search full-width -->
+    <input type="text" id="titleInput" class="add-title-input" placeholder="Media title…" required autocomplete="off" autocapitalize="off">
+    <!-- Row 3: Detailed Add centered -->
+    <div class="add-actions-row">
       <button type="button" class="detailed-add-btn" id="detailedAddBtn">
         <span class="detailed-add-icon">✎</span>
         <span class="detailed-add-label">Detailed Add…</span>
       </button>
-      <button type="button" class="detailed-add-btn discover-btn" id="discoverBtn">
-        <span class="detailed-add-icon">✨</span>
-        <span class="detailed-add-label">Discover…</span>
-      </button>
     </div>
+    <!-- Hidden discover btn kept for JS compatibility -->
+    <button type="button" id="discoverBtn" style="display:none;"></button>
   </form>
 
-
-
-  </form>
+  <div id="addFormExtraEnd"></div>
 
   <div class="toolbar">
     <!-- Full-width search bar -->
@@ -10470,9 +10517,12 @@
   <!-- Layout toggle lives here — controls the columns below it -->
   <div class="library-controls">
     <div class="library-controls-left"><!-- column tabs injected here by render() --></div>
+  </div>
+  <div class="layout-toggle-row">
     <div class="layout-toggle-wrap">
       <button type="button" class="layout-toggle-btn" id="layoutToggleBtn" aria-label="Change layout" title="Change layout" aria-haspopup="true" aria-expanded="false">
         <span class="layout-toggle-icon" id="layoutToggleIcon">⊞</span>
+        <span class="layout-toggle-label-text">View</span>
       </button>
       <div class="layout-menu" id="layoutMenu" role="menu" style="display:none;">
         <button type="button" class="layout-option" data-layout="two-col" role="menuitem">
@@ -10553,6 +10603,14 @@
   <button class="drawer-item" id="drawerGallery"><span class="drawer-icon">🖼️</span> Gallery</button>
   <button class="drawer-item" id="drawerStats"><span class="drawer-icon">📊</span> Stats</button>
   <button class="drawer-item" id="drawerCalendar"><span class="drawer-icon">📅</span> Calendar</button>
+
+  <!-- Sync status at bottom of drawer -->
+  <div class="drawer-footer">
+    <div class="sync-indicator drawer-sync" id="syncIndicator" title="Sync status">
+      <span class="sync-dot"></span>
+      <span class="sync-label">Synced</span>
+    </div>
+  </div>
 </div>
 
 <!-- DNF modal -->
@@ -11773,7 +11831,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v115.1';
+  const APP_VERSION = 'v115.2';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
@@ -14130,7 +14188,7 @@
     }
 
     const cardCount = inProgress.length;
-    const nowCardsClass = cardCount >= 5 ? 'now-cards now-cards-grid' : 'now-cards';
+    const nowCardsClass = 'now-cards'; // always 2-col grid via CSS
 
     const cards = inProgress.map(g => {
       const mt = g.mediaType || 'game';
@@ -26431,12 +26489,12 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
   document.getElementById('dnfBackdrop')?.addEventListener('click', e => { if (e.target===e.currentTarget) e.currentTarget.classList.remove('show'); });
 
   // ================================================================
-  // NEW ADD BAR — single-line type+title+status
+  // NEW ADD BAR — dropdown color accent + submit
   // ================================================================
-  // TYPE_COLORS defined in mobile UX section above
+  const ADD_TYPE_COLORS = { game:'#9B59B6', movie:'#E74C3C', tv:'#3498DB', book:'#27AE60', album:'#F39C12' };
   function updateAddTypeColor() {
     const sel = document.getElementById('addTypeSelect');
-    if (sel) sel.style.borderLeftColor = TYPE_COLORS[sel.value] || 'var(--copper)';
+    if (sel) sel.style.borderLeftColor = ADD_TYPE_COLORS[sel.value] || 'var(--copper)';
   }
   document.getElementById('addTypeSelect')?.addEventListener('change', updateAddTypeColor);
   updateAddTypeColor();
