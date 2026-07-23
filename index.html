@@ -17426,44 +17426,21 @@ Return ONLY the JSON object, nothing else.`;
   }
 
   // --- Add form ---
-  // Default movie/TV mode for the watch split-button: starts on movie, toggle flips it
-  let watchMode = 'movie'; // 'movie' | 'tv'
-
-  // Toggle handler — flips between movie and TV mode for the Watched split-button
-  document.getElementById('watchModeToggle').addEventListener('click', () => {
-    watchMode = (watchMode === 'movie') ? 'tv' : 'movie';
-    const splitBtn = document.querySelector('.split-btn.split-watch');
-    splitBtn.classList.toggle('tv-mode', watchMode === 'tv');
-    // Update data-type on both halves so they pass the right type when clicked
-    document.getElementById('watchBacklogBtn').dataset.type = watchMode;
-    document.getElementById('watchCompletedBtn').dataset.type = watchMode;
-    // Update the icon shown in the backlog half
-    document.getElementById('watchIcon').textContent = watchMode === 'tv' ? '📺' : '🎬';
-    // Update tooltips
-    document.getElementById('watchBacklogBtn').title = watchMode === 'tv'
-      ? 'Add to backlog as a TV show'
-      : 'Add to backlog as a movie';
-    document.getElementById('watchCompletedBtn').title = watchMode === 'tv'
-      ? 'Add as watched TV show'
-      : 'Add as watched movie';
-  });
-
-  // Wire every split-half button to call addTitle with its type + status
-  document.querySelectorAll('.split-btn .split-half').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.preventDefault();
-      const mediaType = btn.dataset.type;
-      const status = btn.dataset.status;
-      addTitle(mediaType, status);
-    });
-  });
-
-  // Pressing Enter in the title input triggers a sensible default action.
-  // We use last-used media type (or game) and default to backlog status.
+  // watchMode kept as a variable in case any remaining code references it
+  let watchMode = 'movie';
   let lastUsedMediaType = 'game';
-  document.getElementById('addForm').addEventListener('submit', e => {
+
+  // Submit handler for the new single-row add bar
+  document.getElementById('addForm')?.addEventListener('submit', async e => {
     e.preventDefault();
-    addTitle(lastUsedMediaType, 'backlog');
+    const titleEl = document.getElementById('titleInput');
+    const title = titleEl?.value?.trim();
+    if (!title) return;
+    const type = document.getElementById('addTypeSelect')?.value || 'game';
+    const status = document.getElementById('addStatusSelect')?.value || 'backlog';
+    lastUsedMediaType = type;
+    await addTitle(type, status);
+    if (titleEl) titleEl.value = '';
   });
 
   // Core add-a-title flow — extracted so split buttons and Enter-key both share it
@@ -17889,13 +17866,10 @@ Return ONLY the JSON object, nothing else.`;
 
   async function addTitle(mediaType, status) {
     const titleInput = document.getElementById('titleInput');
-    const title = titleInput.value.trim();
+    const title = titleInput?.value?.trim();
     if (!title) return;
     lastUsedMediaType = mediaType;
-
-    // Disable all action buttons during classification
-    const allButtons = document.querySelectorAll('.split-btn .split-half, .watch-toggle');
-    allButtons.forEach(b => b.disabled = true);
+    if (titleInput) titleInput.disabled = true;
 
     // === Picker step ===
     // Before adding, fetch candidates and let the user pick the right one.
@@ -17907,7 +17881,7 @@ Return ONLY the JSON object, nothing else.`;
       // Source supports candidate listing — show picker
       const choice = await showPicker(title, mediaType, candidates);
       if (choice === 'cancel') {
-        allButtons.forEach(b => b.disabled = false);
+        if (titleInput) titleInput.disabled = false;
         return;
       }
       if (choice === 'manual') {
@@ -18020,7 +17994,7 @@ Return ONLY the JSON object, nothing else.`;
         render();
       }
     }
-    allButtons.forEach(b => b.disabled = false);
+    if (titleInput) titleInput.disabled = false;
   }
 
   // ============================================================
@@ -26518,18 +26492,6 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
   }
   document.getElementById('addTypeSelect')?.addEventListener('change', updateAddTypeColor);
   updateAddTypeColor();
-
-  // Submit handler for the new single-row add bar
-  document.getElementById('addForm')?.addEventListener('submit', async e => {
-    e.preventDefault();
-    const titleEl = document.getElementById('titleInput');
-    const title = titleEl?.value?.trim();
-    if (!title) return;
-    const type = document.getElementById('addTypeSelect')?.value || 'game';
-    const status = document.getElementById('addStatusSelect')?.value || 'backlog';
-    await handleAddTitle(title, type, status);
-    if (titleEl) titleEl.value = '';
-  });
 
   // ================================================================
   // IMMEDIATE RATING MODAL
