@@ -2042,7 +2042,7 @@
   .container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 48px 32px 80px;
+    padding: 24px 32px 80px;
   }
 
   /* --- Header --- */
@@ -2145,12 +2145,16 @@
   .filter-group.genre-filter.collapsed .genre-chips-row { display: none; }
   /* Type + Genre filters side-by-side, collapsible */
   .filter-row-inline {
-    display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   .filter-row-inline .filter-group { flex: 0 0 auto; }
   .type-chip-all { white-space: nowrap; }
   .type-chips-row {
-    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; justify-content: center;
   }
 
   /* Library controls bar — sits between Now section and columns */
@@ -2689,11 +2693,11 @@
     background: var(--bg-elevated);
     border: 2px solid var(--copper);
     border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 24px;
+    padding: 16px;
+    margin-bottom: 12px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     box-shadow: 0 0 0 1px rgba(224,176,116,0.1), 0 4px 24px rgba(0,0,0,0.2);
     position: relative;
   }
@@ -3025,8 +3029,8 @@
   .toolbar {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
-    gap: 14px;
+    margin-bottom: 12px;
+    gap: 8px;
   }
 
   /* Search bar — full-width pill-shaped input with icon, clear button, and live hint */
@@ -3837,7 +3841,7 @@
   }
 
   @media (max-width: 880px) {
-    .container { padding: 32px 20px 60px; }
+    .container { padding: 16px 16px 60px; }
   }
 
   .column {
@@ -7356,7 +7360,7 @@
   /* ============================================================
      SEARCH CONTROLS ROW
   ============================================================ */
-  .search-controls-row { display: flex; gap: 8px; margin-top: 8px; }
+  .search-controls-row { display: flex; gap: 8px; margin-top: 0; }
   .search-controls-row .sort-toggle-wrap,
   .search-controls-row .filter-adv-wrap { flex: 1; }
   .search-control-btn {
@@ -8619,7 +8623,7 @@
   .floating-actions {
     position: fixed;
     left: 16px;
-    bottom: 27px;
+    bottom: 22px;
     transform: none;
     z-index: 70;
     background: var(--bg-elevated);
@@ -9152,9 +9156,9 @@
     }
     /* --- 6. Header + stats tightening --- */
     .header {
-      padding-bottom: 20px;
-      margin-bottom: 24px;
-      gap: 14px;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      gap: 6px;
     }
     .stats {
       justify-content: space-around;
@@ -9192,8 +9196,8 @@
       scroll-snap-align: start;
     }
 
-    /* Add bar tighter padding so it doesn't dominate */
-    .add-bar { padding: 14px; margin-bottom: 20px; gap: 10px; }
+    /* Add bar tighter padding on mobile */
+    .add-bar { padding: 12px; margin-bottom: 10px; }
 
     /* --- 3. Bigger tap targets on cards ---
        28px icon buttons are below the ~44px comfortable touch minimum. Bump them
@@ -11770,7 +11774,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v116.9';
+  const APP_VERSION = 'v117';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
