@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<!-- CRITICAL: Apply saved theme before CSS parses to prevent flash -->
+<script>
+(function(){
+  try {
+    var t = localStorage.getItem('dami_theme');
+    if (t && t !== 'amethyst') document.documentElement.setAttribute('data-theme', t);
+  } catch(e) {}
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Dami Media Book</title>
 <meta name="description" content="Personal media tracker — games, books, and beyond">
@@ -2643,13 +2652,24 @@
   /* --- Add form --- */
   .add-bar {
     background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    border: 2px solid var(--copper);
+    border-radius: 16px;
     padding: 20px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    box-shadow: 0 0 0 1px rgba(224,176,116,0.1), 0 4px 24px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  /* Add media label above the form */
+  .add-bar::before {
+    content: '＋ Add to Library';
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--copper);
+    margin-bottom: 4px;
   }
 
   /* --- Detailed Add button — secondary entry point under the quick-add bar --- */
@@ -2807,25 +2827,8 @@
   .add-bar input::placeholder { color: var(--text-faint); }
 
   /* Action button row — wraps gracefully on narrow screens */
-  .add-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  /* Split-button group: backlog half | completed half (and optional toggle) */
-  .split-btn {
-    display: inline-flex;
-    align-items: stretch;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  .split-half {
+/* Split-button group: backlog half | completed half (and optional toggle) */
+.split-half {
     background: transparent;
     border: none;
     color: var(--text-muted);
@@ -2844,24 +2847,12 @@
     min-width: 0;
   }
 
-  .split-half.backlog {
-    border-right: 1px solid var(--border);
-    /* Subtle/secondary look — matches old + Backlog button feel */
-    color: var(--text-muted);
-  }
-
-  .split-half.backlog:hover {
+.split-half.backlog:hover {
     background: var(--surface-hover);
     color: var(--text);
   }
 
-  .split-half.completed {
-    /* Filled per-type background applied below in type-specific blocks */
-    color: var(--bg);
-    font-weight: 600;
-  }
-
-  .split-half:disabled {
+.split-half:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
@@ -2872,10 +2863,7 @@
   }
 
   /* GAME — gold/amethyst (matches existing media-badge.game) */
-  .split-btn.split-game .split-half.completed {
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
-  }
-  .split-btn.split-game .split-half.completed:hover {
+.split-btn.split-game .split-half.completed:hover {
     background: linear-gradient(135deg, #DCC0F5 0%, var(--gold) 100%);
     transform: translateY(-1px);
   }
@@ -2884,10 +2872,7 @@
   }
 
   /* MOVIE/TV — rose for movie, copper for TV (theme switches based on toggle state) */
-  .split-btn.split-watch .split-half.completed {
-    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dim) 100%);
-  }
-  .split-btn.split-watch.tv-mode .split-half.completed {
+.split-btn.split-watch.tv-mode .split-half.completed {
     background: linear-gradient(135deg, var(--copper) 0%, var(--copper-dim) 100%);
   }
   .split-btn.split-watch .split-half.completed:hover {
@@ -2902,10 +2887,7 @@
   }
 
   /* BOOK — honey amber */
-  .split-btn.split-book .split-half.completed {
-    background: linear-gradient(135deg, #E8C28A 0%, #B5946B 100%);
-  }
-  .split-btn.split-book .split-half.completed:hover {
+.split-btn.split-book .split-half.completed:hover {
     background: linear-gradient(135deg, #F2D6AA 0%, #E8C28A 100%);
     transform: translateY(-1px);
   }
@@ -2914,10 +2896,7 @@
   }
 
   /* ALBUM — steel blue */
-  .split-btn.split-album .split-half.completed {
-    background: linear-gradient(135deg, #8FB8E0 0%, #6B92BA 100%);
-  }
-  .split-btn.split-album .split-half.completed:hover {
+.split-btn.split-album .split-half.completed:hover {
     background: linear-gradient(135deg, #A8C8E8 0%, #8FB8E0 100%);
     transform: translateY(-1px);
   }
@@ -2926,24 +2905,7 @@
   }
 
   /* The 🎬/📺 toggle inside the watch split-button */
-  .watch-toggle {
-    background: transparent;
-    border: none;
-    border-left: 1px solid var(--border);
-    color: var(--text-muted);
-    padding: 0 10px;
-    cursor: pointer;
-    font-size: 13px;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-    flex: 0 0 auto;
-    position: relative;
-  }
-
-  .watch-toggle:hover {
+.watch-toggle:hover {
     background: var(--surface-hover);
     color: var(--text);
   }
@@ -2956,15 +2918,9 @@
 
   /* On narrow screens, let split-buttons wrap to multiple rows */
   @media (max-width: 720px) {
-    .split-btn {
-      flex: 1 1 calc(50% - 4px);
-    }
   }
 
   @media (max-width: 480px) {
-    .split-btn {
-      flex: 1 1 100%;
-    }
   }
 
   .btn {
@@ -5995,14 +5951,7 @@
 
   .source-config label:first-child { margin-top: 0; }
 
-  .source-help {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 12px;
-    line-height: 1.6;
-  }
-
-  .source-help ol {
+.source-help ol {
     margin: 8px 0 0 18px;
     padding: 0;
   }
@@ -7169,23 +7118,22 @@
     border-color: var(--copper);
   }
 
-  /* ============================================================
-     HAMBURGER BUTTON
-  ============================================================ */
-  .hamburger-btn {
-    position: fixed; top: 16px; left: 16px; z-index: 1100;
-    width: 40px; height: 40px;
+  /* Hamburger — lives inside the header, scrolls with the page */
+  .header-hamburger {
+    position: static; /* not fixed — scrolls with header */
+    width: 38px; height: 38px;
     background: transparent; border: none;
-    border-radius: 10px; cursor: pointer;
+    border-radius: 8px; cursor: pointer;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 5px;
+    flex: 0 0 auto; align-self: center;
     transition: background 0.15s;
   }
-  .hamburger-btn:hover { background: rgba(255,255,255,0.08); }
+  .header-hamburger:hover { background: rgba(255,255,255,0.08); }
   .hamburger-line { width: 20px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.2s; }
-  .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-  .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; }
-  .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .header-hamburger.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .header-hamburger.open .hamburger-line:nth-child(2) { opacity: 0; }
+  .header-hamburger.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
   /* ============================================================
      APP DRAWER — left side sheet
@@ -7234,7 +7182,7 @@
      QUICK MODE FAB
   ============================================================ */
   .quick-fab {
-    position: fixed; bottom: 96px; right: 20px; z-index: 1050;
+    position: fixed; bottom: 12px; right: 16px; z-index: 1050;
     width: 52px; height: 52px; border-radius: 50%;
     background: var(--copper); border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
@@ -7356,8 +7304,7 @@
   /* ============================================================
      NEW ADD BAR — single line
   ============================================================ */
-  .add-bar-single-row { display: flex; align-items: center; gap: 6px; width: 100%; }
-  .add-type-wrap, .add-status-wrap { flex: 0 0 auto; }
+.add-type-wrap, .add-status-wrap { flex: 0 0 auto; }
   .add-type-select, .add-status-select {
     padding: 9px 8px; border-radius: 10px; font-size: 13px;
     background: var(--surface); border: 1px solid var(--border);
@@ -7418,20 +7365,21 @@
   }
   .drawer-sync { display: flex !important; align-items: center; gap: 8px; font-size: 12px; color: var(--text-faint); }
 
-  /* ---- Layout toggle row — centered below tabs, no overflow ---- */
+  /* ---- Layout toggle row — centered below tabs, icon-only clean button ---- */
   .layout-toggle-row { display: flex; justify-content: center; margin-bottom: 10px; }
   .layout-toggle-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-    padding: 5px 14px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 6px 16px; border-radius: 20px;
     background: var(--surface); border: 1px solid var(--border);
-    color: var(--text-muted); cursor: pointer; font-size: 11px;
-    white-space: nowrap; overflow: hidden;
-    max-width: 120px;
+    color: var(--text-muted); cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+    white-space: nowrap; width: auto; min-width: 0;
     transition: all 0.15s;
   }
-  .layout-toggle-btn:hover { border-color: var(--copper); color: var(--text); }
-  .layout-toggle-icon { font-size: 13px; flex: 0 0 auto; }
-  .layout-toggle-label-text { font-size: 11px; letter-spacing: 0.03em; flex: 0 0 auto; }
+  .layout-toggle-btn:hover { border-color: var(--copper); color: var(--copper); }
+  .layout-toggle-icon { font-size: 14px; flex: 0 0 auto; line-height: 1; }
+  .layout-toggle-label-text { flex: 0 0 auto; }
 
   /* ---- Section tabs full-width ---- */
   .library-controls { width: 100%; margin-bottom: 4px; }
@@ -7501,6 +7449,82 @@
   /* ---- Toolbar tighter ---- */
   .toolbar { gap: 8px; margin-bottom: 12px; }
 
+  /* ---- New settings element styles ---- */
+  /* Sources compact */
+  .src-block { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+  .src-block:last-of-type { border-bottom: none; }
+  .src-block-label { font-size: 12px; font-weight: 600; color: var(--text); }
+  .src-block .setting-select { width: 100%; }
+  .src-guide-btn { background: none; border: none; color: var(--copper); cursor: pointer; font-size: 11px; font-family: 'JetBrains Mono', monospace; padding: 0; align-self: flex-start; }
+  .src-guide-btn:hover { color: var(--gold); text-decoration: underline; }
+  .src-guide-panel { background: var(--surface); border-radius: 8px; border: 1px solid var(--border); padding: 10px 12px; font-size: 11px; color: var(--text-muted); line-height: 1.6; margin-bottom: 4px; }
+  .src-guide-panel .source-help { display: none; }
+  .src-guide-panel .source-help.visible { display: block; }
+  .src-guide-panel code { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--copper); }
+  .src-api-key-block { padding: 12px 0 0; }
+
+  /* Account compact */
+  .acct-profile-row { display: flex; align-items: center; gap: 12px; padding: 4px 0 14px; }
+  .acct-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--copper); color: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex: 0 0 auto; }
+  .acct-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .acct-meta { font-size: 11px; color: var(--text-faint); }
+  .acct-info { flex: 1; min-width: 0; }
+  .acct-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+  .acct-row-label { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+  .acct-action-btn { padding: 5px 12px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-size: 11px; white-space: nowrap; transition: all 0.12s; }
+  .acct-action-btn:hover { border-color: var(--copper); color: var(--copper); }
+  .snapshot-list-compact { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .snap-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--surface); border-radius: 8px; font-size: 11px; color: var(--text-muted); }
+  .snap-del-btn { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 12px; flex: 0 0 auto; padding: 2px 4px; border-radius: 4px; }
+  .snap-del-btn:hover { color: #E36F6F; background: rgba(220,80,80,0.08); }
+
+  /* Admin compact cards */
+  .admin-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+  .admin-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .admin-card-title { font-size: 12px; font-weight: 600; color: var(--text); letter-spacing: 0.02em; margin-bottom: 10px; }
+  .admin-card-header .admin-card-title { margin-bottom: 0; }
+  .admin-icon-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--text-muted); cursor: pointer; padding: 3px 8px; font-size: 13px; transition: all 0.12s; }
+  .admin-icon-btn:hover { border-color: var(--copper); color: var(--copper); }
+  .admin-gen-compact { display: flex; flex-direction: column; gap: 6px; }
+  .admin-gen-compact input { padding: 8px 10px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 13px; width: 100%; box-sizing: border-box; }
+  .admin-gen-btn { align-self: flex-start; padding: 7px 16px; font-size: 12px; }
+  .admin-result-pill { margin-top: 8px; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); word-break: break-all; }
+  .admin-codes-compact { display: flex; flex-direction: column; gap: 4px; }
+  .admin-empty-sm { font-size: 11px; color: var(--text-faint); }
+  /* Hide revoked/killed tokens from view */
+  .admin-code-row.is-revoked { display: none !important; }
+  .admin-code-row[data-revoked="true"] { display: none !important; }
+
+  /* Custom achievement compact */
+  .custom-ach-compact { display: flex; flex-direction: column; gap: 6px; }
+  .custom-ach-compact input { padding: 8px 10px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 13px; width: 100%; box-sizing: border-box; }
+  .cach-icon-row { display: flex; align-items: center; gap: 8px; }
+  .cach-icon-btn { width: 36px; height: 36px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+  .cach-icon-input { flex: 1 !important; }
+  .cach-footer-row { display: flex; align-items: center; gap: 8px; }
+  .cach-rarity-select { flex: 1; padding: 8px 10px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 12px; }
+
+  /* Analytics compact */
+  .analytics-compact { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+  .analytics-summary-compact { font-size: 12px; color: var(--text); line-height: 1.7; }
+
+  /* Mobile settings nav — icon grid, no scroll */
+  @media (max-width: 640px) {
+    .settings-sidenav {
+      width: 100%; flex: 0 0 auto; flex-direction: row;
+      overflow: hidden; border-right: none; border-bottom: 1px solid var(--border);
+      padding: 4px; gap: 2px; justify-content: space-around; flex-wrap: nowrap;
+    }
+    .settings-sidenav-header { display: none; }
+    .settings-nav-item {
+      flex-direction: column; padding: 6px 2px; gap: 1px;
+      border-radius: 8px; flex: 1; justify-content: center; min-width: 0;
+    }
+    .settings-nav-label { font-size: 8px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .settings-nav-icon { font-size: 15px; }
+    .settings-nav-item.active::before { display: none; }
+  }
+
   /* ============================================================
      SETTINGS — Side nav shell
   ============================================================ */
@@ -7513,11 +7537,11 @@
     box-shadow: 0 24px 64px rgba(0,0,0,0.5);
   }
   .settings-sidenav {
-    width: 168px; flex: 0 0 168px;
+    width: 148px; flex: 0 0 148px;
     background: var(--bg-elevated);
     border-right: 1px solid var(--border);
     display: flex; flex-direction: column;
-    padding: 0 0 16px; overflow-y: auto;
+    padding: 0 0 12px; overflow: hidden; /* no scroll — all items fit */
   }
   .settings-sidenav-header {
     font-family: 'Fraunces', Georgia, serif;
@@ -7611,60 +7635,23 @@
   .setting-check-icon { font-size: 14px; flex: 0 0 20px; text-align: center; }
   .setting-check-desc { font-size: 11px; color: var(--text-faint); margin-left: auto; text-align: right; max-width: 200px; }
 
-  /* Sources section */
-  .source-config-row {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    padding: 12px 0; border-bottom: 1px solid var(--border);
-  }
-  .source-config-label { font-size: 13px; color: var(--text); font-weight: 500; min-width: 170px; }
-  .source-setup-btn {
-    background: none; border: none; color: var(--copper); cursor: pointer;
-    font-size: 11px; font-family: 'JetBrains Mono', monospace;
-    padding: 0; margin-left: auto;
-  }
-  .source-setup-btn:hover { color: var(--gold); text-decoration: underline; }
-  .source-setup-notes {
-    margin: 0 0 4px; padding: 12px 14px;
-    background: var(--surface); border-radius: 10px;
-    border: 1px solid var(--border);
-    font-size: 12px; color: var(--text-muted); line-height: 1.6;
-  }
-  .source-setup-notes .source-help { display: none; }
-  .source-setup-notes .source-help.visible { display: block; }
+  /* source-config styles removed — replaced by src-block in v116 */
 
   /* Account */
-  .account-info-block {
-    font-family: 'JetBrains Mono', monospace; font-size: 12px;
-    color: var(--text-muted); line-height: 1.7;
-  }
-  .signout-btn { border-color: rgba(220,80,80,0.4) !important; color: #E89090 !important; }
-  .update-result-text { font-size: 12px; color: var(--text-faint); line-height: 1.5; margin-top: 6px; }
-  .push-status-text { font-size: 11px; color: var(--text-faint); margin-top: 6px; }
   .genre-hide-list {
     display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
     max-height: 260px; overflow-y: auto;
   }
   .dash-order-list { display: flex; flex-direction: column; gap: 5px; width: 100%; margin-top: 10px; }
 
-  /* Mobile */
+  /* Mobile settings nav handled in the new 640px block above */
+
+  /* Additional settings mobile overrides */
   @media (max-width: 640px) {
-    .settings-shell { flex-direction: column; height: 94vh; width: 100%; border-radius: 14px 14px 0 0; align-self: flex-end; }
-    .settings-sidenav {
-      width: 100%; flex: 0 0 auto; flex-direction: row;
-      overflow-x: auto; overflow-y: hidden;
-      border-right: none; border-bottom: 1px solid var(--border);
-      padding: 6px 8px; gap: 2px; scrollbar-width: none;
-    }
-    .settings-sidenav::-webkit-scrollbar { display: none; }
-    .settings-sidenav-header { display: none; }
-    .settings-nav-item { padding: 8px 12px; border-radius: 8px; white-space: nowrap; flex: 0 0 auto; }
-    .settings-nav-item.active::before { display: none; }
     .settings-content { padding: 18px 16px 32px; }
     .setting-select { min-width: 130px; }
     .genre-hide-list { grid-template-columns: 1fr; }
     .setting-check-desc { display: none; }
-    .source-config-row { flex-direction: column; align-items: flex-start; }
-    .source-config-label { min-width: unset; }
   }
 
   /* --- Privacy notice + opt-out toggle in Account tab --- */
@@ -7877,15 +7864,7 @@
   }
 
   /* --- Admin panel (code management) --- */
-  .admin-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-    margin-top: 14px;
-  }
-
-  .admin-section-title {
+.admin-section-title {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
     letter-spacing: 0.1em;
@@ -7898,33 +7877,11 @@
     gap: 8px;
   }
 
-  .admin-refresh-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    padding: 4px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.15s;
-  }
-  .admin-refresh-btn:hover {
+.admin-refresh-btn:hover {
     color: var(--gold);
     border-color: var(--gold-dim);
   }
-  .admin-refresh-btn:disabled {
-    opacity: 0.5;
-    cursor: wait;
-  }
-
-  .admin-gen-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 8px;
-  }
-
-  @media (max-width: 560px) {
-    .admin-gen-row { grid-template-columns: 1fr; }
+@media (max-width: 560px) {
   }
 
   .admin-gen-row input {
@@ -7945,16 +7902,7 @@
     white-space: nowrap;
   }
 
-  .admin-gen-result {
-    margin-top: 12px;
-    padding: 12px;
-    background: var(--bg-elevated);
-    border: 1px solid var(--gold-dim);
-    border-radius: 6px;
-    font-size: 12px;
-    line-height: 1.6;
-  }
-  .admin-gen-result .gen-code {
+.admin-gen-result .gen-code {
     font-family: 'JetBrains Mono', monospace;
     color: var(--gold);
     font-weight: 600;
@@ -7989,13 +7937,7 @@
     border-color: var(--gold-dim);
   }
 
-  .admin-codes-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .admin-empty {
+.admin-empty {
     text-align: center;
     padding: 20px;
     color: var(--text-faint);
@@ -8532,19 +8474,18 @@
 
   .floating-actions {
     position: fixed;
-    left: 50%;
+    left: 16px;
     bottom: 16px;
-    transform: translateX(-50%);
+    transform: none;
     z-index: 70;
     background: var(--bg-elevated);
     border: 1px solid var(--border-strong);
     border-radius: 999px;
-    padding: 8px 12px;
+    padding: 6px 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.02);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    max-width: calc(100% - 32px);
-    /* Hide entirely until the user is signed in (controlled via .show class on body or here) */
+    max-width: calc(100% - 88px); /* leave room for FAB on right */
     display: none;
   }
 
@@ -9237,7 +9178,7 @@
     /* --- Add flow / picker tightening --- */
     .detailed-add-modal { max-width: 100%; }
     .detailed-type-btn { min-width: 0; flex: 1 1 calc(33% - 6px); font-size: 13px; padding: 10px 8px; }
-    .split-half { padding: 13px 12px; font-size: 14px; } /* slightly taller tap target */
+  /* slightly taller tap target */
 
     /* Slime modal prompt cards a touch larger */
     .slime-prompt-btn { padding: 14px; }
@@ -9258,60 +9199,7 @@
   }
 
   /* Backups & recovery snapshot list */
-  .snapshot-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .snapshot-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-  }
-  .snapshot-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-  .snapshot-when {
-    font-size: 13px;
-    color: var(--text);
-  }
-  .snapshot-meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    color: var(--text-faint);
-    text-transform: uppercase;
-  }
-  .snapshot-reason {
-    display: inline-block;
-    padding: 1px 6px;
-    border-radius: 4px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    margin-left: 6px;
-  }
-  .snapshot-reason.special { color: var(--gold); border-color: var(--gold-dim); }
-  .snapshot-restore-btn {
-    flex: 0 0 auto;
-    background: transparent;
-    border: 1px solid var(--gold-dim);
-    color: var(--gold);
-    border-radius: 6px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    padding: 6px 12px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .snapshot-restore-btn:hover { background: rgba(201, 164, 240, 0.1); }
+  /* snapshot-row styles removed — replaced by snap-item in v116 */
 
   /* Admin error log */
   .error-log-list { display: flex; flex-direction: column; gap: 6px; }
@@ -10294,6 +10182,12 @@
 
 <div class="container">
   <header class="header">
+    <!-- Hamburger lives in the header so it scrolls with the page, never covers content -->
+    <button class="hamburger-btn header-hamburger" id="hamburgerBtn" type="button" aria-label="Open menu">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
     <div class="title-block">
       <div class="eyebrow">Media Book Journey</div>
       <h1><span id="headerName">Dami</span> <em>Media Book</em></h1>
@@ -10593,12 +10487,7 @@
 <!-- Floating slime button — admin-only. Sits in the bottom-right above the
      floating actions bar. Idle animation: gentle bob. Click opens the slime
      modal where the user picks a quick prompt or types a custom question. -->
-<!-- Hamburger menu button — opens left-side drawer -->
-<button class="hamburger-btn" id="hamburgerBtn" type="button" aria-label="Open menu">
-  <span class="hamburger-line"></span>
-  <span class="hamburger-line"></span>
-  <span class="hamburger-line"></span>
-</button>
+<!-- Hamburger now lives in the header above -->
 
 <!-- Left-side drawer overlay -->
 <div class="drawer-overlay" id="drawerOverlay"></div>
@@ -11050,7 +10939,6 @@
       </button>
     </nav>
 
-    <!-- Content area -->
     <div class="settings-content" id="settingsContent">
       <button class="settings-close-btn" id="settingsCancel" type="button" aria-label="Close settings">×</button>
 
@@ -11063,22 +10951,14 @@
 
         <div class="setting-row">
           <div class="setting-row-left">
-            <div class="setting-row-label">📌 Dashboard Sections</div>
-            <div class="setting-row-desc">Toggle and reorder the sections that appear on your home screen. Drag ⠿ to reorder.</div>
-          </div>
-          <div id="dashSectionOrderList" class="dash-order-list"></div>
-        </div>
-
-        <div class="setting-row">
-          <div class="setting-row-left">
             <div class="setting-row-label">📋 Items per group</div>
-            <div class="setting-row-desc">How many cards show before a "Show more" button appears in each section.</div>
+            <div class="setting-row-desc">Cards shown before "Show more" appears in each section.</div>
           </div>
           <select id="itemsPerGroupSelect" class="setting-select">
-            <option value="10">10 per group</option>
-            <option value="20">20 per group (default)</option>
-            <option value="30">30 per group</option>
-            <option value="50">50 per group</option>
+            <option value="10">10</option>
+            <option value="20">20 (default)</option>
+            <option value="30">30</option>
+            <option value="50">50</option>
             <option value="0">No limit</option>
           </select>
         </div>
@@ -11086,7 +10966,7 @@
         <div class="setting-row">
           <div class="setting-row-left">
             <div class="setting-row-label">🏷️ Metadata source badges</div>
-            <div class="setting-row-desc">Show a small "via OMDb / IGDB / Jikan" tag on each card indicating where its data came from.</div>
+            <div class="setting-row-desc">Show "via OMDb / IGDB" tags on each card.</div>
           </div>
           <label class="setting-toggle"><input type="checkbox" id="showSourceBadgesToggle"><span class="setting-toggle-track"></span></label>
         </div>
@@ -11094,25 +10974,23 @@
         <div class="setting-row">
           <div class="setting-row-left">
             <div class="setting-row-label">💀 Flag stale backlog</div>
-            <div class="setting-row-desc">Highlight backlog items untouched for over a year with a "Still interested?" nudge.</div>
+            <div class="setting-row-desc">Highlight backlog items untouched for over a year.</div>
           </div>
           <label class="setting-toggle"><input type="checkbox" id="deadItemsToggle"><span class="setting-toggle-track"></span></label>
         </div>
       </div>
 
-      <!-- ═══ TOOLBAR ═══ -->
-
       <!-- ═══ SEARCH ═══ -->
       <div class="settings-panel" id="settingsPanelSearch" role="tabpanel" style="display:none;">
         <div class="settings-section-header">
           <div class="settings-section-title">🔍 Search</div>
-          <div class="settings-section-desc">Control what appears in the genre filter row below the search bar.</div>
+          <div class="settings-section-desc">What appears in the genre filter row below the search bar.</div>
         </div>
 
         <div class="setting-row">
           <div class="setting-row-left">
-            <div class="setting-row-label">Hide genre section entirely</div>
-            <div class="setting-row-desc">Remove the genre chip row from the search area completely.</div>
+            <div class="setting-row-label">Hide genre section</div>
+            <div class="setting-row-desc">Remove genre chips from the search area entirely.</div>
           </div>
           <label class="setting-toggle"><input type="checkbox" id="genreHideAllToggle"><span class="setting-toggle-track"></span></label>
         </div>
@@ -11120,13 +10998,12 @@
         <div class="setting-row">
           <div class="setting-row-left">
             <div class="setting-row-label">Hide empty genres</div>
-            <div class="setting-row-desc">Only show genre chips that have at least one item in your library.</div>
+            <div class="setting-row-desc">Only show genres with at least one item in your library.</div>
           </div>
           <label class="setting-toggle"><input type="checkbox" id="genreHideEmptyToggle"><span class="setting-toggle-track"></span></label>
         </div>
 
-        <div class="setting-group-label" style="margin-top:20px;">Hide individual genres</div>
-        <div class="setting-row-desc" style="margin-bottom:12px;">Uncheck any genre you don't want showing as a filter chip. Custom genres appear here too.</div>
+        <div class="setting-group-label" style="margin-top:16px;">Hide individual genres</div>
         <div id="genreIndividualToggles" class="genre-hide-list"></div>
       </div>
 
@@ -11134,102 +11011,103 @@
       <div class="settings-panel" id="settingsPanelGeneral" role="tabpanel" style="display:none;">
         <div class="settings-section-header">
           <div class="settings-section-title">🔌 Sources</div>
-          <div class="settings-section-desc">Where the app fetches cover art, ratings, and metadata when you add something new.</div>
+          <div class="settings-section-desc">Where cover art, ratings and metadata come from when you add something.</div>
         </div>
 
         <div class="setting-row">
           <div class="setting-row-left">
             <div class="setting-row-label">🔀 Compare across sources</div>
-            <div class="setting-row-desc">When adding a title, query every source at once and merge results into one labeled picker.</div>
+            <div class="setting-row-desc">Query every source at once and merge into one picker.</div>
           </div>
           <label class="setting-toggle"><input type="checkbox" id="multiSourceToggle"><span class="setting-toggle-track"></span></label>
         </div>
 
-        <div class="source-config-row">
-          <div class="source-config-label">🎮 Games</div>
+        <div class="src-block">
+          <div class="src-block-label">🎮 Games</div>
           <select id="gamesSourceSelect" class="setting-select">
-            <option value="none">None — fill in manually</option>
-            <option value="igdb">IGDB (best data, requires Netlify)</option>
-            <option value="rawg">RAWG.io (good data, requires Netlify)</option>
-            <option value="claude">Claude API (works anywhere)</option>
+            <option value="none">Manual entry</option>
+            <option value="igdb">IGDB — best data, free</option>
+            <option value="rawg">RAWG.io — good data, free</option>
+            <option value="claude">Claude API</option>
           </select>
-          <button class="source-setup-btn" data-setup="games">Setup guide ›</button>
+          <button class="src-guide-btn" data-setup="games">Setup ›</button>
         </div>
-        <div class="source-setup-notes" id="setupNotesGames" style="display:none;">
+        <div class="src-guide-panel" id="setupNotesGames" style="display:none;">
           <div class="source-help" data-for="igdb">
-            <strong>IGDB</strong> — Twitch dev console → register app → copy Client ID + Client Secret → Netlify env vars <code>TWITCH_CLIENT_ID</code> + <code>TWITCH_CLIENT_SECRET</code> → redeploy. Free: 60k req/mo.
+            <strong>IGDB</strong> — Twitch dev console → register app → copy Client ID + Secret → Cloudflare Pages env vars <code>TWITCH_CLIENT_ID</code> + <code>TWITCH_CLIENT_SECRET</code> → redeploy. Free: 60k req/mo.
           </div>
           <div class="source-help" data-for="rawg">
-            <strong>RAWG</strong> — get free key at rawg.io/apidocs → Netlify env var <code>RAWG_API_KEY</code> → redeploy. Free: 20k req/mo.
+            <strong>RAWG</strong> — free key at rawg.io/apidocs → Cloudflare Pages env var <code>RAWG_API_KEY</code> → redeploy. Free: 20k req/mo.
           </div>
-          <div class="source-help" data-for="claude">Uses the Anthropic API key below. No server needed.</div>
+          <div class="source-help" data-for="claude">Uses the Claude API key below. Works with Cloudflare/GitHub deployment.</div>
         </div>
 
-        <div class="source-config-row">
-          <div class="source-config-label">🎬 Movies & 📺 TV</div>
+        <div class="src-block">
+          <div class="src-block-label">🎬 Movies & 📺 TV</div>
           <select id="moviesSourceSelect" class="setting-select">
-            <option value="none">None — fill in manually</option>
-            <option value="omdb">OMDb (Rotten Tomatoes + IMDb)</option>
-            <option value="tmdb">TMDb (The Movie Database)</option>
-            <option value="claude">Claude API (works anywhere)</option>
+            <option value="none">Manual entry</option>
+            <option value="omdb">OMDb — IMDb + RT scores</option>
+            <option value="tmdb">TMDb — rich metadata</option>
+            <option value="claude">Claude API</option>
           </select>
-          <button class="source-setup-btn" data-setup="movies">Setup guide ›</button>
+          <button class="src-guide-btn" data-setup="movies">Setup ›</button>
         </div>
-        <div class="source-setup-notes" id="setupNotesMovies" style="display:none;">
+        <div class="src-guide-panel" id="setupNotesMovies" style="display:none;">
           <div class="source-help" data-for="omdb">
-            <strong>OMDb</strong> — free key at omdbapi.com/apikey.aspx (1k req/day free, $1/mo unlimited) → Netlify env var <code>OMDB_API_KEY</code> → redeploy. RT scores on movies only; TV gets IMDb rating.
+            <strong>OMDb</strong> — free key at omdbapi.com (1k/day free, $1/mo unlimited) → Cloudflare Pages env var <code>OMDB_API_KEY</code>.
           </div>
           <div class="source-help" data-for="tmdb">
-            <strong>TMDb</strong> — free key at themoviedb.org/settings/api → Netlify env var <code>TMDB_API_KEY</code> → redeploy.
+            <strong>TMDb</strong> — free key at themoviedb.org/settings/api → Cloudflare Pages env var <code>TMDB_API_KEY</code>.
           </div>
-          <div class="source-help" data-for="claude">Uses the Anthropic API key below.</div>
+          <div class="source-help" data-for="claude">Uses the Claude API key below.</div>
         </div>
 
-        <div class="source-config-row">
-          <div class="source-config-label">📺 Default when adding movies & TV</div>
+        <div class="src-block">
+          <div class="src-block-label">📺 Default for movies & TV</div>
           <select id="defaultWatchSourceSelect" class="setting-select">
-            <option value="omdb">OMDb / IMDb (live action — default)</option>
-            <option value="tmdb">TMDb (rich data)</option>
+            <option value="omdb">OMDb / IMDb (live action)</option>
+            <option value="tmdb">TMDb</option>
             <option value="jikan">Jikan / MyAnimeList (anime)</option>
           </select>
         </div>
 
-        <div class="source-config-row">
-          <div class="source-config-label">📚 Books</div>
+        <div class="src-block">
+          <div class="src-block-label">📚 Books</div>
           <select id="booksSourceSelect" class="setting-select">
-            <option value="none">None — fill in manually</option>
-            <option value="openlibrary">Open Library (free, no key needed)</option>
-            <option value="googlebooks">Google Books (free, optional key)</option>
-            <option value="claude">Claude API (works anywhere)</option>
+            <option value="none">Manual entry</option>
+            <option value="openlibrary">Open Library — free, no key</option>
+            <option value="googlebooks">Google Books — free</option>
+            <option value="claude">Claude API</option>
           </select>
-          <button class="source-setup-btn" data-setup="books">Setup guide ›</button>
+          <button class="src-guide-btn" data-setup="books">Setup ›</button>
         </div>
-        <div class="source-setup-notes" id="setupNotesBooks" style="display:none;">
+        <div class="src-guide-panel" id="setupNotesBooks" style="display:none;">
           <div class="source-help" data-for="openlibrary"><strong>Open Library</strong> — no signup, no key. Just works.</div>
-          <div class="source-help" data-for="googlebooks"><strong>Google Books</strong> — works without a key up to standard limits. Optional: Google Cloud Console → Books API → API key → Netlify env var <code>GOOGLE_BOOKS_KEY</code>.</div>
-          <div class="source-help" data-for="claude">Uses the Anthropic API key below.</div>
+          <div class="source-help" data-for="googlebooks"><strong>Google Books</strong> — works without a key. Optional: Google Cloud Console → Books API → key → Cloudflare Pages env var <code>GOOGLE_BOOKS_KEY</code>.</div>
+          <div class="source-help" data-for="claude">Uses the Claude API key below.</div>
         </div>
 
-        <div class="source-config-row">
-          <div class="source-config-label">💿 Albums</div>
+        <div class="src-block">
+          <div class="src-block-label">💿 Albums</div>
           <select id="musicSourceSelect" class="setting-select">
-            <option value="none">None — fill in manually</option>
-            <option value="musicbrainz">MusicBrainz (free, no key, track listings)</option>
-            <option value="itunes">iTunes / Apple Music (free, no key, great art)</option>
-            <option value="claude">Claude API (works anywhere)</option>
+            <option value="none">Manual entry</option>
+            <option value="musicbrainz">MusicBrainz — free, track listings</option>
+            <option value="itunes">iTunes / Apple Music — great art</option>
+            <option value="claude">Claude API</option>
           </select>
-          <button class="source-setup-btn" data-setup="music">Setup guide ›</button>
+          <button class="src-guide-btn" data-setup="music">Setup ›</button>
         </div>
-        <div class="source-setup-notes" id="setupNotesMusic" style="display:none;">
-          <div class="source-help" data-for="musicbrainz"><strong>MusicBrainz</strong> — no signup, no key. Gold-standard open music DB with full track listings. Rate-limited to 1 req/sec.</div>
-          <div class="source-help" data-for="itunes"><strong>iTunes</strong> — no signup, no key. Great cover art, quick lookups.</div>
-          <div class="source-help" data-for="claude">Uses the Anthropic API key below.</div>
+        <div class="src-guide-panel" id="setupNotesMusic" style="display:none;">
+          <div class="source-help" data-for="musicbrainz"><strong>MusicBrainz</strong> — no signup needed. Rate-limited to 1 req/sec.</div>
+          <div class="source-help" data-for="itunes"><strong>iTunes</strong> — no signup needed. Great cover art.</div>
+          <div class="source-help" data-for="claude">Uses the Claude API key below.</div>
         </div>
 
-        <div class="setting-group-label" style="margin-top:24px;">Claude API Key</div>
-        <div class="setting-row-desc" style="margin-bottom:10px;">Only needed if any source above is set to "Claude API". Stored on this device only. Get one at <span class="code">console.anthropic.com</span>. Costs a fraction of a cent per lookup.</div>
-        <input type="password" id="apiKeyInput" placeholder="sk-ant-…" autocomplete="off" style="width:100%;margin-bottom:0;">
-        <!-- Hidden anchor for legacy setupNotes reference in JS -->
+        <div class="src-api-key-block">
+          <div class="src-block-label">🤖 Claude API Key</div>
+          <div class="setting-row-desc" style="margin-bottom:8px;">Only needed if any source above is set to Claude API. Stored on this device only.</div>
+          <input type="password" id="apiKeyInput" placeholder="sk-ant-…" autocomplete="off" style="width:100%;box-sizing:border-box;">
+        </div>
         <div id="setupNotes" style="display:none;"></div>
       </div>
 
@@ -11237,7 +11115,7 @@
       <div class="settings-panel" id="settingsPanelThemes" role="tabpanel" style="display:none;">
         <div class="settings-section-header">
           <div class="settings-section-title">🎨 Appearance</div>
-          <div class="settings-section-desc">Click a theme to preview it live. Click again to save. Close without saving to revert.</div>
+          <div class="settings-section-desc">Tap to preview · Tap again to save · Close to revert.</div>
         </div>
         <div class="theme-grid" id="themeGrid"></div>
       </div>
@@ -11246,7 +11124,7 @@
       <div class="settings-panel" id="settingsPanelGenres" role="tabpanel" style="display:none;">
         <div class="settings-section-header">
           <div class="settings-section-title">🏷️ Genres</div>
-          <div class="settings-section-desc">Add your own genres alongside the built-ins. They appear in the genre dropdown when editing cards and in the filter chips.</div>
+          <div class="settings-section-desc">Add custom genres alongside the built-ins. They appear in the genre dropdown and filter chips.</div>
         </div>
         <div class="custom-genres-container" id="customGenresContainer"></div>
       </div>
@@ -11255,74 +11133,66 @@
       <div class="settings-panel" id="settingsPanelAccount" role="tabpanel" style="display:none;">
         <div class="settings-section-header">
           <div class="settings-section-title">👤 Account</div>
-          <div class="settings-section-desc">Your profile, app version, backups, and privacy controls.</div>
+          <div class="settings-section-desc">Profile, version, backups and privacy.</div>
         </div>
 
-        <div class="setting-row" style="align-items:flex-start; flex-direction:column; gap:10px;">
-          <div class="setting-row-label">Signed in as</div>
-          <div id="accountInfo" class="account-info-block"></div>
-          <button class="btn btn-ghost signout-btn" type="button" id="signOutBtn">Sign out</button>
-        </div>
-
-        <div class="settings-divider"></div>
-
-        <div class="setting-row" style="flex-direction:column; align-items:flex-start; gap:8px;">
-          <div class="setting-row-label">🔄 App Version</div>
-          <div class="setting-row-desc">Currently running <strong id="appVersionDisplay" style="color:var(--gold);">…</strong>. Updates appear automatically. Check manually if something seems off.</div>
-          <button class="btn btn-ghost" type="button" id="checkUpdatesBtn">Check for updates</button>
-          <div id="checkUpdatesResult" class="update-result-text"></div>
-        </div>
-
-        <div class="settings-divider"></div>
-
-        <div class="setting-row" style="flex-direction:column; align-items:flex-start; gap:8px;">
-          <div class="setting-row-label">🛟 Backups & Recovery</div>
-          <div class="setting-row-desc">Point-in-time snapshots of your library — locally and in the cloud. Restoring a snapshot first backs up your current state, so it's always reversible.</div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-ghost" type="button" id="createSnapshotBtn">📸 Create snapshot</button>
-            <button class="btn btn-ghost" type="button" id="exportBackupBtn">⬇ Export to file</button>
-            <button class="btn btn-ghost" type="button" id="restoreCloudBtn">☁ Restore from cloud</button>
+        <div class="acct-profile-row">
+          <div class="acct-avatar" id="acctAvatar">?</div>
+          <div class="acct-info">
+            <div class="acct-name" id="acctDisplayName">—</div>
+            <div id="accountInfo" class="acct-meta"></div>
           </div>
-          <div id="snapshotList" class="snapshot-list"></div>
+          <button class="btn btn-ghost signout-btn" type="button" id="signOutBtn" style="margin-left:auto;">Sign out</button>
         </div>
 
         <div class="settings-divider"></div>
 
-        <div class="setting-row">
-          <div class="setting-row-left">
-            <div class="setting-row-label">🔔 Push Notifications</div>
-            <div class="setting-row-desc">Gentle reminders when items release, streaks are at risk, or your backlog needs attention. At most one per day.</div>
-          </div>
-          <div id="pushNotifArea">
-            <button class="btn btn-ghost" type="button" id="pushEnableBtn">Enable</button>
-            <button class="btn btn-ghost" type="button" id="pushDisableBtn" style="display:none;">Disable</button>
-          </div>
+        <div class="acct-row">
+          <div class="acct-row-label">🔄 Version</div>
+          <span id="appVersionDisplay" style="color:var(--gold);font-size:12px;">…</span>
+          <button class="acct-action-btn" type="button" id="checkUpdatesBtn">Check</button>
         </div>
-        <div id="pushStatus" class="push-status-text"></div>
+        <div id="checkUpdatesResult" style="font-size:11px;color:var(--text-faint);padding:0 0 8px;"></div>
 
         <div class="settings-divider"></div>
 
-        <div class="setting-row">
-          <div class="setting-row-left">
-            <div class="setting-row-label">🔒 Privacy</div>
-            <div class="setting-row-desc">The admin can see <strong>aggregate counts</strong> only — total entries and type breakdown. Never your titles, ratings, or notes.</div>
+        <div class="acct-row" style="align-items:flex-start;flex-direction:column;gap:6px;">
+          <div class="acct-row-label">🛟 Backups <span style="font-size:10px;color:var(--text-faint);font-weight:400;">(2 max kept)</span></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="acct-action-btn" type="button" id="createSnapshotBtn">📸 Snapshot</button>
+            <button class="acct-action-btn" type="button" id="exportBackupBtn">⬇ Export</button>
+            <button class="acct-action-btn" type="button" id="restoreCloudBtn">☁ Restore</button>
           </div>
-          <label class="setting-toggle">
-            <input type="checkbox" id="analyticsOptOutToggle">
-            <span class="setting-toggle-track"></span>
-          </label>
+          <div id="snapshotList" class="snapshot-list-compact"></div>
         </div>
-        <div class="setting-row-desc" style="margin-top:-8px;">Toggle on to opt out of aggregate stats entirely.</div>
-        <div id="analyticsOptOutHint" class="setting-row-desc" style="display:none;color:var(--sage);"></div>
 
         <div class="settings-divider"></div>
 
-        <div class="setting-row" style="flex-direction:column; align-items:flex-start; gap:8px;">
-          <div class="setting-row-label">🤓 Your Stats</div>
-          <div class="setting-row-desc">Nerdy deep-dive numbers — hours consumed per media type, fastest completion, most active day, and more.</div>
-          <button class="btn btn-ghost" type="button" id="hiddenStatsToggle">View hidden stats</button>
-          <div id="hiddenStatsContent" style="display:none; margin-top:4px;">
-            <div id="hiddenStatsBody" style="font-size:13px; color:var(--text); line-height:1.8;"></div>
+        <div class="acct-row">
+          <div class="acct-row-label">🔔 Push Notifications</div>
+          <div id="pushNotifArea" style="display:flex;gap:6px;">
+            <button class="acct-action-btn" type="button" id="pushEnableBtn">Enable</button>
+            <button class="acct-action-btn" type="button" id="pushDisableBtn" style="display:none;">Disable</button>
+          </div>
+        </div>
+        <div id="pushStatus" style="font-size:11px;color:var(--text-faint);padding:4px 0 0;"></div>
+
+        <div class="settings-divider"></div>
+
+        <div class="acct-row">
+          <div class="acct-row-label">🔒 Privacy</div>
+          <label class="setting-toggle"><input type="checkbox" id="analyticsOptOutToggle"><span class="setting-toggle-track"></span></label>
+        </div>
+        <div style="font-size:11px;color:var(--text-faint);padding:2px 0 8px;">Opt out of aggregate stats visible to admin.</div>
+        <div id="analyticsOptOutHint" style="display:none;font-size:11px;color:var(--sage);"></div>
+
+        <div class="settings-divider"></div>
+
+        <div class="acct-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+          <div class="acct-row-label">🤓 Hidden Stats</div>
+          <button class="acct-action-btn" type="button" id="hiddenStatsToggle">View deep stats</button>
+          <div id="hiddenStatsContent" style="display:none;margin-top:8px;">
+            <div id="hiddenStatsBody" style="font-size:12px;color:var(--text);line-height:1.8;"></div>
           </div>
         </div>
       </div>
@@ -11331,210 +11201,88 @@
       <div class="settings-panel" id="settingsPanelAdmin" role="tabpanel" style="display:none;">
         <div class="settings-section-header">
           <div class="settings-section-title">🛡️ Admin</div>
-          <div class="settings-section-desc">Manage access codes and custom achievements for this shared library.</div>
+          <div class="settings-section-desc">Access codes and custom achievements.</div>
         </div>
 
-        <div class="setting-group-label">Code Management</div>
-        <div class="setting-row-desc" style="margin-bottom:12px;">Generate access codes for friends, rotate compromised codes, or revoke access.</div>
-
-        <div class="admin-section">
-          <div class="admin-section-title">➕ Generate new code</div>
-          <div class="admin-gen-row">
-            <input type="text" id="adminGenNote" placeholder="Note (e.g., 'For Mike')" maxlength="200" autocomplete="off">
+        <!-- Code generation -->
+        <div class="admin-card">
+          <div class="admin-card-title">Generate Access Code</div>
+          <div class="admin-gen-compact">
+            <input type="text" id="adminGenNote" placeholder="Label (e.g. For Mike)" maxlength="200" autocomplete="off">
             <input type="text" id="adminGenPrefix" placeholder="Prefix (optional)" maxlength="12" autocomplete="off">
-            <button type="button" class="btn" id="adminGenBtn">Generate</button>
+            <button type="button" class="btn admin-gen-btn" id="adminGenBtn">Generate</button>
           </div>
-          <div id="adminGenResult" class="admin-gen-result" style="display:none;"></div>
+          <div id="adminGenResult" class="admin-result-pill" style="display:none;"></div>
         </div>
 
-        <div class="admin-section">
-          <div class="admin-section-title">Existing codes <button type="button" class="admin-refresh-btn" id="adminRefreshBtn" title="Refresh">↻</button></div>
-          <div id="adminCodesList" class="admin-codes-list"><div class="admin-empty">Click ↻ to load codes</div></div>
+        <!-- Existing codes -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div class="admin-card-title">Active Codes</div>
+            <button type="button" class="admin-icon-btn" id="adminRefreshBtn" title="Refresh">↻</button>
+          </div>
+          <div id="adminCodesList" class="admin-codes-compact"><span class="admin-empty-sm">Click ↻ to load</span></div>
         </div>
 
-        <div class="settings-divider"></div>
-        <div class="setting-group-label">Custom Achievements</div>
-        <div class="setting-row-desc" style="margin-bottom:12px;">Create your own badges. Name it, describe it, set keywords that match titles in your library — when a title matches, the badge unlocks.</div>
-
-        <div class="custom-ach-form" id="customAchForm">
-          <div class="custom-ach-row">
-            <div class="custom-ach-icon-pick">
-              <label style="font-size:11px;">Icon</label>
-              <button type="button" class="custom-ach-icon-btn" id="customAchIconBtn" title="Pick an emoji">🏆</button>
+        <!-- Custom achievements -->
+        <div class="admin-card">
+          <div class="admin-card-title">Custom Achievements</div>
+          <div class="custom-ach-compact" id="customAchForm">
+            <div class="cach-icon-row">
+              <button type="button" class="cach-icon-btn" id="customAchIconBtn" title="Pick emoji">🏆</button>
               <div class="custom-ach-emoji-grid" id="customAchEmojiGrid" style="display:none;"></div>
-              <input type="text" id="customAchIconInput" class="custom-ach-icon-input" placeholder="or type any emoji…" maxlength="8" autocomplete="off">
+              <input type="text" id="customAchIconInput" class="cach-icon-input" placeholder="or type…" maxlength="8" autocomplete="off">
             </div>
-            <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
-              <input type="text" id="customAchName" placeholder="Badge name (e.g., 'Soul Reaper')" maxlength="60" autocomplete="off">
-              <input type="text" id="customAchDesc" placeholder="Description (e.g., 'Have a Bleach entry')" maxlength="120" autocomplete="off">
-              <input type="text" id="customAchKeywords" placeholder="Keywords to match (comma-separated)" maxlength="200" autocomplete="off">
-              <select id="customAchRarity" style="padding:8px; font-size:13px;">
-                <option value="bronze">🥉 Bronze (easy)</option>
-                <option value="silver" selected>🥈 Silver (moderate)</option>
-                <option value="gold">🥇 Gold (significant)</option>
-                <option value="platinum">💠 Platinum (dedicated)</option>
-                <option value="diamond">💎 Diamond (legendary)</option>
+            <input type="text" id="customAchName" placeholder="Badge name" maxlength="60" autocomplete="off">
+            <input type="text" id="customAchDesc" placeholder="Description" maxlength="120" autocomplete="off">
+            <input type="text" id="customAchKeywords" placeholder="Keywords (comma-separated)" maxlength="200" autocomplete="off">
+            <div class="cach-footer-row">
+              <select id="customAchRarity" class="cach-rarity-select">
+                <option value="bronze">🥉 Bronze</option>
+                <option value="silver" selected>🥈 Silver</option>
+                <option value="gold">🥇 Gold</option>
+                <option value="platinum">💠 Platinum</option>
+                <option value="diamond">💎 Diamond</option>
               </select>
+              <button type="button" class="btn admin-gen-btn" id="customAchAddBtn">＋ Add</button>
             </div>
           </div>
-          <button type="button" class="btn" id="customAchAddBtn" style="margin-top:8px;">+ Add Achievement</button>
+          <div class="custom-ach-list" id="customAchList"></div>
         </div>
-        <div class="custom-ach-list" id="customAchList"></div>
       </div>
 
       <!-- ═══ ANALYTICS ═══ -->
       <div class="settings-panel" id="settingsPanelAnalytics" role="tabpanel" style="display:none;">
         <div class="settings-section-header">
           <div class="settings-section-title">📊 Analytics</div>
-          <div class="settings-section-desc">Aggregate stats across all libraries. Shows counts and patterns only — no titles, ratings, or notes.</div>
+          <div class="settings-section-desc">Aggregate counts only — no titles, ratings or notes.</div>
         </div>
 
-        <div class="admin-section">
-          <div class="admin-section-title">Per-user breakdown <button type="button" class="admin-refresh-btn" id="analyticsRefreshBtn" title="Refresh">↻</button></div>
-          <div id="analyticsUsersList" class="analytics-users-list"><div class="admin-empty">Click ↻ to load</div></div>
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div class="admin-card-title">Per-User</div>
+            <button type="button" class="admin-icon-btn" id="analyticsRefreshBtn" title="Refresh">↻</button>
+          </div>
+          <div id="analyticsUsersList" class="analytics-compact"><span class="admin-empty-sm">Click ↻ to load</span></div>
         </div>
-        <div class="admin-section" id="analyticsSummarySection" style="display:none;">
-          <div class="admin-section-title">Across all libraries</div>
-          <div id="analyticsSummary" class="analytics-summary"></div>
+
+        <div class="admin-card" id="analyticsSummarySection" style="display:none;">
+          <div class="admin-card-title">All Libraries</div>
+          <div id="analyticsSummary" class="analytics-summary-compact"></div>
         </div>
-        <div class="admin-section">
-          <div class="admin-section-title">🐞 Error log <button type="button" class="admin-refresh-btn" id="errorLogRefreshBtn" title="Load errors">↻</button></div>
-          <div class="setting-row-desc" style="margin-bottom:8px;">Runtime errors caught across all users — no personal data.</div>
-          <div id="errorLogList" class="error-log-list"><div class="admin-empty">Click ↻ to load</div></div>
+
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div class="admin-card-title">Error Log</div>
+            <button type="button" class="admin-icon-btn" id="errorLogRefreshBtn" title="Load errors">↻</button>
+          </div>
+          <div id="errorLogList" class="analytics-compact"><span class="admin-empty-sm">Click ↻ to load</span></div>
         </div>
       </div>
 
     </div><!-- /.settings-content -->
   </div><!-- /.settings-shell -->
 </div><!-- /#settingsBackdrop -->
-    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-      <input type="checkbox" id="showSourceBadgesToggle" style="width:auto; margin:0;">
-      🏷️ Show metadata source badges on cards
-    </label>
-    <p style="font-size: 11px; color: var(--text-faint); line-height: 1.5; margin: 6px 0 18px;">
-      Displays a small "via OMDb / IGDB / Jikan…" tag on each card so you can see where its metadata came from. Helpful when comparing sources.
-    </p>
-
-    <!-- Multi-source compare -->
-    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-      <input type="checkbox" id="multiSourceToggle" style="width:auto; margin:0;">
-      🔀 Compare across sources when adding
-    </label>
-    <p style="font-size: 11px; color: var(--text-faint); line-height: 1.5; margin: 6px 0 18px;">
-      When adding a title, query every available source at once and merge the results into one picker — each labeled by source, with the best match starred. Currently games search both IGDB and RAWG. Turn off to use a single source per type.
-    </p>
-
-    <!-- Dashboard section visibility + ordering -->
-    <label style="margin-bottom:4px;">📌 Dashboard Sections</label>
-    <p style="font-size: 11px; color: var(--text-faint); line-height: 1.5; margin: 0 0 10px;">
-      Toggle and reorder sections on your home screen.
-    </p>
-    <div id="dashSectionOrderList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:18px;"></div>
-
-    <!-- Dead items detection toggle -->
-    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-      <input type="checkbox" id="deadItemsToggle" style="width:auto; margin:0;">
-      💀 Flag stale backlog items
-    </label>
-    <p style="font-size: 11px; color: var(--text-faint); line-height: 1.5; margin: 6px 0 18px;">
-      Highlight backlog items untouched for 1+ year with a "Still interested?" nudge. Helps keep your backlog fresh and honest.
-    </p>
-
-    <!-- Duplicate detection -->
-    <button type="button" class="btn btn-ghost" id="dupeCheckBtn" style="margin-bottom:18px;">🔍 Check for duplicate items</button>
-
-    <label>🎮 Games — Source</label>
-    <select id="gamesSourceSelect">
-      <option value="none">None — fill in manually</option>
-      <option value="igdb">IGDB (best data, requires Netlify deploy)</option>
-      <option value="rawg">RAWG.io (good data, requires Netlify deploy)</option>
-      <option value="claude">Claude API (works anywhere, costs cents)</option>
-    </select>
-
-    <label style="margin-top: 18px;">🎬 Movies & 📺 TV — Source</label>
-    <select id="moviesSourceSelect">
-      <option value="none">None — fill in manually</option>
-      <option value="omdb">OMDb (Rotten Tomatoes + IMDb, requires Netlify)</option>
-      <option value="tmdb">TMDb (The Movie Database, requires TMDB_API_KEY)</option>
-      <option value="claude">Claude API (works anywhere, costs cents)</option>
-    </select>
-
-    <!-- Default Watch Source — controls which source the picker shows first when adding
-         a movie or TV title. The picker has a "switch source" button so this is just
-         the starting point, not a hard restriction. -->
-    <label style="margin-top: 14px;">📺 / 🎭 When adding movies & TV, start with</label>
-    <select id="defaultWatchSourceSelect">
-      <option value="omdb">📺 OMDb / IMDb (live action — default)</option>
-      <option value="tmdb">🎬 TMDb (live action, rich data)</option>
-      <option value="jikan">🎭 Jikan / MyAnimeList (anime)</option>
-    </select>
-    <p style="font-size: 11px; color: var(--text-faint); line-height: 1.5; margin: 6px 0 0;">
-      With "Compare across sources" on, the picker queries OMDb and TMDb together and merges results. This setting controls which one leads when comparing is off. The picker also has a "switch source" button to flip to Jikan for anime mid-add.
-    </p>
-
-    <label style="margin-top: 18px;">📚 Books — Source</label>
-    <select id="booksSourceSelect">
-      <option value="none">None — fill in manually</option>
-      <option value="openlibrary">Open Library (free, no key required)</option>
-      <option value="googlebooks">Google Books (free, optional API key for higher limits)</option>
-      <option value="claude">Claude API (works anywhere, costs cents)</option>
-    </select>
-
-    <label style="margin-top: 18px;">💿 Albums — Source</label>
-    <select id="musicSourceSelect">
-      <option value="none">None — fill in manually</option>
-      <option value="musicbrainz">MusicBrainz (free, no key, includes track listings)</option>
-      <option value="itunes">iTunes / Apple Music (free, no key, great artwork)</option>
-      <option value="claude">Claude API (works anywhere, costs cents)</option>
-    </select>
-
-    <!-- Setup instructions per source -->
-    <div class="source-config-box" id="setupNotes">
-      <div class="source-help" data-for="igdb" style="display:none;">
-        <strong style="color: var(--text);">IGDB setup</strong> — credentials live as Netlify environment variables.
-        <ol>
-          <li>Sign in at <span class="code">dev.twitch.tv/console</span>, register an application (OAuth Redirect: <span class="code">http://localhost</span>, category: Application Integration)</li>
-          <li>Copy the Client ID; click "New Secret" for a Client Secret</li>
-          <li>In Netlify: Site configuration → Environment variables → add <span class="code">TWITCH_CLIENT_ID</span> and <span class="code">TWITCH_CLIENT_SECRET</span></li>
-          <li>Trigger a redeploy</li>
-        </ol>
-        Free tier: 60,000 requests/month.
-      </div>
-      <div class="source-help" data-for="rawg" style="display:none;">
-        <strong style="color: var(--text);">RAWG setup</strong>
-        <ol>
-          <li>Get a free key at <span class="code">rawg.io/apidocs</span></li>
-          <li>In Netlify: add env var <span class="code">RAWG_API_KEY</span></li>
-          <li>Trigger a redeploy</li>
-        </ol>
-        Free tier: 20,000 requests/month.
-      </div>
-      <div class="source-help" data-for="omdb" style="display:none;">
-        <strong style="color: var(--text);">OMDb setup</strong> — gives Rotten Tomatoes scores for movies, IMDb ratings for both.
-        <ol>
-          <li>Get a free key at <span class="code">omdbapi.com/apikey.aspx</span> (1,000 requests/day on free tier; $1/mo for unlimited)</li>
-          <li>In Netlify: add env var <span class="code">OMDB_API_KEY</span></li>
-          <li>Trigger a redeploy</li>
-        </ol>
-        Note: OMDb only returns Rotten Tomatoes scores for <em>movies</em>. TV shows get IMDb rating instead.
-      </div>
-      <div class="source-help" data-for="openlibrary" style="display:none;">
-        <strong style="color: var(--text);">Open Library setup</strong> — no signup, no API key needed.
-        <p style="margin-top: 8px;">Open Library is a free service from the Internet Archive. Returns title, author, year, page count, cover art, and rough genre tags. Just works once you select it.</p>
-      </div>
-      <div class="source-help" data-for="musicbrainz" style="display:none;">
-        <strong style="color: var(--text);">MusicBrainz setup</strong> — no signup, no API key needed.
-        <p style="margin-top: 8px;">MusicBrainz is the gold-standard open music database. Returns artist, year, album type, and the full track listing. Cover art via the sister Cover Art Archive. Rate-limited to 1 request/sec, so back-to-back additions of many albums may pause briefly.</p>
-      </div>
-      <div class="source-help" data-for="claude" style="display:none;">
-        <strong style="color: var(--text);">Claude API setup</strong>
-        <label style="margin-top: 12px;">Anthropic API Key</label>
-        <input type="password" id="apiKeyInput" placeholder="sk-ant-…" autocomplete="off">
-        <p style="margin-top: 10px;">Stored only on this device. Get a key at <span class="code">console.anthropic.com</span>. Costs a fraction of a cent per item added. Works without any server setup.</p>
-      </div>
-    </div>
-
-
 
 <!-- Details modal (summary view) -->
 <div class="modal-backdrop" id="detailsBackdrop">
@@ -11856,7 +11604,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v115.3';
+  const APP_VERSION = 'v116.2';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
@@ -13186,6 +12934,7 @@
       const themeResult = await db.get('theme');
       if (themeResult && themeResult.value) {
         state.theme = themeResult.value;
+        try { localStorage.setItem('dami_theme', themeResult.value); } catch(e) {}
       } else {
         state.theme = 'amethyst'; // default
       }
@@ -18541,6 +18290,11 @@ Return ONLY the JSON object, nothing else.`;
     // Hide the entire genre section if toggled off
     if (gv.hideAll) { container.innerHTML = ''; return; }
 
+    // Start collapsed by default if never been interacted with
+    if (!container.classList.contains('collapsed') && !container.dataset.everExpanded) {
+      container.classList.add('collapsed');
+    }
+
     const activeType = state.typeFilter || 'all';
     let genres;
     if (activeType === 'all') {
@@ -20156,7 +19910,7 @@ Return ONLY the JSON object, nothing else.`;
   }
   function closeDupes() { document.getElementById('dupeBackdrop').classList.remove('show'); }
 
-  document.getElementById('dupeCheckBtn').addEventListener('click', openDupes);
+  document.getElementById('dupeCheckBtn')?.addEventListener('click', openDupes);
   document.getElementById('dupeCloseBtn').addEventListener('click', closeDupes);
   document.getElementById('dupeBackdrop').addEventListener('click', e => {
     if (e.target === document.getElementById('dupeBackdrop')) closeDupes();
@@ -23937,6 +23691,8 @@ CRITICAL OUTPUT RULES:
     if (targetFilter === 'all' && wasActive) {
       // Toggle collapse of the genre chips row
       group.classList.toggle('collapsed');
+      // Mark that user has explicitly interacted — don't auto-collapse anymore
+      if (!group.classList.contains('collapsed')) group.dataset.everExpanded = '1';
       const chipsRow = group.querySelector('.genre-chips-row');
       if (chipsRow) chipsRow.style.display = group.classList.contains('collapsed') ? 'none' : '';
       // Update chevron
@@ -25507,26 +25263,19 @@ CRITICAL OUTPUT RULES:
         </div>
       `;
     }
-    // Populate account info section
+    // Populate account info section — new compact layout
     const accountEl = document.getElementById('accountInfo');
+    const nameEl = document.getElementById('acctDisplayName');
+    const avatarEl = document.getElementById('acctAvatar');
+    if (nameEl) {
+      const name = auth.displayName || '—';
+      nameEl.textContent = name + (auth.isAdmin ? ' 🛡️' : '');
+      if (avatarEl) avatarEl.textContent = name.charAt(0).toUpperCase() || '?';
+    }
     if (accountEl) {
-      const adminTag = auth.isAdmin ? ' <span style="color: var(--gold); font-weight: 600;">[ADMIN]</span>' : '';
-      const claimedStr = auth.claimedAt
-        ? new Date(auth.claimedAt).toLocaleDateString()
-        : '—';
-      const lastSyncStr = sync.lastSyncAt
-        ? new Date(sync.lastSyncAt).toLocaleString()
-        : 'not yet';
-      // Mask the access code: show first segment + last 4 chars
-      const codeMasked = auth.accessCode
-        ? auth.accessCode.slice(0, 4) + '••••' + auth.accessCode.slice(-4)
-        : '—';
-      accountEl.innerHTML = `
-        Signed in as: <strong style="color: var(--text);">${escapeHtml(auth.displayName || '—')}</strong>${adminTag}<br>
-        Code: <span style="color: var(--text-faint);">${escapeHtml(codeMasked)}</span><br>
-        Joined: <span style="color: var(--text-faint);">${escapeHtml(claimedStr)}</span><br>
-        Last sync: <span style="color: var(--text-faint);">${escapeHtml(lastSyncStr)}</span>
-      `;
+      const codeMasked = auth.accessCode ? auth.accessCode.slice(0,4) + '••••' + auth.accessCode.slice(-4) : '—';
+      const lastSyncStr = sync.lastSyncAt ? new Date(sync.lastSyncAt).toLocaleString() : 'not yet';
+      accountEl.innerHTML = `Code: ${escapeHtml(codeMasked)} · Last sync: ${escapeHtml(lastSyncStr)}`;
     }
     // Show or hide the Admin + Analytics tabs based on auth state
     const adminTabEl = document.getElementById('adminTab');
@@ -25550,7 +25299,7 @@ CRITICAL OUTPUT RULES:
     const navItems = document.querySelectorAll('.settings-nav-item');
     const panels = {
       display:    document.getElementById('settingsPanelDisplay'),
-      toolbar:    document.getElementById('settingsPanelToolbar'),
+      // toolbar panel removed — buttons now in drawer
       search:     document.getElementById('settingsPanelSearch'),
       sources:    document.getElementById('settingsPanelGeneral'), // ID kept for JS compat
       themes:     document.getElementById('settingsPanelThemes'),
@@ -27208,37 +26957,51 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
   async function renderSnapshotList() {
     const listEl = document.getElementById('snapshotList');
     if (!listEl) return;
-    const index = await getSnapshotIndex();
+    let index = await getSnapshotIndex();
     if (index.length === 0) {
-      listEl.innerHTML = '<div style="font-size:12px; color:var(--text-faint);">No snapshots yet. One is created automatically as you use the app, or tap "Create snapshot now."</div>';
+      listEl.innerHTML = '<div style="font-size:11px;color:var(--text-faint);padding:4px 0;">No snapshots yet.</div>';
       return;
     }
+    // Keep only the 2 most recent — auto-purge older ones
+    if (index.length > 2) {
+      const toRemove = index.slice(2);
+      for (const old of toRemove) {
+        try { await db.delete('snapshot_' + old.ts); } catch(e) {}
+      }
+      index = index.slice(0, 2);
+      await db.set('snapshot_index', JSON.stringify(index));
+    }
+    const REASON_LABELS_LOCAL = { auto: 'auto', manual: 'manual', 'pre-import': 'pre-import', 'pre-cloud-signin': 'pre-sign-in' };
     listEl.innerHTML = index.map(s => {
-      const special = s.reason && s.reason !== 'auto';
-      const reasonLabel = REASON_LABELS[s.reason] || s.reason;
-      return `
-        <div class="snapshot-row">
-          <div class="snapshot-info">
-            <span class="snapshot-when">${relativeTime(s.ts)} <span class="snapshot-reason${special ? ' special' : ''}">${escapeHtml(reasonLabel)}</span></span>
-            <span class="snapshot-meta">${new Date(s.ts).toLocaleString()} · ${s.count} item${s.count === 1 ? '' : 's'}</span>
-          </div>
-          <button class="snapshot-restore-btn" data-restore-ts="${s.ts}" type="button">Restore</button>
-        </div>
-      `;
+      const label = REASON_LABELS_LOCAL[s.reason] || s.reason || 'snapshot';
+      return `<div class="snap-item">
+        <span style="font-size:10px;color:var(--copper);font-family:'JetBrains Mono',monospace;">${label}</span>
+        <span style="flex:1;">${relativeTime(s.ts)} · ${s.count} items</span>
+        <button class="snap-restore-btn acct-action-btn" data-restore-ts="${s.ts}" type="button" title="Restore">↩</button>
+        <button class="snap-del-btn" data-del-ts="${s.ts}" type="button" title="Delete snapshot">✕</button>
+      </div>`;
     }).join('');
-    // Wire restore buttons
     listEl.querySelectorAll('[data-restore-ts]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const ts = parseInt(btn.dataset.restoreTs, 10);
         const snap = await readSnapshot(ts);
-        if (!snap || !Array.isArray(snap.games)) {
-          showToast('Could not read that snapshot');
-          return;
-        }
+        if (!snap || !Array.isArray(snap.games)) { showToast('Could not read snapshot'); return; }
         const when = new Date(ts).toLocaleString();
-        if (!confirm(`Restore your library to the snapshot from ${when} (${snap.count} items)?\n\nYour current library will be snapshotted first, so you can undo this.`)) return;
+        if (!confirm(`Restore to snapshot from ${when} (${snap.count} items)? Current library is snapshotted first.`)) return;
         await restoreSnapshot(snap.games, when);
         await renderSnapshotList();
+      });
+    });
+    listEl.querySelectorAll('[data-del-ts]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const ts = parseInt(btn.dataset.delTs, 10);
+        if (!confirm('Delete this snapshot?')) return;
+        try { await db.delete('snapshot_' + ts); } catch(e) {}
+        let idx = await getSnapshotIndex();
+        idx = idx.filter(s => s.ts !== ts);
+        await db.set('snapshot_index', JSON.stringify(idx));
+        await renderSnapshotList();
+        showToast('Snapshot deleted');
       });
     });
   }
@@ -27533,6 +27296,8 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
       _themePreviewId = null;
       state.theme = themeId;
       await saveSetting('theme', themeId);
+      // Also persist to localStorage so the inline head script can apply it before CSS
+      try { localStorage.setItem('dami_theme', themeId); } catch(e) {}
       renderThemeGrid();
       showToast(`🎨 Theme saved: ${THEMES.find(t => t.id === themeId)?.name || themeId}`);
     } else {
@@ -27543,17 +27308,17 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
     }
   });
 
-  // === Source setup guide toggles ===
+  // === Source setup guide toggles (supports both old .source-setup-btn and new .src-guide-btn) ===
   function wireSourceSetupButtons() {
-    document.querySelectorAll('.source-setup-btn').forEach(btn => {
+    document.querySelectorAll('.source-setup-btn, .src-guide-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const key = btn.dataset.setup;
-        const notesEl = document.getElementById('setupNotes' + key.charAt(0).toUpperCase() + key.slice(1));
+        const panelId = 'setupNotes' + key.charAt(0).toUpperCase() + key.slice(1);
+        const notesEl = document.getElementById(panelId);
         if (!notesEl) return;
         const isOpen = notesEl.style.display !== 'none';
         notesEl.style.display = isOpen ? 'none' : '';
-        btn.textContent = isOpen ? 'Setup guide ›' : 'Setup guide ▾';
-        // Show only the help block matching current source selection
+        btn.textContent = isOpen ? 'Setup ›' : 'Setup ▾';
         if (!isOpen) {
           const selectId = key === 'games' ? 'gamesSourceSelect' : key === 'movies' ? 'moviesSourceSelect' : key === 'books' ? 'booksSourceSelect' : 'musicSourceSelect';
           const sel = document.getElementById(selectId);
@@ -27564,7 +27329,6 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
         }
       });
     });
-    // Also update visible source help when selects change
     [['gamesSourceSelect','setupNotesGames'],['moviesSourceSelect','setupNotesMovies'],['booksSourceSelect','setupNotesBooks'],['musicSourceSelect','setupNotesMusic']].forEach(([selId, notesId]) => {
       const sel = document.getElementById(selId);
       const notes = document.getElementById(notesId);
