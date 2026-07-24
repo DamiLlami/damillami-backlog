@@ -7563,8 +7563,95 @@
   }
 
   /* ============================================================
-     SETTINGS — Side nav shell
+     UP NEXT — inline section beneath Now cards
   ============================================================ */
+  .up-next-section {
+    margin-top: 14px;
+  }
+
+  /* Copper divider with centered label */
+  .up-next-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .up-next-divider-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(to right, transparent, var(--copper), transparent);
+    opacity: 0.4;
+  }
+  .up-next-divider-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--copper);
+    white-space: nowrap; flex: 0 0 auto;
+  }
+
+  /* 2-column grid matching Now cards */
+  .up-next-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* Individual Up Next card — subdued vs Now cards */
+  .up-next-card {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 10px;
+    background: var(--bg-elevated);
+    border: 1px dashed rgba(224,176,116,0.3);
+    cursor: pointer; position: relative;
+    transition: border-color 0.15s, background 0.15s;
+    min-width: 0;
+  }
+  .up-next-card:hover {
+    border-color: var(--copper);
+    background: rgba(224,176,116,0.06);
+  }
+  .up-next-card-cover {
+    width: 30px; height: 42px; border-radius: 4px;
+    background: var(--surface); background-size: cover; background-position: center;
+    flex: 0 0 30px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; opacity: 0.85;
+  }
+  .up-next-card-cover-empty { border: 1px dashed var(--border); }
+  .up-next-card-info { flex: 1; min-width: 0; }
+  .up-next-card-title {
+    font-size: 12px; color: var(--text-muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-weight: 500;
+  }
+  .up-next-card-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--copper); letter-spacing: 0.06em;
+    text-transform: uppercase; margin-top: 2px;
+  }
+
+  /* Start button */
+  .up-next-card-start {
+    flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(224,176,116,0.12); border: 1px solid rgba(224,176,116,0.3);
+    color: var(--copper); font-size: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .up-next-card:hover .up-next-card-start {
+    background: var(--copper); color: var(--bg); border-color: var(--copper);
+  }
+
+  /* Pin button on backlog cards */
+  .up-next-toggle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.04em;
+    color: var(--text-faint); border-color: var(--border) !important;
+    transition: all 0.15s;
+  }
+  .up-next-toggle:hover { color: var(--copper) !important; border-color: var(--copper) !important; }
+  .up-next-toggle.active {
+    color: var(--copper) !important;
+    border-color: var(--copper) !important;
+    background: rgba(224,176,116,0.1) !important;
+    font-weight: 600;
+  }
   #settingsBackdrop.show { display: flex; align-items: center; justify-content: center; }
   .settings-shell {
     display: flex; flex-direction: column;
@@ -11647,7 +11734,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v116.5';
+  const APP_VERSION = 'v116.7';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
@@ -13222,18 +13309,17 @@
     const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
     if (theme.id === 'amethyst') {
       // Only clear data-theme if localStorage also has no saved theme.
-      // If localStorage has a theme, the head script already set data-theme —
-      // don't wipe it just because IndexedDB returned a stale/empty result.
+      // This prevents a DB-miss from wiping a theme the head script correctly applied.
       let lsTheme = null;
       try { lsTheme = localStorage.getItem('dami_theme'); } catch(e) {}
       if (!lsTheme || lsTheme === 'amethyst') {
         document.documentElement.removeAttribute('data-theme');
       }
-      // Either way, keep state.theme correct
+      // Do NOT write to localStorage here — only the explicit save path does that.
     } else {
       document.documentElement.setAttribute('data-theme', theme.id);
-      // Keep localStorage in sync
-      try { localStorage.setItem('dami_theme', theme.id); } catch(e) {}
+      // Do NOT write to localStorage here — applyTheme is also called for previews.
+      // Only saveSetting('theme', ...) + localStorage.setItem belong in the commit path.
     }
     state.theme = theme.id;
   }
@@ -14028,6 +14114,36 @@
     const cardCount = inProgress.length;
     const nowCardsClass = 'now-cards'; // always 2-col grid via CSS
 
+    // === Up Next ===
+    const upNextItems = state.games.filter(g => g.upNext && normalizeStatus(g.status) === 'backlog');
+    let upNextHtml = '';
+    if (upNextItems.length > 0) {
+      const upNextCards = upNextItems.map(g => {
+        const mt = g.mediaType || 'game';
+        const cover = g.coverUrl
+          ? `<div class="up-next-card-cover" style="background-image:url('${g.coverUrl}')"></div>`
+          : `<div class="up-next-card-cover up-next-card-cover-empty">${mediaTypeIcon(mt)}</div>`;
+        return `
+          <div class="up-next-card" data-now-open="${g.id}" title="Open ${escapeHtml(g.title)}">
+            ${cover}
+            <div class="up-next-card-info">
+              <div class="up-next-card-title">${escapeHtml(g.title)}</div>
+              <div class="up-next-card-type">${mediaTypeLabel(mt)}</div>
+            </div>
+            <button class="up-next-card-start" data-un-start="${g.id}" title="Start now">▶</button>
+          </div>`;
+      }).join('');
+      upNextHtml = `
+        <div class="up-next-section">
+          <div class="up-next-divider">
+            <span class="up-next-divider-line"></span>
+            <span class="up-next-divider-label">⬆ Up Next</span>
+            <span class="up-next-divider-line"></span>
+          </div>
+          <div class="up-next-cards">${upNextCards}</div>
+        </div>`;
+    }
+
     const cards = inProgress.map(g => {
       const mt = g.mediaType || 'game';
       const { text: progText, pct } = getProgressInfo(g);
@@ -14086,9 +14202,30 @@
     el.innerHTML = `${orderedSections}
       <div class="now-header">📌 Now${inProgress.length > 1 ? ' (' + inProgress.length + ')' : ''}</div>
       <div class="${nowCardsClass}">${cards}</div>
+      ${upNextHtml}
     `;
 
-    // Wire quick-increment buttons
+    // Wire Up Next start buttons
+    el.querySelectorAll('[data-un-start]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const game = state.games.find(g => g.id === btn.dataset.unStart);
+        if (!game) return;
+        delete game.upNext;
+        game.status = 'in-progress';
+        if (!game.startedAt) game.startedAt = Date.now();
+        game.updatedAt = Date.now();
+        saveState().then(() => { renderNowDashboard(); render(); showToast(`▶ Started: ${game.title}`); });
+      });
+    });
+
+    // Wire Up Next card tap → open edit modal
+    el.querySelectorAll('.up-next-card[data-now-open]').forEach(card => {
+      card.addEventListener('click', () => {
+        const game = state.games.find(g => g.id === card.dataset.nowOpen);
+        if (game) openEditModal(game);
+      });
+    });
     el.querySelectorAll('[data-quick-id]').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();
@@ -15041,6 +15178,15 @@
             </div>
           </div>
           <div class="card-actions">
+            ${isBacklog ? `
+              <button class="icon-btn up-next-toggle${g.upNext ? ' active' : ''}"
+                      data-action="toggle-up-next"
+                      data-id="${g.id}"
+                      data-media-type="${mediaType}"
+                      title="${g.upNext ? 'Remove from Up Next' : 'Flag as Up Next'}">
+                ${g.upNext ? '⬆ Up Next' : '⬆'}
+              </button>
+            ` : ''}
             ${mediaType === 'tv' ? `
               <button class="complete-toggle${g.completed ? ' active' : ''}"
                       data-action="toggle-complete"
@@ -15296,10 +15442,12 @@
       if (target === 'played') {
         game.status = 'played';
         game.completedAt = Date.now();
+        delete game.upNext;
       } else if (target === 'in-progress') {
         game.status = 'in-progress';
         if (!game.startedAt) game.startedAt = Date.now();
         delete game.completedAt;
+        delete game.upNext;
       } else {
         game.status = 'backlog';
         delete game.completedAt;
@@ -15606,6 +15754,38 @@
       saveState();
       render();
       showToast(`Removed "${entry.title}"`);
+    } else if (action === 'toggle-up-next') {
+      e.stopPropagation();
+      const mt = game.mediaType || 'game';
+      if (game.upNext) {
+        // Toggling off — always allowed
+        delete game.upNext;
+        game.updatedAt = Date.now();
+        saveState();
+        renderNowDashboard();
+        render();
+        showToast(`Removed "${game.title}" from Up Next`);
+      } else {
+        // Toggling on — enforce one-per-media-type
+        const existing = state.games.find(g => g.upNext && (g.mediaType || 'game') === mt && g.id !== game.id);
+        if (existing) {
+          // Replace the existing one — confirm with user
+          existing.upNext = false;
+          game.upNext = true;
+          game.updatedAt = Date.now();
+          saveState();
+          renderNowDashboard();
+          render();
+          showToast(`⬆ Up Next: "${game.title}" (replaced "${existing.title}")`);
+        } else {
+          game.upNext = true;
+          game.updatedAt = Date.now();
+          saveState();
+          renderNowDashboard();
+          render();
+          showToast(`⬆ "${game.title}" flagged as Up Next`);
+        }
+      }
     }
   }
 
@@ -27414,7 +27594,11 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
   function revertThemePreview() {
     if (_themePreviewId) {
       _themePreviewId = null;
-      applyTheme(state.theme || 'amethyst');
+      // Revert to the last *saved* theme — use localStorage as source of truth
+      // since state.theme may have been mutated by preview applyTheme calls
+      let savedTheme = null;
+      try { savedTheme = localStorage.getItem('dami_theme'); } catch(e) {}
+      applyTheme(savedTheme || 'amethyst');
       renderThemeGrid();
     }
   }
