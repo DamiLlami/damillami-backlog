@@ -7562,8 +7562,32 @@
     .setting-check-desc { display: none; }
   }
 
-  /* ============================================================
-     UP NEXT — inline section beneath Now cards
+  /* Theme save/cancel row — appears below grid when preview is active */
+  .theme-save-row {
+    display: none; /* shown via JS */
+    align-items: center; justify-content: center;
+    gap: 10px; margin-top: 16px;
+    padding: 14px 16px;
+    background: rgba(224,176,116,0.07);
+    border: 1px solid rgba(224,176,116,0.25);
+    border-radius: 12px;
+    position: sticky; bottom: 0;
+  }
+  .theme-save-btn {
+    flex: 1; max-width: 180px;
+    padding: 10px 20px; border-radius: 10px;
+    background: var(--copper); border: none;
+    color: var(--bg); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .theme-save-btn:hover { background: var(--gold); }
+  .theme-revert-btn {
+    padding: 10px 16px; border-radius: 10px;
+    background: none; border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 13px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .theme-revert-btn:hover { border-color: var(--border-strong); color: var(--text); }
   ============================================================ */
   .up-next-section {
     margin-top: 14px;
@@ -11245,9 +11269,14 @@
       <div class="settings-panel" id="settingsPanelThemes" role="tabpanel" style="display:none;">
         <div class="settings-section-header">
           <div class="settings-section-title">🎨 Appearance</div>
-          <div class="settings-section-desc">Tap to preview · Tap again to save · Close to revert.</div>
+          <div class="settings-section-desc">Tap any theme to preview it live.</div>
         </div>
         <div class="theme-grid" id="themeGrid"></div>
+        <!-- Save button — appears when a preview is active -->
+        <div class="theme-save-row" id="themeSaveRow" style="display:none;">
+          <button type="button" class="theme-save-btn" id="themeSaveBtn">Save Theme</button>
+          <button type="button" class="theme-revert-btn" id="themeRevertBtn">Cancel</button>
+        </div>
       </div>
 
       <!-- ═══ GENRES ═══ -->
@@ -11734,7 +11763,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v116.7';
+  const APP_VERSION = 'v116.8';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
@@ -25563,6 +25592,8 @@ CRITICAL OUTPUT RULES:
     // Lazy-load admin codes the first time the Admin tab is selected
     if (which === 'admin') refreshAdminCodes();
     if (which === 'analytics') refreshAnalytics();
+    // If navigating away from themes tab with unsaved preview, revert silently
+    if (which !== 'themes') revertThemePreview();
     // Scroll content pane back to top
     const content = document.getElementById('settingsContent');
     if (content) content.scrollTop = 0;
@@ -27530,26 +27561,41 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
   // Lets you see the theme applied before locking it in.
   let _themePreviewId = null;
 
-  document.getElementById('themeGrid').addEventListener('click', async e => {
+  function showThemeSaveRow(visible) {
+    const row = document.getElementById('themeSaveRow');
+    if (row) row.style.display = visible ? 'flex' : 'none';
+  }
+
+  document.getElementById('themeGrid').addEventListener('click', e => {
     const swatch = e.target.closest('[data-theme-id]');
     if (!swatch || swatch.disabled) return;
     const themeId = swatch.dataset.themeId;
+    // Single click — preview, show save/cancel row
+    _themePreviewId = themeId;
+    applyTheme(themeId);
+    renderThemeGrid();
+    showThemeSaveRow(true);
+  });
 
-    if (_themePreviewId === themeId) {
-      // Second click on same swatch — commit and save
-      _themePreviewId = null;
-      state.theme = themeId;
-      await saveSetting('theme', themeId);
-      // Also persist to localStorage so the inline head script can apply it before CSS
-      try { localStorage.setItem('dami_theme', themeId); } catch(e) {}
-      renderThemeGrid();
-      showToast(`🎨 Theme saved: ${THEMES.find(t => t.id === themeId)?.name || themeId}`);
-    } else {
-      // First click — preview without saving
-      _themePreviewId = themeId;
-      applyTheme(themeId);
-      renderThemeGrid();
-    }
+  document.getElementById('themeSaveBtn')?.addEventListener('click', async () => {
+    if (!_themePreviewId) return;
+    const themeId = _themePreviewId;
+    _themePreviewId = null;
+    state.theme = themeId;
+    await saveSetting('theme', themeId);
+    try { localStorage.setItem('dami_theme', themeId); } catch(e) {}
+    showThemeSaveRow(false);
+    renderThemeGrid();
+    showToast(`🎨 Theme saved: ${THEMES.find(t => t.id === themeId)?.name || themeId}`);
+  });
+
+  document.getElementById('themeRevertBtn')?.addEventListener('click', () => {
+    _themePreviewId = null;
+    let savedTheme = null;
+    try { savedTheme = localStorage.getItem('dami_theme'); } catch(e) {}
+    applyTheme(savedTheme || 'amethyst');
+    showThemeSaveRow(false);
+    renderThemeGrid();
   });
 
   // === Source setup guide toggles (supports both old .source-setup-btn and new .src-guide-btn) ===
@@ -27587,18 +27633,25 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
   }
 
   function closeSettings() {
-    revertThemePreview();
+    // Silently revert any active preview on close
+    if (_themePreviewId) {
+      _themePreviewId = null;
+      let savedTheme = null;
+      try { savedTheme = localStorage.getItem('dami_theme'); } catch(e) {}
+      applyTheme(savedTheme || 'amethyst');
+      showThemeSaveRow(false);
+      renderThemeGrid();
+    }
     document.getElementById('settingsBackdrop').classList.remove('show');
   }
 
   function revertThemePreview() {
     if (_themePreviewId) {
       _themePreviewId = null;
-      // Revert to the last *saved* theme — use localStorage as source of truth
-      // since state.theme may have been mutated by preview applyTheme calls
       let savedTheme = null;
       try { savedTheme = localStorage.getItem('dami_theme'); } catch(e) {}
       applyTheme(savedTheme || 'amethyst');
+      showThemeSaveRow(false);
       renderThemeGrid();
     }
   }
