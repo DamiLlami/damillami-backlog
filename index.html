@@ -2048,11 +2048,11 @@
   /* --- Header --- */
   .header {
     border-bottom: 1px solid var(--border);
-    padding-bottom: 16px;
-    margin-bottom: 16px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
   }
 
   /* Row 1: hamburger left, title center, spacer right */
@@ -2073,9 +2073,8 @@
     align-items: center;
     width: 100%;
     font-family: 'JetBrains Mono', monospace;
-    padding: 4px 0;
     border-top: 1px solid var(--border);
-    padding-top: 12px;
+    padding-top: 8px;
   }
 
   .stat {
@@ -2092,7 +2091,7 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--text-faint);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
   }
 
   .title-block h1 {
@@ -2144,16 +2143,14 @@
   }
   .filter-group.genre-filter { flex-direction: column; align-items: stretch; gap: 0; }
   .filter-group.genre-filter.collapsed .genre-chips-row { display: none; }
-  .centered-type-filter {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    width: 100%;
+  /* Type + Genre filters side-by-side, collapsible */
+  .filter-row-inline {
+    display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap;
   }
-  .centered-type-filter .type-chip {
-    flex: 0 0 auto;
+  .filter-row-inline .filter-group { flex: 0 0 auto; }
+  .type-chip-all { white-space: nowrap; }
+  .type-chips-row {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
   }
 
   /* Library controls bar — sits between Now section and columns */
@@ -8622,7 +8619,7 @@
   .floating-actions {
     position: fixed;
     left: 16px;
-    bottom: 14px;
+    bottom: 27px;
     transform: none;
     z-index: 70;
     background: var(--bg-elevated);
@@ -9183,9 +9180,11 @@
     }
     /* Type chips wrap into 2 clean centered lines */
     .filter-group.type-filter {
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       overflow-x: visible;
-      justify-content: center;
+    }
+    .type-chips-row {
+      flex-wrap: wrap;
     }
     .filter-group::-webkit-scrollbar { display: none; }
     .chip {
@@ -10568,18 +10567,26 @@
       </div>
     </div><!-- /.search-controls-row -->
 
-    <div class="filter-stack">
-      <div class="filter-group type-filter centered-type-filter" id="typeFilterGroup">
-        <button class="chip type-chip" data-type="game">🎮 Games</button>
-        <button class="chip type-chip" data-type="movie">🎬 Movies</button>
-        <button class="chip type-chip" data-type="tv">📺 TV</button>
-        <button class="chip type-chip" data-type="book">📚 Books</button>
-        <button class="chip type-chip" data-type="album">💿 Albums</button>
+    <!-- Type + Genre filters on one row, both collapsible -->
+    <div class="filter-row-inline">
+      <!-- All Media pill + expandable type chips -->
+      <div class="filter-group type-filter" id="typeFilterGroup">
+        <button class="chip chip-all type-chip-all active" data-type="all" id="typeFilterAllBtn">
+          🎮 All Media <span class="chip-chevron">▸</span>
+        </button>
+        <div class="type-chips-row" id="typeChipsRow" style="display:none;">
+          <button class="chip type-chip" data-type="game">🎮 Games</button>
+          <button class="chip type-chip" data-type="movie">🎬 Movies</button>
+          <button class="chip type-chip" data-type="tv">📺 TV</button>
+          <button class="chip type-chip" data-type="book">📚 Books</button>
+          <button class="chip type-chip" data-type="album">💿 Albums</button>
+        </div>
       </div>
+      <!-- All Genres pill + expandable genre chips -->
       <div class="filter-group genre-filter" id="filterGroup"></div>
-      <div class="filter-group platform-filter" id="platformFilterGroup"></div>
     </div>
-  </div>
+    <div class="filter-group platform-filter" id="platformFilterGroup"></div>
+  </div><!-- /.toolbar -->
 
   <div class="now-dashboard" id="nowDashboard"></div>
 
@@ -11763,7 +11770,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v116.8';
+  const APP_VERSION = 'v116.9';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
@@ -23937,17 +23944,40 @@ CRITICAL OUTPUT RULES:
   // clicking it again expands them back. Clicking another type also expands so the
   // user can see what they switched to.
   document.getElementById('typeFilterGroup').addEventListener('click', e => {
-    const chip = e.target.closest('.type-chip');
-    if (!chip) return; // could be the layout toggle button
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+
+    // All Media pill — toggle expand/collapse
+    if (chip.classList.contains('type-chip-all')) {
+      const chipsRow = document.getElementById('typeChipsRow');
+      const chevron = chip.querySelector('.chip-chevron');
+      const isExpanded = chipsRow && chipsRow.style.display !== 'none';
+      if (chipsRow) chipsRow.style.display = isExpanded ? 'none' : 'flex';
+      if (chevron) chevron.textContent = isExpanded ? '▸' : '▾';
+      // If collapsing while a type is selected, reset to all
+      if (isExpanded && state.typeFilter !== 'all') {
+        document.querySelectorAll('#typeFilterGroup .type-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        state.typeFilter = 'all';
+        renderGenreChips();
+        render();
+      }
+      return;
+    }
+
+    // Individual type chip
     const targetType = chip.dataset.type;
-    if (!targetType) return;
+    if (!targetType || targetType === 'all') return;
     const wasActive = chip.classList.contains('active');
     document.querySelectorAll('#typeFilterGroup .type-chip').forEach(c => c.classList.remove('active'));
+    const allBtn = document.getElementById('typeFilterAllBtn');
     if (wasActive) {
-      // Clicking the active chip deselects it — show all types
+      // Deselect → back to all
+      if (allBtn) allBtn.classList.add('active');
       state.typeFilter = 'all';
     } else {
       chip.classList.add('active');
+      if (allBtn) allBtn.classList.remove('active');
       state.typeFilter = targetType;
     }
     renderGenreChips();
