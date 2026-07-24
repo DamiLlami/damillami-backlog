@@ -11774,7 +11774,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v117';
+  const APP_VERSION = 'v117.2';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
@@ -14140,14 +14140,8 @@
       reminderHtml = `<div class="now-reminder">⭐ You have <strong>${unratedCompleted.length} completed items</strong> without a rating — rate a few to improve your recommendations and achievements.</div>`;
     }
 
-    if (inProgress.length === 0 && !reminderHtml) {
-      // Always show Now section even when empty
-      el.innerHTML = `${orderedSections}
-        <div class="now-header">📌 Now</div>
-        <div class="now-empty">Nothing in progress — <button class="now-empty-btn" id="nowSurpriseBtn">🎲 Surprise me</button> or pick something from your backlog.</div>
-      `;
-      const btn = el.querySelector('#nowSurpriseBtn');
-      if (btn) btn.addEventListener('click', () => document.getElementById('surpriseBtn')?.click());
+    if (inProgress.length === 0) {
+      el.innerHTML = '';
       return;
     }
 
@@ -14223,49 +14217,8 @@
       `;
     }).join('');
 
-    const ds = state.dashSections || {};
-
-    const sectionMap = {
-      streak: ds.streak !== false ? streakHtml : '',
-      pickup: ds.pickup !== false ? pickUpHtml : '',
-      hotTake: ds.hotTake !== false ? hotTakeHtml : '',
-      milestone: ds.milestone !== false ? milestoneHtml + almostHtml : '',
-      health: ds.health !== false ? healthHtml : '',
-      seasonal: ds.seasonal !== false ? seasonalHtml : '',
-      upcoming: ds.upcoming !== false ? upcomingHtml : '',
-      reminders: ds.reminders !== false ? reminderHtml : '',
-    };
-    const order = (state.dashOrder || DEFAULT_DASH_ORDER).filter(k => k in sectionMap);
-    const orderedSections = order.map(k => sectionMap[k]).join('') +
-      suggestionsHtml + readyHtml + waitingRoomHtml;
-
-    el.innerHTML = `${orderedSections}
-      <div class="now-header">📌 Now${inProgress.length > 1 ? ' (' + inProgress.length + ')' : ''}</div>
-      <div class="${nowCardsClass}">${cards}</div>
-      ${upNextHtml}
-    `;
-
-    // Wire Up Next start buttons
-    el.querySelectorAll('[data-un-start]').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        const game = state.games.find(g => g.id === btn.dataset.unStart);
-        if (!game) return;
-        delete game.upNext;
-        game.status = 'in-progress';
-        if (!game.startedAt) game.startedAt = Date.now();
-        game.updatedAt = Date.now();
-        saveState().then(() => { renderNowDashboard(); render(); showToast(`▶ Started: ${game.title}`); });
-      });
-    });
-
-    // Wire Up Next card tap → open edit modal
-    el.querySelectorAll('.up-next-card[data-now-open]').forEach(card => {
-      card.addEventListener('click', () => {
-        const game = state.games.find(g => g.id === card.dataset.nowOpen);
-        if (game) openEditModal(game);
-      });
-    });
+    // Dashboard sections all removed — nothing renders here now
+    el.innerHTML = '';
     el.querySelectorAll('[data-quick-id]').forEach(btn => {
       btn.addEventListener('click', e => {
         e.stopPropagation();
