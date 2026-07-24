@@ -2,12 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<!-- CRITICAL: Apply saved theme before CSS parses to prevent flash -->
+<!-- CRITICAL: Apply saved theme IMMEDIATELY before CSS or JS loads.
+     This is the only guaranteed way to prevent flash-of-wrong-theme on refresh.
+     localStorage is synchronous — no async gap, no race condition. -->
 <script>
 (function(){
   try {
     var t = localStorage.getItem('dami_theme');
-    if (t && t !== 'amethyst') document.documentElement.setAttribute('data-theme', t);
+    if (t && t !== 'amethyst') {
+      document.documentElement.setAttribute('data-theme', t);
+      // Stamp it so JS knows not to overwrite with default
+      document.documentElement.setAttribute('data-theme-locked', '1');
+    }
   } catch(e) {}
 })();
 </script>
@@ -11641,7 +11647,7 @@
 <script>
   // Single source of truth for the app version — referenced by the update checker
   // and anywhere else in the page that needs to know the running version.
-  const APP_VERSION = 'v116.4';
+  const APP_VERSION = 'v116.5';
 
   // ============================================================
   // ERROR VISIBILITY — catch errors that would otherwise vanish silently.
@@ -12968,12 +12974,23 @@
       if (state.defaultWatchSource !== 'jikan') state.defaultWatchSource = 'omdb';
 
       // Theme — load saved preference and apply to <html>
+      // Priority: IndexedDB (source of truth) → localStorage (set by head script) → default
       const themeResult = await db.get('theme');
       if (themeResult && themeResult.value) {
         state.theme = themeResult.value;
+        // Keep localStorage in sync with DB
         try { localStorage.setItem('dami_theme', themeResult.value); } catch(e) {}
       } else {
-        state.theme = 'amethyst'; // default
+        // IndexedDB empty — fall back to localStorage (set by the inline head script)
+        let lsFallback = null;
+        try { lsFallback = localStorage.getItem('dami_theme'); } catch(e) {}
+        if (lsFallback && lsFallback !== 'amethyst') {
+          state.theme = lsFallback;
+          // Backfill IndexedDB so next load is consistent
+          try { await db.set('theme', lsFallback); } catch(e) {}
+        } else {
+          state.theme = 'amethyst';
+        }
       }
       applyTheme(state.theme);
 
@@ -13204,9 +13221,19 @@
   function applyTheme(themeId) {
     const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
     if (theme.id === 'amethyst') {
-      document.documentElement.removeAttribute('data-theme');
+      // Only clear data-theme if localStorage also has no saved theme.
+      // If localStorage has a theme, the head script already set data-theme —
+      // don't wipe it just because IndexedDB returned a stale/empty result.
+      let lsTheme = null;
+      try { lsTheme = localStorage.getItem('dami_theme'); } catch(e) {}
+      if (!lsTheme || lsTheme === 'amethyst') {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      // Either way, keep state.theme correct
     } else {
       document.documentElement.setAttribute('data-theme', theme.id);
+      // Keep localStorage in sync
+      try { localStorage.setItem('dami_theme', theme.id); } catch(e) {}
     }
     state.theme = theme.id;
   }
@@ -27544,7 +27571,9 @@ Don't be sycophantic. Don't pad responses with filler. Be useful, then be cute.`
     renderGenreChips();
     updateLayoutToggleUI();
     updateSortToggleUI();
-    applyTheme(state.theme || 'amethyst'); // re-apply after pull in case state changed
+    // Re-apply theme after pull — use localStorage as the tiebreaker if state.theme is missing
+    const themeToApply = state.theme || (() => { try { return localStorage.getItem('dami_theme'); } catch(e) { return null; } })() || 'amethyst';
+    applyTheme(themeToApply);
     render();
     document.getElementById('loadingOverlay').classList.add('hidden');
 
